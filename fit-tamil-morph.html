@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Bodiodi – Fit Tamil Variable (slow peach-white morph)</title>
+  <title>Bodiodi – Cohesive CSS-only breathing mark</title>
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <style>
     html, body {
@@ -10,56 +10,98 @@
       margin: 0;
       display: grid;
       place-items: center;
-      background: transparent; /* transparent for Google Sites */
+      background: transparent;
+      overflow: hidden;
     }
 
+    /* --- COLOR DNA --- */
+    :root {
+      --bodiodi-peach: #fff5f0;                /* warm near-white peach */
+      --bodiodi-glow: rgba(255, 245, 240, 0.6);
+    }
+
+    /* --- CONTAINER --- */
+    .brand {
+      position: relative;
+      display: grid;
+      place-items: center;
+      isolation: isolate;                     /* keeps text above circles */
+    }
+
+    /* --- THREE CIRCLES --- */
+    .circles {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(2rem, 8vw, 6rem);
+      opacity: 0.3;
+    }
+
+    .circles span {
+      width: clamp(40px, 10vw, 120px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--bodiodi-peach);
+      box-shadow:
+        0 0 12px var(--bodiodi-glow),
+        0 0 30px rgba(255,230,215,0.25);
+      animation: breathe 7.2s ease-in-out infinite;
+    }
+
+    /* Slight delay between circles for a wave effect */
+    .circles span:nth-child(2) { animation-delay: 1.2s; }
+    .circles span:nth-child(3) { animation-delay: 2.4s; }
+
+    /* --- TEXT --- */
     .word {
       font-family: "fit-tamil-variable", sans-serif;
       font-style: normal;
       font-size: clamp(2.5rem, 12vw, 16rem);
       line-height: 0.9;
-
-      /* ultra-light peach white */
-      color: #fff5f0;
-
-      /* soft glow for subtle presence */
-      text-shadow:
-        0 0 6px rgba(255, 245, 240, 0.7),
-        0 0 12px rgba(255, 230, 215, 0.3);
-
+      color: var(--bodiodi-peach);
+      text-align: center;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
-      will-change: font-variation-settings;
+      animation: breatheWord 7.2s ease-in-out infinite;
+      will-change: transform, filter;
+      filter: drop-shadow(0 0 10px var(--bodiodi-glow));
+    }
+
+    /* --- ANIMATIONS --- */
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(0.9);
+        opacity: 0.3;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes breatheWord {
+      0%, 100% {
+        transform: scaleX(0.95);
+        letter-spacing: -0.01em;
+      }
+      50% {
+        transform: scaleX(1.05);
+        letter-spacing: 0.03em;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="word">BODIODI</div>
-  <script>
-    const el = document.querySelector('.word');
-
-    // --- Tunables ---
-    const MIN = 140;       // compressed bound
-    const MAX = 460;       // expanded bound
-    const PERIOD = 7200;   // ms for a full cycle (7.2 seconds) → slower & smoother
-    // ---------------
-
-    const MID  = (MIN + MAX) / 2;
-    const AMP  = (MAX - MIN) / 2;
-    const TAU  = Math.PI * 2;
-    const t0   = performance.now();
-
-    // continuous sinusoidal morph (no blink)
-    function frame(now) {
-      const phase = ((now - t0) % PERIOD) / PERIOD;
-      const wdth  = MID + AMP * Math.sin(phase * TAU);
-      el.style.fontVariationSettings = `"wdth" ${wdth.toFixed(1)}`;
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  </script>
+  <div class="brand">
+    <div class="circles">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="word">BODIODI</div>
+  </div>
 </body>
 </html>
+
 
 
 
