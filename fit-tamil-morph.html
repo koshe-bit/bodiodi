@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Bodiodi – Fit Tamil Variable (smooth morph)</title>
+  <title>Bodiodi – Fit Tamil Variable (smooth morph, peach-white)</title>
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <style>
     html, body {
@@ -10,17 +10,23 @@
       margin: 0;
       display: grid;
       place-items: center;
-      background: transparent;           /* keep transparent */
+      background: transparent; /* remains see-through for Google Sites */
     }
+
     .word {
       font-family: "fit-tamil-variable", sans-serif;
       font-style: normal;
       font-size: clamp(2.5rem, 12vw, 16rem);
       line-height: 0.9;
-      color: #111;                       /* reads on white Sites sections */
+
+      /* ultra-light peach white */
+      color: #fff5f0;
+
+      /* faint glow to improve legibility on mixed backgrounds */
       text-shadow:
-        0 0 1px rgba(255,255,255,.22),
-        0 0 2px rgba(255,255,255,.12);   /* subtle edge help on busy bgs */
+        0 0 6px rgba(255, 245, 240, 0.7),
+        0 0 12px rgba(255, 230, 215, 0.3);
+
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
       will-change: font-variation-settings;
@@ -33,9 +39,9 @@
     const el = document.querySelector('.word');
 
     // --- Tunables ---
-    const MIN = 140;   // tighter lower bound (less jagged than 100)
-    const MAX = 460;   // gentler upper bound (avoid extreme ultra-wide)
-    const PERIOD = 3800; // ms for a full expand→compress cycle (slower/smoother)
+    const MIN = 140;      // slightly compressed bound
+    const MAX = 460;      // expanded bound
+    const PERIOD = 3800;  // ms for one full cycle (slower/smoother)
     // ---------------
 
     const MID  = (MIN + MAX) / 2;
@@ -43,11 +49,10 @@
     const TAU  = Math.PI * 2;
     const t0   = performance.now();
 
-    // smooth, time-based sinusoid → no endpoint flips → no blink
+    // smooth sinusoidal morph — no blink, no grain
     function frame(now){
-      const phase = ((now - t0) % PERIOD) / PERIOD;     // 0..1
-      const wdth  = MID + AMP * Math.sin(phase * TAU);  // continuous
-      // one decimal to reduce raster noise without stepping
+      const phase = ((now - t0) % PERIOD) / PERIOD;
+      const wdth  = MID + AMP * Math.sin(phase * TAU);
       el.style.fontVariationSettings = `"wdth" ${wdth.toFixed(1)}`;
       requestAnimationFrame(frame);
     }
@@ -55,4 +60,5 @@
   </script>
 </body>
 </html>
+
 
