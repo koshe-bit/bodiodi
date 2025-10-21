@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Bodiodi – Fit Tamil Variable (smooth morph, peach-white)</title>
+  <title>Bodiodi – Fit Tamil Variable (slow peach-white morph)</title>
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <style>
     html, body {
@@ -10,7 +10,7 @@
       margin: 0;
       display: grid;
       place-items: center;
-      background: transparent; /* remains see-through for Google Sites */
+      background: transparent; /* transparent for Google Sites */
     }
 
     .word {
@@ -22,7 +22,7 @@
       /* ultra-light peach white */
       color: #fff5f0;
 
-      /* faint glow to improve legibility on mixed backgrounds */
+      /* soft glow for subtle presence */
       text-shadow:
         0 0 6px rgba(255, 245, 240, 0.7),
         0 0 12px rgba(255, 230, 215, 0.3);
@@ -39,9 +39,9 @@
     const el = document.querySelector('.word');
 
     // --- Tunables ---
-    const MIN = 140;      // slightly compressed bound
-    const MAX = 460;      // expanded bound
-    const PERIOD = 3800;  // ms for one full cycle (slower/smoother)
+    const MIN = 140;       // compressed bound
+    const MAX = 460;       // expanded bound
+    const PERIOD = 7200;   // ms for a full cycle (7.2 seconds) → slower & smoother
     // ---------------
 
     const MID  = (MIN + MAX) / 2;
@@ -49,8 +49,8 @@
     const TAU  = Math.PI * 2;
     const t0   = performance.now();
 
-    // smooth sinusoidal morph — no blink, no grain
-    function frame(now){
+    // continuous sinusoidal morph (no blink)
+    function frame(now) {
       const phase = ((now - t0) % PERIOD) / PERIOD;
       const wdth  = MID + AMP * Math.sin(phase * TAU);
       el.style.fontVariationSettings = `"wdth" ${wdth.toFixed(1)}`;
@@ -60,5 +60,6 @@
   </script>
 </body>
 </html>
+
 
 
