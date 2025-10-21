@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Bodiodi – Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: transparent;
+      display: grid;
+      place-items: center;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(255,230,215,0.25);
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <iframe id="signupForm"
+      src="https://docs.google.com/forms/d/e/1FAIpQLScfkXkmtMju_lhwAEuPkqzdBZNptDwJSZn-pwJvJlJyp85nNQ/viewform?embedded=true"
+      scrolling="no"></iframe>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('signupForm');
+    function resize() {
+      try {
+        const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const height = innerDoc.body.scrollHeight;
+        iframe.style.height = height + 'px';
+      } catch(e) {
+        iframe.style.height = '1800px'; // fallback static height
+      }
+    }
+    iframe.addEventListener('load', resize);
+    window.addEventListener('resize', resize);
+  </script>
+</body>
+</html>
