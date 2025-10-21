@@ -2,49 +2,57 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Bodiodi – Fit Tamil Variable (JS morph)</title>
-
-  <!-- Your Adobe Fonts kit (from your message) -->
+  <title>Bodiodi – Fit Tamil Variable (smooth morph)</title>
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
-
   <style>
     html, body {
       height: 100%;
       margin: 0;
       display: grid;
       place-items: center;
-      background: transparent; /* stays transparent inside Google Sites iframe */
+      background: transparent;           /* keep transparent */
     }
     .word {
       font-family: "fit-tamil-variable", sans-serif;
       font-style: normal;
       font-size: clamp(2.5rem, 12vw, 16rem);
       line-height: 0.9;
-      color: #ffffff; /* change if you want a different text color */
+      color: #111;                       /* reads on white Sites sections */
+      text-shadow:
+        0 0 1px rgba(255,255,255,.22),
+        0 0 2px rgba(255,255,255,.12);   /* subtle edge help on busy bgs */
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
+      will-change: font-variation-settings;
     }
   </style>
 </head>
 <body>
   <div class="word">BODIODI</div>
-
   <script>
-    // Smooth, reliable morph by animating the wdth axis directly.
     const el = document.querySelector('.word');
-    let wdth = 120;      // starting width
-    let dir  = 1;        // 1 expands, -1 compresses
-    const min = 100;     // tighten more by lowering this
-    const max = 500;     // expand more by raising this
-    const step = 4;      // speed (higher = faster)
 
-    function tick() {
-      wdth += dir * step;
-      if (wdth > max || wdth < min) dir *= -1;
-      el.style.fontVariationSettings = `"wdth" ${wdth}`;
-      requestAnimationFrame(tick);
+    // --- Tunables ---
+    const MIN = 140;   // tighter lower bound (less jagged than 100)
+    const MAX = 460;   // gentler upper bound (avoid extreme ultra-wide)
+    const PERIOD = 3800; // ms for a full expand→compress cycle (slower/smoother)
+    // ---------------
+
+    const MID  = (MIN + MAX) / 2;
+    const AMP  = (MAX - MIN) / 2;
+    const TAU  = Math.PI * 2;
+    const t0   = performance.now();
+
+    // smooth, time-based sinusoid → no endpoint flips → no blink
+    function frame(now){
+      const phase = ((now - t0) % PERIOD) / PERIOD;     // 0..1
+      const wdth  = MID + AMP * Math.sin(phase * TAU);  // continuous
+      // one decimal to reduce raster noise without stepping
+      el.style.fontVariationSettings = `"wdth" ${wdth.toFixed(1)}`;
+      requestAnimationFrame(frame);
     }
-    tick();
+    requestAnimationFrame(frame);
   </script>
 </body>
 </html>
+
