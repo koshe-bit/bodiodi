@@ -1,0 +1,195 @@
+/* ====== Bodiodi Global Styles ====== */
+:root{
+  /* Palette */
+  --bg: #fffaf8;                /* warm near-white */
+  --fg: #1d1d1d;                /* ink */
+  --peach: #f6e3da;             /* hero peach */
+  --peach-glow-1: rgba(246, 227, 218, .65);
+  --peach-glow-2: rgba(246, 227, 218, .35);
+  --sage: #839b85;              /* accent sage */
+  --sage-light: #9eb6a0;
+  --sage-dark: #6c8570;
+
+  /* Typography */
+  --font-logo: "fit-tamil-variable", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-head: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-body: "Krub", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+
+  /* Layout rhythm */
+  --container: min(1100px, 92vw);
+  --space-1: .5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+
+  /* Motion */
+  --cycle: 7.2s;
+}
+
+/* ====== Base ====== */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; padding: 0; }
+body{
+  color: var(--fg);
+  background: var(--bg);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ====== Containers ====== */
+.container{ width: var(--container); margin: 0 auto; padding: var(--space-6) 0; }
+.stack > * + *{ margin-top: var(--space-3); }
+.grid-2{ display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+@media (min-width: 900px){ .grid-2{ grid-template-columns: 1fr 1fr; } }
+
+/* ====== Hero ====== */
+.hero{
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 76vh;
+  padding: var(--space-6) var(--space-2);
+  background: 
+    radial-gradient(1200px 800px at 25% 10%, rgba(246,227,218,0.55) 0%, transparent 60%),
+    radial-gradient(900px 700px at 85% 0%, rgba(131,155,133,0.40) 0%, transparent 55%);
+  overflow: hidden;
+}
+.hero-inner{
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  isolation: isolate;
+}
+
+/* Circles behind the logo */
+.circles{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(2rem, 8vw, 6rem);
+  opacity: .32;
+  z-index: 0;
+}
+.circles span{
+  width: clamp(40px, 10vw, 120px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--peach);
+  box-shadow:
+    0 0 12px var(--peach-glow-1),
+    0 0 30px var(--peach-glow-2);
+  animation: breatheCircles var(--cycle) ease-in-out infinite;
+}
+.circles span:nth-child(2){ 
+  background: var(--sage);
+  animation-delay: 1.2s; 
+}
+.circles span:nth-child(3){ 
+  background: var(--sage-dark);
+  animation-delay: 2.4s; 
+}
+
+/* Logo (Fit Tamil Variable) */
+.logo{
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: var(--font-logo);
+  font-style: normal;
+  font-size: clamp(2.8rem, 11vw, 14rem);
+  line-height: .9;
+  color: var(--peach);
+  text-shadow:
+    0 0 6px var(--peach-glow-1),
+    0 0 12px var(--peach-glow-2);
+  animation: breatheText var(--cycle) ease-in-out infinite;
+}
+
+/* Eyebrow */
+.eyebrow{
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .7;
+}
+
+/* CTA buttons */
+.cta-row{ display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+.btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: .85rem 1.25rem; border-radius: 999px; text-decoration: none;
+  font-family: var(--font-head); font-weight: 600; letter-spacing: .01em;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.btn.primary{
+  color: #fff; background: var(--sage);
+  box-shadow: 0 8px 24px rgba(131,155,133,.4);
+}
+.btn.primary:hover{ 
+  background: var(--sage-dark); transform: translateY(-1px);
+}
+.btn.ghost{
+  color: var(--fg); background: rgba(0,0,0,.06);
+  backdrop-filter: blur(4px);
+}
+.btn.ghost:hover{ background: rgba(0,0,0,.08); }
+
+/* Headings & Body */
+.h2{
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4.8vw, 2.4rem);
+  letter-spacing: -.01em;
+  color: var(--sage-dark);
+}
+.h3{
+  margin: 0 0 .25rem;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 3.8vw, 1.5rem);
+  color: var(--sage-dark);
+}
+.body{
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: .01em;
+  color: #2d2d2d;
+}
+
+/* Footer */
+.footer{
+  display: grid; place-items: center;
+  padding: var(--space-4) var(--space-2);
+  opacity: .7; font-family: var(--font-body);
+}
+.small{ font-size: .9rem; margin: 0; }
+
+/* ====== Motion keyframes ====== */
+@keyframes breatheCircles{
+  0%,100%{ transform: scale(.9); opacity:.3; }
+  50%    { transform: scale(1.1); opacity:.6; }
+}
+
+/* Fit Tamil Variable font axes */
+@keyframes breatheText{
+  0%,100%{
+    font-variation-settings: "wdth" 140, "wght" 320;
+    letter-spacing: -0.01em;
+  }
+  50%{
+    font-variation-settings: "wdth" 460, "wght" 520;
+    letter-spacing: 0.03em;
+  }
+}
