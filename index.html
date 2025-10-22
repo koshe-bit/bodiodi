@@ -1,11 +1,177 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bodiodi</title>
-  <meta http-equiv="refresh" content="0; url=fit-tamil-morph.html" />
+
+  <!-- Fit Tamil Variable (Adobe Fonts kit) -->
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <!-- Inter + Krub -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Krub:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #fffaf8;
+      --fg: #1d1d1d;
+      --peach: #f6e3da;
+      --sage: #839b85;
+      --sage-dark:#6c8570;
+      --cycle: 7.2s;
+      --container: min(1100px,92vw);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{font-family:"Krub",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+    /* --- Nav --- */
+    .nav{
+      position:fixed; top:.75rem; right:.75rem; z-index:30;
+      font-family:"Inter",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    .nav a{color:#111;text-decoration:none;font-weight:600;opacity:.8}
+    .nav-desktop{display:none; gap:1rem; background:rgba(255,255,255,.6); backdrop-filter:blur(6px); border-radius:999px; padding:.5rem .75rem}
+    .burger{display:inline-flex; width:42px; height:42px; border-radius:9px; border:1px solid rgba(0,0,0,.08); background:rgba(255,255,255,.6); align-items:center; justify-content:center; cursor:pointer}
+    .burger span{display:block; width:18px; height:2px; background:#111; position:relative}
+    .burger span:before,.burger span:after{content:""; position:absolute; left:0; width:18px; height:2px; background:#111}
+    .burger span:before{top:-6px} .burger span:after{top:6px}
+    /* Drawer */
+    .drawer{position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:.2s; z-index:25}
+    .panel{position:absolute; top:0; right:-80%; width:78%; height:100%; background:#fff; padding:1.25rem; box-shadow:-24px 0 60px rgba(0,0,0,.15); transition:.25s; display:flex; flex-direction:column; gap:.5rem}
+    .panel a{color:#111; text-decoration:none; font-family:"Inter"; font-weight:600; padding:.75rem 0; border-bottom:1px solid rgba(0,0,0,.06)}
+    .drawer.open{opacity:1; pointer-events:auto}
+    .drawer.open .panel{right:0}
+
+    @media(min-width:980px){
+      .burger{display:none}
+      .nav-desktop{display:flex}
+      .drawer{display:none}
+    }
+
+    /* --- Hero --- */
+    .hero{
+      position:relative; min-height:86vh; display:grid; place-items:center; overflow:hidden;
+      background: center/cover no-repeat url('BG.png');
+    }
+    @media(max-width:700px){
+      .hero{ background-image: url('BGFlipped.png'); background-position:center; }
+    }
+
+    .hero-inner{ width:var(--container); margin:0 auto; padding:18vh 1rem 14vh; text-align:center; position:relative; }
+    .logo{
+      margin:0;
+      font-family:"fit-tamil-variable",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      font-style:normal;
+      font-size: clamp(2.8rem, 12vw, 16rem);
+      line-height:.9;
+      color:#ffffff;             /* white */
+      /* true variable axes, no glow */
+      animation: breatheText var(--cycle) ease-in-out infinite;
+    }
+
+    /* CTA block under logo */
+    .cta-wrap{ margin-top:2rem; display:grid; gap:1rem; justify-items:center; }
+    .cta-wrap h2{
+      margin:.5rem 0 0;
+      font-family:"Inter"; font-weight:700; letter-spacing:-.01em;
+      color:#111; font-size: clamp(1.4rem,4.2vw,2.2rem);
+    }
+    .cta-wrap p{
+      margin:.25rem 0 0; max-width:50ch; color:#2a2a2a;
+      font-size: clamp(1rem,2.9vw,1.125rem);
+    }
+    .btn-row{ display:flex; gap:.75rem; flex-wrap:wrap; justify-content:center; margin-top:1rem; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:.9rem 1.25rem; border-radius:999px; text-decoration:none;
+      font-family:"Inter"; font-weight:700; letter-spacing:.01em;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+      border:1px solid rgba(0,0,0,.08);
+      background:#fff; color:#111;
+    }
+    .btn:hover{ transform:translateY(-1px); }
+    .btn.primary{ background:var(--sage); color:#fff; border-color:transparent; }
+    .btn.primary:hover{ background:var(--sage-dark) }
+
+    /* Sections */
+    .container{ width:var(--container); margin:0 auto; padding:4rem 1rem; }
+
+    /* Footer */
+    .footer{ display:grid; place-items:center; padding:2rem 1rem; opacity:.7; font-size:.9rem }
+
+    /* Variable font animation */
+    @keyframes breatheText{
+      0%,100%{ font-variation-settings:"wdth" 140, "wght" 320; letter-spacing:-0.01em; }
+      50%    { font-variation-settings:"wdth" 460, "wght" 520; letter-spacing: 0.03em; }
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="fit-tamil-morph.html">Bodiodi animation</a>...</p>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-desktop">
+      <a href="schedule.html">Class Schedule</a>
+      <a href="signup.html">Sign up</a>
+      <a href="classes.html">Class Descriptions</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="burger" id="openMenu" aria-label="Open menu"><span></span></button>
+  </nav>
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="panel">
+      <a href="schedule.html">Class Schedule</a>
+      <a href="signup.html">Sign up</a>
+      <a href="classes.html">Class Descriptions</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#" id="closeMenu" style="margin-top:auto;color:#555">Close ✕</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1 class="logo">BODIODI</h1>
+
+      <div class="cta-wrap">
+        <h2>Secure your spot</h2>
+        <p>Small groups, big gains — spots go fast. Grab yours now.</p>
+        <div class="btn-row">
+          <a class="btn" href="schedule.html">Class Schedule</a>
+          <a class="btn primary" href="signup.html">Sign up</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- OPTIONAL CONTENT (about/contact placeholders) -->
+  <main>
+    <section id="about" class="container">
+      <h3 style="font-family:Inter;margin:0 0 .5rem 0;letter-spacing:-.01em">About</h3>
+      <p style="max-width:70ch;margin:0">Bodiodi blends functional strength and mindful mobility to help you move better in every dimension.</p>
+    </section>
+
+    <section id="contact" class="container">
+      <h3 style="font-family:Inter;margin:0 0 .5rem 0;letter-spacing:-.01em">Contact</h3>
+      <p style="margin:0">Questions? <a href="mailto:info@bodiodi.com">info@bodiodi.com</a></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    © <span id="y"></span> Bodiodi
+  </footer>
+
+  <script>
+    // year
+    document.getElementById('y').textContent = new Date().getFullYear();
+    // mobile menu
+    const drawer = document.getElementById('drawer');
+    document.getElementById('openMenu').onclick = () => { drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); };
+    document.getElementById('closeMenu').onclick = (e) => { e.preventDefault(); drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); };
+    drawer.addEventListener('click', (e)=>{ if(e.target===drawer){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }});
+  </script>
 </body>
 </html>
