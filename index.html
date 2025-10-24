@@ -47,13 +47,17 @@
     @media (max-width:740px){ .brand-logo{ height:38px } }
 
     /* Hero */
-    .hero{
-        position:relative;
-        background: top center / 120% auto no-repeat url('BG.png'); /* uses your BG.png; on GitHub it will load */
-        min-height:78vh;
-        display:flex; align-items:flex-end;
-        padding-top:84px;
-    }
+    .hero {
+  position: relative;
+  background: top center / cover no-repeat url('BG.png');
+  background-position: top center;
+  background-attachment: scroll;
+  min-height: 78vh;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 84px;
+}
+
     .hero-inner{ width:var(--container); margin:0 auto; padding:48px 12px 56px; position:relative; }
 
     /* Motion outline word — raised a bit more for extra breathing room */
@@ -158,7 +162,7 @@
     <div class="topbar">
         <div class="topbar-inner">
             <p class="brand">
-                <img src="Bodiodi Logo.svg" alt="Bodiodi" class="brand-logo">
+                <img src="BodiodiLogo.svg" alt="Bodiodi" class="brand-logo">
             </p>
             <nav class="navlinks">
                 <a href="#schedule">Schedule</a>
@@ -214,10 +218,19 @@
 
     <div class="rule" aria-hidden="true"></div>
 
-    <section class="section" id="about">
-        <h3>A MODERN MICRO STUDIO</h3>
-        <p>Yes, it’s technically a garage. And it’s also one of the best workouts you’ll find in 400 square feet. The studio is tucked inside a converted carriage house right here in Heritage Hill. Think small-scale, design-driven, and thoughtfully equipped — proper ventilation, soft Marmoleum flooring, and warm lighting that feels more boutique than basement. Some might call it unexpectedly elevated. Classes are small, scheduled, and intentionally personal — because this is training built for real people, not crowds.</p>
-    </section>
+    <section id="about" class="section">
+  <div class="hero-copy">
+    <h2>A MODERN MICRO STUDIO</h2>
+    <p>
+      Yes, it’s technically a garage. And it’s also one of the best workouts you’ll find
+      in 400 square feet. The studio is tucked inside a converted carriage house right here
+      in Heritage Hill. Think small-scale, design-driven, and thoughtfully equipped — proper
+      ventilation, soft Marmoleum flooring, and warm lighting that feels more boutique than
+      basement. Some might call it unexpectedly elevated. Classes are small, scheduled, and
+      intentionally personal — because this is training built for real people, not crowds.
+    </p>
+  </div>
+</section>
 
     <div class="strip" id="contact"></div>
 
