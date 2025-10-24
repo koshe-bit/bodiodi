@@ -27,7 +27,7 @@
       background:#fffaf8;
     }
 
-    /* Top nav */
+    /* Top nav (DESKTOP UNCHANGED) */
     .topbar{
       position:fixed; inset:0 0 auto 0; height:56px; z-index:50;
       display:flex; align-items:center; justify-content:center;
@@ -44,37 +44,32 @@
     .navlinks a{ text-decoration:none; color:#fff; opacity:.95; font-weight:700; }
     @media (max-width:740px){ .navlinks{ display:none } }
 
-    /* Hero */
-.hero{
-  position: relative;
+    /* Hero (DESKTOP UNCHANGED) */
+    .hero{
+      position: relative;
 
-  /* lock the image’s top edge to the top of the site */
-  background-image: url('BGFlipped.png');
-  background-repeat: no-repeat;
-  background-position: center -20px;
+      /* your current desktop hero background settings */
+      background-image: url('BGFlipped.png');
+      background-repeat: no-repeat;
+      background-position: center -20px;
+      background-size: 100% auto;
 
-  /* DESKTOP/TABLET: show the full image width, no top crop */
-  background-size: 100% auto;
-
-  min-height: 78vh;
-  display: flex;
-  align-items: flex-end;
-  padding-top: 84px;
-}
-
-/* PHONE: use cover so it still fills narrow screens nicely */
-@media (max-width: 900px){
-  .hero{
-    background-size: cover;       /* fill small screens */
-    background-position: top center;
-  }
-}
-
+      min-height: 78vh;
+      display: flex;
+      align-items: flex-end;
+      padding-top: 84px;
+    }
+    @media (max-width: 900px){
+      .hero{
+        background-size: cover;       /* fill small screens */
+        background-position: top center;
+      }
+    }
     .hero-inner{ width:var(--container); margin:0 auto; padding:48px 12px 56px; position:relative; }
 
-    /* Motion outline word — raised further for extra space above headline */
+    /* Motion outline (DESKTOP UNCHANGED) */
     .logo-outline{
-      position:absolute; inset:auto 0 440px 0;  /* was 310px */
+      position:absolute; inset:auto 0 440px 0;
       display:flex; justify-content:center;
       pointer-events:none; user-select:none; opacity:.65;
     }
@@ -116,11 +111,10 @@
     }
     .btn:hover{ transform:translateY(-1px); background:var(--dk85); color:#fff }
 
-    /* Find Your Formula panel */
+    /* Find Your Formula (DESKTOP UNCHANGED, taller) */
     .panel{ background:var(--dk); color:#fff; border-top:1px solid rgba(0,0,0,.2); border-bottom:1px solid rgba(0,0,0,.2); }
     .panel-inner{
       width:var(--container); margin:0 auto;
-      /* +2 inches on top & bottom for more breathing room */
       padding: calc(60px + 2in) 12px calc(64px + 2in);
       display:grid; grid-template-columns:1fr; gap:20px; align-items:start;
     }
@@ -143,27 +137,25 @@
 
     .rule{ height:1px; background:rgba(0,0,0,.18) }
 
-    /* Generic section defaults */
+    /* Generic section defaults (DESKTOP UNCHANGED) */
     .section{ width:var(--container); margin:0 auto; padding:28px 12px 46px }
     .section h3{ margin:0 0 10px 0; font-family:"Inter"; font-weight:800; letter-spacing:-.01em; color:var(--dk); font-size:clamp(26px,4.2vw,38px); line-height:1.02 }
     .section p{ margin:0; font-size:16px; line-height:1.6; max-width:78ch; color:var(--dk) }
 
-    /* Modern Micro Studio (ABOUT) — full-bleed BG; column aligns with hero */
+    /* Modern Micro Studio (DESKTOP UNCHANGED sizing + BG) */
     #about.section{
       width:100%;
       background: center 20px / cover no-repeat url('BG.png');
-      min-height:70vh;                 /* taller to show more background */
-      padding: calc(60px + 1.5in) 0;   /* more space top & bottom */
+      min-height:70vh;
+      padding: calc(60px + 1.5in) 0;
       border-radius:0;
     }
     #about .content-col{
-      /* same width/position feel as .hero-copy */
       width:min(780px, 92vw);
       margin:0 auto;
       padding:0 12px;
-      text-align:left;                  /* left-justified heading + paragraph */
+      text-align:left;
     }
-    /* Match panel H2 treatment, dk color */
     #about h2{
       margin:0 0 10px 0;
       font-family:"Inter";
@@ -175,7 +167,7 @@
     }
     #about p{
       margin:0;
-      font-size:15.5px;                /* mirror panel paragraph size for consistency */
+      font-size:15.5px;
       line-height:1.55;
       max-width:58ch;
       color:var(--dk);
@@ -183,14 +175,49 @@
 
     .strip{ height:44vh; background:#000; background-image:linear-gradient(to top, rgba(0,0,0,.4), rgba(0,0,0,.12)) }
 
-    /* Mobile drawer */
-    .drawer{
-      position:fixed; top:56px; right:12px; background:rgba(50,65,59,.92); color:#fff;
-      border-radius:12px; padding:12px 14px; display:none; z-index:60; min-width:220px;
-      box-shadow:0 10px 28px rgba(0,0,0,.28)
+    /* ===== MOBILE-ONLY FIXES (desktop untouched) ===== */
+    @media (max-width: 740px){
+
+      /* Outline word: keep as outline & move it UP so it doesn't overlap buttons */
+      .logo-outline{
+        position: absolute;
+        top: 10px;
+        left: 0; right: 0;
+        bottom: auto;
+        opacity: .60;
+      }
+      .logo-outline h1{
+        -webkit-text-stroke: 1px var(--accent);
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        font-size: clamp(56px, 28vw, 160px);
+        animation: breatheOutlineMobile var(--cycle) ease-in-out infinite;
+      }
+
+      /* Ensure hero fills nicely on phones */
+      .hero{
+        background-size: cover;
+        background-position: top center;
+        min-height: 72vh;
+      }
+
+      /* Show hamburger (inline style on the button sets display:none by default) */
+      .menu-btn{
+        display: inline-block !important;
+      }
+
+      /* Remove the visible divider line between sections on mobile */
+      .rule{
+        height: 0;
+        background: transparent;
+      }
+
+      /* Mobile-only line break: show <br class="only-mobile"> */
+      .only-mobile{ display: inline; }
     }
-    .drawer a{ display:block; color:#fff; text-decoration:none; padding:8px 6px }
-    @media (max-width:740px){ .navlinks{ display:none } .menu-btn{ display:inline-block } }
+
+    /* default hidden for mobile-only <br> */
+    .only-mobile{ display: none; }
 
     @media (prefers-reduced-motion: reduce){ .logo-outline h1{ animation:none } }
   </style>
@@ -260,7 +287,7 @@
 
   <section id="about" class="section">
     <div class="content-col">
-      <h2>A MODERN MICRO STUDIO</h2>
+      <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
       <p>
         Yes, it’s technically a garage. And it’s also one of the best workouts you’ll find
         in 400 square feet. The studio is tucked inside a converted carriage house right here
