@@ -45,14 +45,31 @@
     @media (max-width:740px){ .navlinks{ display:none } }
 
     /* Hero */
-    .hero{
-      position:relative;
-      /* Top edge of BG.png aligned to top of site */
-      background: top center / cover no-repeat url('BG.png');
-      min-height:78vh;
-      display:flex; align-items:flex-end;
-      padding-top:84px;
-    }
+.hero{
+  position: relative;
+
+  /* lock the image’s top edge to the top of the site */
+  background-image: url('BG.png');
+  background-repeat: no-repeat;
+  background-position: top center;
+
+  /* DESKTOP/TABLET: show the full image width, no top crop */
+  background-size: 100% auto;
+
+  min-height: 78vh;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 84px;
+}
+
+/* PHONE: use cover so it still fills narrow screens nicely */
+@media (max-width: 900px){
+  .hero{
+    background-size: cover;       /* fill small screens */
+    background-position: top center;
+  }
+}
+
     .hero-inner{ width:var(--container); margin:0 auto; padding:48px 12px 56px; position:relative; }
 
     /* Motion outline word — raised further for extra space above headline */
