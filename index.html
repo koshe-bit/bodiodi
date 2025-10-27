@@ -27,7 +27,9 @@
       background:#fffaf8;
     }
 
-    /* Top nav (DESKTOP UNCHANGED) */
+    /* ————————————————
+       TOPBAR (Desktop)
+       ———————————————— */
     .topbar{
       position:fixed; inset:0 0 auto 0; height:56px; z-index:50;
       display:flex; align-items:center; justify-content:center;
@@ -44,7 +46,9 @@
     .navlinks a{ text-decoration:none; color:#fff; opacity:.95; font-weight:700; }
     @media (max-width:740px){ .navlinks{ display:none } }
 
-    /* Mobile hamburger (icon) — hidden on desktop */
+    /* ————————————————
+       MOBILE HAMBURGER
+       ———————————————— */
     .menu-btn{
       display:none;
       margin-left:auto;
@@ -60,7 +64,6 @@
     .hamburger::before{ top:-7px }
     .hamburger::after{ top:7px }
 
-    /* Slide-out drawer */
     .drawer{
       position:fixed; top:56px; right:0; z-index:60;
       width:min(78vw, 320px);
@@ -74,30 +77,25 @@
     .drawer.open{ transform:translateX(0) }
     .drawer a{ display:block; color:#fff; text-decoration:none; padding:10px 6px; font-weight:700 }
 
-    /* Hero (DESKTOP UNCHANGED) */
+    /* ————————————————
+       HERO (Desktop)
+       ———————————————— */
     .hero{
       position: relative;
-
-      /* your current desktop hero background settings */
-      background-image: url('BGFlipped.png');
-      background-repeat: no-repeat;
-      background-position: center -20px;
-      background-size: 100% auto;
-
+      background: center -20px / 100% auto no-repeat url('BGFlipped.png');
       min-height: 78vh;
       display: flex;
       align-items: flex-end;
       padding-top: 84px;
     }
-    @media (max-width: 900px){
-      .hero{
-        background-size: cover;       /* fill small screens */
-        background-position: top center;
-      }
+    @media (max-width:900px){
+      .hero{ background-size: cover; background-position: top center; }
     }
     .hero-inner{ width:var(--container); margin:0 auto; padding:48px 12px 56px; position:relative; }
 
-    /* Motion outline (DESKTOP UNCHANGED) */
+    /* ————————————————
+       MOTION OUTLINE
+       ———————————————— */
     .logo-outline{
       position:absolute; inset:auto 0 440px 0;
       display:flex; justify-content:center;
@@ -106,150 +104,116 @@
     .logo-outline h1{
       margin:0; font-family:"fit-tamil-variable";
       font-size:clamp(80px,20vw,380px); line-height:.9;
-      color:transparent; -webkit-text-stroke:1.2px var(--accent); text-stroke:1.2px var(--accent);
-      letter-spacing:.03em; animation:breatheOutline var(--cycle) ease-in-out infinite; paint-order:stroke fill;
+      color:transparent; -webkit-text-stroke:1.2px var(--accent);
+      letter-spacing:.03em; animation:breatheOutline var(--cycle) ease-in-out infinite;
     }
     @keyframes breatheOutline{
       0%,100%{ font-variation-settings:"wdth"170,"wght"300; letter-spacing:.02em }
-      50%{    font-variation-settings:"wdth"410,"wght"370; letter-spacing:.05em }
-    }
-    @media (max-width:480px){
-      .logo-outline{ inset:auto 0 128px 0; opacity:.55 }
-      .logo-outline h1{
-        -webkit-text-stroke:.9px var(--accent);
-        font-size:clamp(56px,28vw,160px);
-        animation:breatheOutlineMobile var(--cycle) ease-in-out infinite;
-      }
-      @keyframes breatheOutlineMobile{
-        0%,100%{ font-variation-settings:"wdth"180,"wght"290; letter-spacing:.02em }
-        50%{    font-variation-settings:"wdth"380,"wght"350; letter-spacing:.055em }
-      }
+      50%{ font-variation-settings:"wdth"410,"wght"370; letter-spacing:.05em }
     }
 
+    /* ————————————————
+       HERO COPY
+       ———————————————— */
     .hero-copy{ position:relative; z-index:2; max-width:780px; }
     .h1{
       margin:0 0 6px 0; font-family:"Inter"; font-weight:800; letter-spacing:-.01em;
       color:var(--dk); font-size:clamp(28px,5vw,54px); line-height:1.02;
     }
-    .sub{ margin:0 0 18px 0; font-family:"Krub"; font-size:clamp(15px,2.6vw,18px); color:var(--dk); letter-spacing:.01em; opacity:.95 }
+    .sub{ margin:0 0 18px 0; font-family:"Krub"; font-size:clamp(15px,2.6vw,18px); color:var(--dk); opacity:.95 }
     .btn-row{ display:flex; gap:12px; flex-wrap:wrap; }
     .btn{
-      display:inline-flex; align-items:center; justify-content:center; padding:12px 18px; border-radius:999px;
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 18px; border-radius:999px;
       text-decoration:none; font-family:"Inter"; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
       border:2px solid var(--dk85); color:var(--dk85); background:transparent;
-      transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+      transition: transform .18s ease, background .18s ease, color .18s ease;
     }
     .btn:hover{ transform:translateY(-1px); background:var(--dk85); color:#fff }
 
-    /* Find Your Formula (DESKTOP UNCHANGED, taller) */
-    .panel{ background:var(--dk); color:#fff; border-top:1px solid rgba(0,0,0,.2); border-bottom:1px solid rgba(0,0,0,.2); }
+    /* ————————————————
+       FIND YOUR FORMULA
+       ———————————————— */
+    .panel{
+      background:var(--dk); color:#fff;
+      border-top:1px solid rgba(0,0,0,.2);
+      border-bottom:1px solid rgba(0,0,0,.2);
+    }
     .panel-inner{
       width:var(--container); margin:0 auto;
       padding: calc(60px + 2in) 12px calc(64px + 2in);
-      display:grid; grid-template-columns:1fr; gap:20px; align-items:start;
+      display:grid; grid-template-columns:1fr; gap:20px;
     }
     @media (min-width:900px){
       .panel-inner{ grid-template-columns:1fr 1.1fr; gap:40px }
     }
-    .figure{ display:none }
-    @media (min-width:900px){
-      .figure{ display:block; position:relative; height:260px }
-      .sqL{ position:absolute; width:168px; height:168px; left:36px; top:8px; background:var(--accent); opacity:.95 }
-      .sqS{ position:absolute; width:76px; height:76px; left:230px; top:150px; background:var(--accent); opacity:.95 }
-      .sqO{ position:absolute; width:208px; height:208px; left:6px; top:48px; border:1.6px solid rgba(255,255,255,.52); background:transparent }
-    }
     .panel h2{
-      margin:0 0 8px 0; font-family:"Inter"; font-weight:800; letter-spacing:-.01em;
+      margin:0 0 8px 0; font-family:"Inter"; font-weight:800;
       color:var(--accent); font-size:clamp(26px,4.2vw,38px); line-height:1.02;
     }
     .panel p{ margin:0; font-size:15.5px; line-height:1.55; max-width:58ch; color:var(--accent) }
-    .panel a.link{ color:#fff; text-decoration:underline; text-underline-offset:3px }
 
-    .rule{ height:1px; background:rgba(0,0,0,.18) }
+    .rule{ height:1px; background:rgba(0,0,0,.18); }
 
-    /* Generic section defaults (DESKTOP UNCHANGED) */
-    .section{ width:var(--container); margin:0 auto; padding:28px 12px 46px }
-    .section h3{ margin:0 0 10px 0; font-family:"Inter"; font-weight:800; letter-spacing:-.01em; color:var(--dk); font-size:clamp(26px,4.2vw,38px); line-height:1.02 }
-    .section p{ margin:0; font-size:16px; line-height:1.6; max-width:78ch; color:var(--dk) }
-
-    /* Modern Micro Studio (DESKTOP UNCHANGED sizing + BG) */
+    /* ————————————————
+       MODERN MICRO STUDIO
+       ———————————————— */
     #about.section{
       width:100%;
       background: center 20px / cover no-repeat url('BG.png');
       min-height:70vh;
       padding: calc(60px + 1.5in) 0;
-      border-radius:0;
     }
     #about .content-col{
-      width:min(780px, 92vw);
-      margin:0 auto;
-      padding:0 12px;
-      text-align:left;
+      width:min(780px, 92vw); margin:0 auto; padding:0 12px; text-align:left;
     }
     #about h2{
-      margin:0 0 10px 0;
-      font-family:"Inter";
-      font-weight:800;
-      letter-spacing:-.01em;
-      font-size:clamp(26px,4.2vw,38px);
-      line-height:1.02;
-      color:var(--dk);
+      margin:0 0 10px 0; font-family:"Inter"; font-weight:800; letter-spacing:-.01em;
+      font-size:clamp(26px,4.2vw,38px); color:var(--dk);
     }
-    #about p{
-      margin:0;
-      font-size:15.5px;
-      line-height:1.55;
-      max-width:58ch;
-      color:var(--dk);
-    }
+    #about p{ margin:0; font-size:15.5px; line-height:1.55; max-width:58ch; color:var(--dk); }
 
     .strip{ height:44vh; background:#000; background-image:linear-gradient(to top, rgba(0,0,0,.4), rgba(0,0,0,.12)) }
 
-    /* ===== MOBILE-ONLY FIXES (desktop untouched) ===== */
-    @media (max-width: 740px){
+    /* ————————————————
+       MOBILE (<=740px)
+       ———————————————— */
+    @media (max-width:740px){
 
-      /* Show hamburger button on mobile */
-      .menu-btn{ display:inline-flex }
+      .menu-btn{ display:inline-flex; }
 
-      /* Outline word: keep as outline & move it UP so it doesn't overlap buttons */
+      /* Move motion text up higher */
       .logo-outline{
         position:absolute;
-        top: 6px;            /* higher so it never hits the heading/buttons */
-        left:0; right:0;
-        bottom:auto;
+        top:-90px;  /* raised toward top of viewport */
+        left:0; right:0; bottom:auto;
         opacity:.60;
       }
       .logo-outline h1{
-        -webkit-text-stroke: 1px var(--accent);
-        -webkit-text-fill-color: transparent;
-        color: transparent;
-        font-size: clamp(52px, 26vw, 140px);  /* slightly smaller max for safer spacing */
-        animation: breatheOutlineMobile var(--cycle) ease-in-out infinite;
+        -webkit-text-stroke:1px var(--accent);
+        -webkit-text-fill-color:transparent;
+        color:transparent;
+        font-size:clamp(52px,26vw,140px);
+        animation:breatheOutline var(--cycle) ease-in-out infinite;
       }
 
-      /* Ensure hero fills nicely on phones */
-      .hero{
-        background-size: cover;
-        background-position: top center;
-        min-height: 72vh;
-      }
+      /* Hero adjustments for mobile */
+      .hero{ background-size:cover; background-position:top center; min-height:72vh; }
 
-      /* Remove the visible divider gap on mobile */
-      .rule{
-        display:none;       /* hide the divider entirely */
-      }
-      .panel{
-        border-bottom:none; /* also remove panel bottom border so sections touch */
-      }
+      /* Remove divider + merge Formula and Micro blocks */
+      .rule{ display:none; }
+      .panel{ border-bottom:none; }
+      .panel-inner{ padding-bottom:0; }
+      #about.section{ margin-top:0; padding-top:0; }
 
-      /* Mobile-only line break: show <br class="only-mobile"> */
-      .only-mobile{ display:inline }
+      /* Line break visibility */
+      .only-mobile{ display:inline; }
     }
 
-    /* default hidden for mobile-only <br> */
-    .only-mobile{ display:none }
+    /* default: hidden mobile-only <br> */
+    .only-mobile{ display:none; }
 
-    @media (prefers-reduced-motion: reduce){ .logo-outline h1{ animation:none } }
+    @media (prefers-reduced-motion:reduce){ .logo-outline h1{ animation:none } }
   </style>
 </head>
 <body>
@@ -268,7 +232,6 @@
         <a href="#contact">Contact</a>
       </nav>
 
-      <!-- mobile hamburger -->
       <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
         <span class="hamburger" aria-hidden="true"></span>
       </button>
@@ -285,9 +248,7 @@
 
   <header class="hero">
     <div class="hero-inner">
-      <div class="logo-outline" aria-hidden="true">
-        <h1>BODIODI</h1>
-      </div>
+      <div class="logo-outline" aria-hidden="true"><h1>BODIODI</h1></div>
       <div class="hero-copy">
         <h2 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h2>
         <p class="sub">Spots go fast. Grab yours now.</p>
@@ -302,9 +263,7 @@
   <section class="panel" id="classes">
     <div class="panel-inner">
       <div class="figure" aria-hidden="true">
-        <div class="sqO"></div>
-        <div class="sqL"></div>
-        <div class="sqS"></div>
+        <div class="sqO"></div><div class="sqL"></div><div class="sqS"></div>
       </div>
       <div>
         <h2>FIND YOUR FORMULA</h2>
@@ -341,15 +300,11 @@
       const btn = document.getElementById('menuBtn');
       const drawer = document.getElementById('drawer');
       if(!btn || !drawer) return;
-
-      // slide-in open/close
       btn.addEventListener('click', () => {
         const opened = drawer.classList.toggle('open');
         btn.setAttribute('aria-expanded', String(opened));
         drawer.setAttribute('aria-hidden', String(!opened));
       });
-
-      // click outside to close
       document.addEventListener('click', (e) => {
         if(!drawer.classList.contains('open')) return;
         const within = drawer.contains(e.target) || btn.contains(e.target);
