@@ -44,6 +44,36 @@
     .navlinks a{ text-decoration:none; color:#fff; opacity:.95; font-weight:700; }
     @media (max-width:740px){ .navlinks{ display:none } }
 
+    /* Mobile hamburger (icon) — hidden on desktop */
+    .menu-btn{
+      display:none;
+      margin-left:auto;
+      align-items:center; justify-content:center;
+      width:40px; height:40px;
+      background:transparent; border:0; padding:0; cursor:pointer;
+    }
+    .hamburger{ position:relative; width:22px; height:2px; background:#fff; border-radius:2px; }
+    .hamburger::before,
+    .hamburger::after{
+      content:""; position:absolute; left:0; width:22px; height:2px; background:#fff; border-radius:2px;
+    }
+    .hamburger::before{ top:-7px }
+    .hamburger::after{ top:7px }
+
+    /* Slide-out drawer */
+    .drawer{
+      position:fixed; top:56px; right:0; z-index:60;
+      width:min(78vw, 320px);
+      background:rgba(50,65,59,.97); color:#fff;
+      border-radius:12px 0 0 12px;
+      padding:12px 14px;
+      box-shadow:0 10px 28px rgba(0,0,0,.28);
+      transform:translateX(105%);
+      transition:transform .22s ease;
+    }
+    .drawer.open{ transform:translateX(0) }
+    .drawer a{ display:block; color:#fff; text-decoration:none; padding:10px 6px; font-weight:700 }
+
     /* Hero (DESKTOP UNCHANGED) */
     .hero{
       position: relative;
@@ -178,19 +208,22 @@
     /* ===== MOBILE-ONLY FIXES (desktop untouched) ===== */
     @media (max-width: 740px){
 
+      /* Show hamburger button on mobile */
+      .menu-btn{ display:inline-flex }
+
       /* Outline word: keep as outline & move it UP so it doesn't overlap buttons */
       .logo-outline{
-        position: absolute;
-        top: 10px;
-        left: 0; right: 0;
-        bottom: auto;
-        opacity: .60;
+        position:absolute;
+        top: 6px;            /* higher so it never hits the heading/buttons */
+        left:0; right:0;
+        bottom:auto;
+        opacity:.60;
       }
       .logo-outline h1{
         -webkit-text-stroke: 1px var(--accent);
         -webkit-text-fill-color: transparent;
         color: transparent;
-        font-size: clamp(56px, 28vw, 160px);
+        font-size: clamp(52px, 26vw, 140px);  /* slightly smaller max for safer spacing */
         animation: breatheOutlineMobile var(--cycle) ease-in-out infinite;
       }
 
@@ -201,23 +234,20 @@
         min-height: 72vh;
       }
 
-      /* Show hamburger (inline style on the button sets display:none by default) */
-      .menu-btn{
-        display: inline-block !important;
-      }
-
-      /* Remove the visible divider line between sections on mobile */
+      /* Remove the visible divider gap on mobile */
       .rule{
-        height: 0;
-        background: transparent;
+        display:none;       /* hide the divider entirely */
+      }
+      .panel{
+        border-bottom:none; /* also remove panel bottom border so sections touch */
       }
 
       /* Mobile-only line break: show <br class="only-mobile"> */
-      .only-mobile{ display: inline; }
+      .only-mobile{ display:inline }
     }
 
     /* default hidden for mobile-only <br> */
-    .only-mobile{ display: none; }
+    .only-mobile{ display:none }
 
     @media (prefers-reduced-motion: reduce){ .logo-outline h1{ animation:none } }
   </style>
@@ -229,6 +259,7 @@
       <p class="brand">
         <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
       </p>
+
       <nav class="navlinks">
         <a href="#schedule">Schedule</a>
         <a href="#reserve">Reserve</a>
@@ -236,17 +267,21 @@
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
-      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer" style="display:none;color:#fff;background:transparent;border:0;font-weight:700;">Menu ▾</button>
+
+      <!-- mobile hamburger -->
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
 
-  <div id="drawer" class="drawer" aria-hidden="true">
+  <nav id="drawer" class="drawer" aria-hidden="true">
     <a href="#schedule">Schedule</a>
     <a href="#reserve">Reserve</a>
     <a href="#classes">Classes</a>
     <a href="#about">About</a>
     <a href="#contact">Contact</a>
-  </div>
+  </nav>
 
   <header class="hero">
     <div class="hero-inner">
@@ -307,18 +342,19 @@
       const drawer = document.getElementById('drawer');
       if(!btn || !drawer) return;
 
+      // slide-in open/close
       btn.addEventListener('click', () => {
-        const open = drawer.style.display === 'block';
-        drawer.style.display = open ? 'none' : 'block';
-        btn.setAttribute('aria-expanded', String(!open));
-        drawer.setAttribute('aria-hidden', String(open));
+        const opened = drawer.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(opened));
+        drawer.setAttribute('aria-hidden', String(!opened));
       });
 
+      // click outside to close
       document.addEventListener('click', (e) => {
-        if(!drawer || !btn) return;
+        if(!drawer.classList.contains('open')) return;
         const within = drawer.contains(e.target) || btn.contains(e.target);
-        if(!within && drawer.style.display === 'block'){
-          drawer.style.display = 'none';
+        if(!within){
+          drawer.classList.remove('open');
           btn.setAttribute('aria-expanded','false');
           drawer.setAttribute('aria-hidden','true');
         }
