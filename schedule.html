@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bodiodi — Schedule</title>
+
+  <!-- Your existing fonts (keep what you used on the homepage) -->
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Page styles -->
+  <link rel="stylesheet" href="assets/schedule.css">
+</head>
+<body class="ink">
+  <!-- Fixed nav matching your homepage -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/">Bodiodi</a>
+      <nav class="nav-links">
+        <a href="/schedule.html" class="active">Schedule</a>
+        <a href="/classes.html">Classes</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/about.html">About</a>
+      </nav>
+
+      <!-- mobile hamburger -->
+      <details class="burger">
+        <summary>☰</summary>
+        <div class="drawer">
+          <a href="/schedule.html" class="active">Schedule</a>
+          <a href="/classes.html">Classes</a>
+          <a href="/pricing.html">Pricing</a>
+          <a href="/about.html">About</a>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <!-- Gradient backdrop to match home -->
+  <div class="page-bg"></div>
+
+  <main class="wrap">
+    <div class="pagehead">
+      <h1>Schedule</h1>
+      <div id="week-range" class="muted"></div>
+      <div class="controls">
+        <div class="seg">
+          <button id="btn-day" class="seg-btn active">Day</button>
+          <button id="btn-week" class="seg-btn">Week</button>
+        </div>
+        <div class="navbtns">
+          <button id="btn-prev" class="btn">← Prev</button>
+          <button id="btn-today" class="btn">This week</button>
+          <button id="btn-next" class="btn">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day view -->
+    <section id="day-view" class="day-view"></section>
+
+    <!-- Week view -->
+    <section id="week-view" class="week-view">
+      <div class="week-grid" id="week-grid">
+        <!-- JS will inject column headers + hour rows + event blocks -->
+      </div>
+      <div id="status" class="status"></div>
+    </section>
+
+    <footer class="footnote">
+      <p class="muted">
+        Tip: In each Google Calendar event <em>Description</em>, add lines like <strong>Instructor: Name</strong>,
+        <strong>Difficulty: All Levels</strong>, and (optionally) put a booking URL on its own line. We’ll parse them automatically.
+      </p>
+      <p class="muted small">
+        Public Calendar (embed):
+        <a target="_blank" rel="noreferrer" href="https://calendar.google.com/calendar/embed?src=104b8c581baad0960307efc991a3296289a2ed2d6abfd193aae1b103eecd0819%40group.calendar.google.com&ctz=America%2FDetroit">open</a>
+        • iCal:
+        <a target="_blank" rel="noreferrer" href="https://calendar.google.com/calendar/ical/104b8c581baad0960307efc991a3296289a2ed2d6abfd193aae1b103eecd0819%40group.calendar.google.com/public/basic.ics">open</a>
+      </p>
+    </footer>
+  </main>
+
+  <script type="module" src="assets/schedule.js"></script>
+</body>
+</html>
