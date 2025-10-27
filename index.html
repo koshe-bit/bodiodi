@@ -195,51 +195,52 @@
     .only-mobile{ display:none }
 
     /* ===== MOBILE-ONLY (phones ≤ 740px) ===== */
-    @media (max-width: 740px){
+@media (max-width: 740px){
 
-      /* Show hamburger; hide desktop links */
-      .menu-btn{ display:inline-flex }
-      .navlinks{ display:none }
+  /* Show hamburger; hide desktop links */
+  .menu-btn{ display:inline-flex }
+  .navlinks{ display:none }
 
-      /* Move Bodiodi motion text higher & force outline (no fill) */
-      .logo-outline{
-        position:absolute;
-        top:-140px;        /* higher so it never hits the headline/buttons */
-        left:0; right:0;
-        bottom:auto;
-        opacity:.60;
-      }
-      .logo-outline h1{
-        -webkit-text-stroke: 1px var(--accent);
-        -webkit-text-fill-color: transparent;
-        color: transparent;
-        font-size: clamp(48px, 24vw, 120px);
-        animation: breatheOutlineMobile var(--cycle) ease-in-out infinite;
-      }
-      @keyframes breatheOutlineMobile{
-        0%,100%{ font-variation-settings:"wdth"180,"wght"290; letter-spacing:.02em }
-        50%{    font-variation-settings:"wdth"380,"wght"350; letter-spacing:.055em }
-      }
+  /* Adjust Bodiodi motion outline text (lower than before) */
+  .logo-outline{
+    position:absolute;
+    top:-60px;           /* lowered back into visible area */
+    left:0; right:0;
+    bottom:auto;
+    opacity:.60;
+  }
+  .logo-outline h1{
+    -webkit-text-stroke: 1px var(--accent);
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-size: clamp(52px, 26vw, 140px);
+    animation: breatheOutlineMobile var(--cycle) ease-in-out infinite;
+  }
+  @keyframes breatheOutlineMobile{
+    0%,100%{ font-variation-settings:"wdth"180,"wght"290; letter-spacing:.02em }
+    50%{    font-variation-settings:"wdth"380,"wght"350; letter-spacing:.055em }
+  }
 
-      /* Give a bit more top padding to the hero content on phones */
-      .hero-inner{ padding-top:108px; }
+  /* Keep normal hero layout but slightly more breathing room */
+  .hero-inner{ padding-top:96px; }
 
-      /* Ensure hero fills nicely on phones */
-      .hero{
-        background-size: cover;
-        background-position: top center;
-        min-height: 72vh;
-      }
+  /* Ensure hero fills nicely on phones */
+  .hero{
+    background-size: cover;
+    background-position: top center;
+    min-height: 72vh;
+  }
 
-      /* Remove any visible gap between Formula and Micro blocks */
-      .rule{ display:none; height:0; background:transparent; }
-      .panel{ border-bottom:none; margin-bottom:-1px; }  /* 1px overlap kills iOS seam */
-      .panel-inner{ padding-bottom:8px; }
-      #about.section{ padding-top:0; margin-top:-1px; }
+  /* Remove visible gap between Formula and Micro BACKGROUNDS only */
+  .rule{ display:none; height:0; background:transparent; }
+  .panel{ border-bottom:none; margin-bottom:-2px; }   /* slight overlap of backgrounds */
+  .panel-inner{ padding-bottom:48px; }                /* restore text spacing inside panel */
+  #about.section{ padding-top:48px; margin-top:-2px; } /* overlap backgrounds, keep text normal */
 
-      /* Mobile-only line break in the “Modern Micro” heading */
-      .only-mobile{ display:inline }
-    }
+  /* Mobile-only line break in the “Modern Micro” heading */
+  .only-mobile{ display:inline }
+}
+
 
     @media (prefers-reduced-motion: reduce){ .logo-outline h1{ animation:none } }
   </style>
