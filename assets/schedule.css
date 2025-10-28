@@ -40,12 +40,6 @@
 }
 .seg-btn.active{ background:#fff; opacity:1 }
 
-.btn{
-  padding:8px 12px; border-radius:12px;
-  border:1px solid var(--ring, rgba(0,0,0,.08));
-  background:#fff;
-}
-
 /* ── Week grid ─────────────────────────────────────────────── */
 
 .week-grid{
