@@ -1,7 +1,7 @@
 // ======= CONFIG =======
 const CALENDAR_ID =
   "104b8c581baad0960307efc991a3296289a2ed2d6abfd193aae1b103eecd0819@group.calendar.google.com";
-const API_KEY = "YOUR_GOOGLE_API_KEY"; // Restrict to your domain in Google Cloud
+const API_KEY = "AIzaSyCrEWVrSotulVDC50Ta7-JU1_I4wLVa9rw"; // Restrict to your domain in Google Cloud
 
 // Optional: title fragment → booking URL mapping (fallback if no URL in description)
 const BOOKING_LINKS = {
