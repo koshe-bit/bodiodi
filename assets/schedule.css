@@ -25,30 +25,6 @@ body.ink{color:var(--ink);font-family:var(--font2);}
 
 .wrap{max-width:1120px;margin:0 auto;padding:96px 16px 48px}
 
-.nav{
-  position:sticky; top:0; z-index:30;
-  backdrop-filter:saturate(1.2) blur(6px);
-  background:rgba(255,255,255,.6);
-  border-bottom:1px solid var(--ring);
-}
-.nav-inner{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{
-  display:inline-block; padding:6px 12px; border-radius:999px;
-  background:var(--pill); border:var(--ring-border); font:600 14px/1 var(--font1); color:var(--ink); text-decoration:none;
-}
-.nav-links{display:none;gap:24px}
-.nav-links a{font:500 14px/1 var(--font2); color:var(--ink); text-decoration:none; opacity:.85}
-.nav-links a:hover{opacity:1}
-.nav-links a.active{opacity:1; text-decoration:underline; text-underline-offset:3px}
-@media(min-width:768px){.nav-links{display:flex}}
-.burger summary{
-  list-style:none; cursor:pointer; user-select:none;
-  padding:8px 12px; border-radius:12px; background:white; border:1px solid var(--ring); box-shadow:var(--shadow);
-}
-.burger[open] .drawer{
-  margin-top:8px; padding:12px; background:white; border:1px solid var(--ring);
-  border-radius:12px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px;
-}
 @media(min-width:768px){.burger{display:none}}
 
 .pagehead h1{font:800 28px/1.2 var(--font1); margin:0 0 6px}
