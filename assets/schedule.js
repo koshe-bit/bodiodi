@@ -10,6 +10,19 @@ const BOOKING_LINKS = {
   tonnix: "https://bodiodi.com/signup",
   rhythmix: "https://bodiodi.com/signup",
 };
+const ALLOWED_DOMAINS = [
+  "bodiodi.com",
+  "www.bodiodi.com",
+  "koshe-bit.github.io"
+];
+function isAllowedUrl(urlString) {
+  try {
+    const u = new URL(urlString);
+    return ALLOWED_DOMAINS.includes(u.hostname);
+  } catch {
+    return false;
+  }
+}
 
 // ======= HELPERS =======
 const $ = (sel) => document.querySelector(sel);
