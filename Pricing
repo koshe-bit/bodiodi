@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bodiodi — Pricing</title>
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Global styles -->
+  <link rel="stylesheet" href="assets/global.css?v=6">
+</head>
+
+<body class="simple-page">
+
+  <!-- Topbar (same as other pages) -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
+
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+        <a href="https://bodiodi.com/signup.html">Reserve</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
+      </nav>
+
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Reserve</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+  </nav>
+
+  <!-- Page content -->
+  <main class="simple-main">
+    <h1>Pricing</h1>
+
+    <div class="grid">
+      <article class="card">
+        <h2>First-Time Free Trial</h2>
+        <p>1 Class</p>
+      </article>
+
+      <article class="card">
+        <h2>Single Class Drop-In</h2>
+        <p>$7</p>
+      </article>
+
+      <article class="card">
+        <h2>Punchcard</h2>
+        <p>10 Classes for $40</p>
+      </article>
+
+      <article class="card">
+        <h2>Monthly Unlimited</h2>
+        <p>$50</p>
+      </article>
+    </div>
+
+    <h2 style="margin-top:36px;">Ways to Pay</h2>
+    <p>To reserve your spot, follow the link and complete the short form. You’ll choose the option that fits best — drop-in, punchcard, or monthly unlimited. After you submit, you’ll get the Venmo details to complete payment.</p>
+    <p>Venmo is preferred. If that doesn’t work for you, text <strong>Nicole</strong> at <a href="tel:16164432011">616-443-2011</a> and we’ll set up another method.</p>
+
+    <div class="btn-row" style="margin-top:18px;">
+      <a class="btn" href="https://bodiodi.com/signup.html">Reserve a Class</a>
+    </div>
+
+    <p class="back-link" style="margin-top:48px;">
+      <a href="index.html">← Back</a>
+    </p>
+  </main>
+
+  <script src="assets/site.js?v=2"></script>
+</body>
+</html>
