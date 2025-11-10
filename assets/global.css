@@ -151,7 +151,7 @@ body{
 /* Modern Micro Studio (DESKTOP UNCHANGED sizing + BG) */
 #about.section{
   width:100%;
-  background: center 20px / cover no-repeat url('BG.png');
+  background: center 20px / cover no-repeat url('../BG.png');
   min-height:70vh;
   padding: calc(60px + 1.5in) 0;
   border-radius:0;
