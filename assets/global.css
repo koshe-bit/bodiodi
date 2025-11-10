@@ -267,3 +267,37 @@ p {
 
 /* Optional top spacing if you keep the fixed topbar on a page */
 body.with-topbar main { padding-top: 96px; }
+
+/* ---------- Generic layout utilities for simple pages ---------- */
+
+/* Give simple pages a soft background offset and consistent spacing */
+body.simple-page {
+  background: #fffaf8;
+}
+
+body.simple-page .topbar {
+  background: rgba(50,65,59,.9);
+  backdrop-filter: saturate(120%) blur(8px);
+  -webkit-backdrop-filter: saturate(120%) blur(8px);
+}
+
+/* Simple page main container */
+.simple-main {
+  width: var(--container);
+  margin: 0 auto;
+  padding: 120px 12px 60px; /* extra top padding for fixed nav */
+}
+
+/* Class cards grid */
+.grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 1fr;
+  margin-top: 32px;
+}
+@media (min-width: 700px){
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+.card h2 {
+  margin-bottom: 8px;
+}
