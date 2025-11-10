@@ -232,3 +232,38 @@ body{
 }
 
 @media (prefers-reduced-motion: reduce){ .logo-outline h1{ animation:none } }
+
+/* ---------- Base semantic defaults so every page looks good ---------- */
+
+/* Container: make plain <main> act like .section */
+main {
+  width: var(--container);
+  margin: 0 auto;
+  padding: 28px 12px 46px;
+}
+
+/* Heading defaults (mirror your .h1 look, scaled) */
+h1, h2, h3 {
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--dk);
+  line-height: 1.02;
+  margin: 0 0 10px 0;
+}
+
+h1 { font-size: clamp(28px, 5vw, 54px); }
+h2 { font-size: clamp(24px, 4.2vw, 38px); }
+h3 { font-size: clamp(20px, 3.8vw, 32px); }
+
+/* Paragraph defaults */
+p {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--dk);
+  max-width: 78ch;
+}
+
+/* Optional top spacing if you keep the fixed topbar on a page */
+body.with-topbar main { padding-top: 96px; }
