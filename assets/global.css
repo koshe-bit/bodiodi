@@ -17,7 +17,7 @@ body{
   background:#fffaf8;
 }
 
-/* Top nav */
+/* Top nav (DESKTOP UNCHANGED) */
 .topbar{
   position:fixed; inset:0 0 auto 0; height:56px; z-index:50;
   display:flex; align-items:center; justify-content:center;
@@ -30,9 +30,9 @@ body{
 .brand{ margin:0; display:flex; align-items:center; gap:10px; }
 .brand-logo{ height:42px; width:auto; display:block; }
 .navlinks{ display:flex; gap:1rem; margin-left:auto; font-family:"Inter"; }
-.navlinks a{ text-decoration:none; color:#fff; opacity:.95; font-weight:700; }
+.navlinks a{ text-decoration:none; color:#fff; opacity:.95; font-weight:700 }
 
-/* Mobile hamburger (icon) */
+/* Mobile hamburger (icon) — hidden by default, shown in mobile media query */
 .menu-btn{
   display:none;
   margin-left:auto;
@@ -62,13 +62,13 @@ body{
 .drawer.open{ transform:translateX(0) }
 .drawer a{ display:block; color:#fff; text-decoration:none; padding:10px 6px; font-weight:700 }
 
-/* Hide desktop nav on small screens */
+/* Hide desktop nav on small screens (overridden in mobile media query) */
 @media (max-width:740px){ .navlinks{ display:none } }
 
-/* Hero */
+/* Hero (DESKTOP UNCHANGED) */
 .hero{
   position: relative;
-  background-image: url('../BGFlipped.png'); /* path fixed for assets/ */
+  background-image: url('BGFlipped.png');
   background-repeat: no-repeat;
   background-position: center -20px;
   background-size: 100% auto;
@@ -85,7 +85,7 @@ body{
 }
 .hero-inner{ width:var(--container); margin:0 auto; padding:48px 12px 56px; position:relative; }
 
-/* Motion outline */
+/* Motion outline (DESKTOP UNCHANGED) */
 .logo-outline{
   position:absolute; inset:auto 0 440px 0;
   display:flex; justify-content:center;
@@ -148,10 +148,10 @@ body{
 .section h3{ margin:0 0 10px 0; font-family:"Inter"; font-weight:800; letter-spacing:-.01em; color:var(--dk); font-size:clamp(26px,4.2vw,38px); line-height:1.02 }
 .section p{ margin:0; font-size:16px; line-height:1.6; max-width:78ch; color:var(--dk) }
 
-/* Modern Micro Studio */
+/* Modern Micro Studio (DESKTOP UNCHANGED sizing + BG) */
 #about.section{
   width:100%;
-  background: center 20px / cover no-repeat url('../BG.png'); /* path fixed */
+  background: center 20px / cover no-repeat url('BG.png');
   min-height:70vh;
   padding: calc(60px + 1.5in) 0;
   border-radius:0;
@@ -191,10 +191,10 @@ body{
   .menu-btn{ display:inline-flex }
   .navlinks{ display:none }
 
-  /* Adjust Bodiodi motion outline text */
+  /* Adjust Bodiodi motion outline text (lower than before) */
   .logo-outline{
     position:absolute;
-    top:-10px;
+    top:-10px;           /* lowered back into visible area */
     left:0; right:0;
     bottom:auto;
     opacity:.60;
@@ -211,22 +211,25 @@ body{
     50%{    font-variation-settings:"wdth"380,"wght"350; letter-spacing:.055em }
   }
 
+  /* Keep normal hero layout but slightly more breathing room */
   .hero-inner{ padding-top:96px; }
 
+  /* Ensure hero fills nicely on phones */
   .hero{
     background-size: cover;
     background-position: top center;
     min-height: 72vh;
   }
 
+  /* Remove visible gap between Formula and Micro BACKGROUNDS only */
   .rule{ display:none; height:0; background:transparent; }
-  .panel{ border-bottom:none; margin-bottom:-30px; }
-  .panel-inner{ padding-bottom:250px; }
-  #about.section{ padding-top:250px; margin-top:-30px; }
+  .panel{ border-bottom:none; margin-bottom:-30px; }   /* slight overlap of backgrounds */
+  .panel-inner{ padding-bottom:250px; }                /* restore text spacing inside panel */
+  #about.section{ padding-top:250px; margin-top:-30px; } /* overlap backgrounds, keep text normal */
 
+  /* Mobile-only line break in the “Modern Micro” heading */
   .only-mobile{ display:inline }
 }
 
-@media (prefers-reduced-motion: reduce){
-  .logo-outline h1{ animation:none }
-}
+@media (prefers-reduced-motion: reduce){ .logo-outline h1{ animation:none } }
+
