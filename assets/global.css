@@ -68,7 +68,7 @@ body{
 /* Hero (DESKTOP UNCHANGED) */
 .hero{
   position: relative;
-  background-image: url('BGFlipped.png');
+  background-image: url('../BGFlipped.png');
   background-repeat: no-repeat;
   background-position: center -20px;
   background-size: 100% auto;
