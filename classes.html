@@ -3,50 +3,78 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bodiodi</title>
+  <title>Bodiodi — Classes</title>
 
   <!-- Fonts -->
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles (shared across the site) -->
- <link rel="stylesheet" href="assets/global.css?v=4">
-
-  <!-- (Optional) Page-specific overrides go after global.css -->
-  <!-- <link rel="stylesheet" href="assets/classes.css"> -->
+  <!-- Global styles -->
+  <link rel="stylesheet" href="assets/global.css?v=5">
 </head>
 
-<body>
-  <div class="top">
-    <p class="logo">BODIODI</p>
-    <a class="back" href="index.html">← Back</a>
+<body class="simple-page">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
+
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+        <a href="https://bodiodi.com/signup.html">Reserve</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
+      </nav>
+
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
   </div>
 
-  <main class="wrap">
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Reserve</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+  </nav>
+
+  <main class="simple-main">
     <h1>Class Descriptions</h1>
+
     <div class="grid">
       <article class="card">
         <h2>Kinetix</h2>
         <p>Mobility meets mechanics. This functional training format rebuilds your foundation—improving range, control, and coordination so you move better in every dimension of life.</p>
       </article>
+
       <article class="card">
         <h2>Tonnix</h2>
         <p>Strength with substance. Grounded lifts, clean form, and controlled overload come together to build power, resilience, and confidence from the inside out.</p>
       </article>
+
       <article class="card">
         <h2>Rhythmix</h2>
         <p>Dance meets drive. A high-energy fusion of music, movement, and metabolic elevation. You’ll sweat, smile, and find your rhythm while every beat works in your favor.</p>
       </article>
+
       <article class="card">
         <h2>Flexion</h2>
         <p>A modern yoga experience rooted in balance, symmetry, and strength. Intelligent sequencing and fluid flow create a space for restoration, awareness, and refined movement.</p>
       </article>
+
       <article class="card">
         <h2>Anabolix</h2>
         <p>Where science meets sweat. A high-intensity metabolic burn built around driving music, precision intervals, and total immersion. Expect to push hard, stay in rhythm, and leave every system firing.</p>
       </article>
     </div>
   </main>
+
+  <script src="assets/site.js?v=2"></script>
 </body>
 </html>
