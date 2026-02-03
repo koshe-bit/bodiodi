@@ -1,3 +1,33 @@
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
+
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Reserve</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+      </nav>
+
+      <!-- mobile hamburger -->
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Reserve</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+  </nav>
 <!-- ====== BODIODI: Rolling 7-Day Schedule (Single Chunk) ====== -->
 <section class="bodi-schedule">
   <header class="bodi-schedule__head">
@@ -48,23 +78,26 @@
     padding: 14px;
   }
 
+  /* Align day header items LEFT (date drops under the day label) */
   .bodi-day__head{
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     padding-bottom: 10px;
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(0,0,0,.08);
   }
 
+  /* Day header slightly larger than class name */
   .bodi-day__label{
     margin: 0;
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 750;
     letter-spacing: -.01em;
     color: var(--sage-dark);
-    font-size: 1.02rem;
+    font-size: 1.15rem; /* ↑ hierarchy */
+    line-height: 1.2;
   }
 
   .bodi-day__date{
@@ -72,7 +105,7 @@
     font-family: var(--font-head);
     font-weight: 500;
     opacity: .75;
-    font-size: .95rem;
+    font-size: .98rem;
   }
 
   /* Items list */
@@ -83,9 +116,9 @@
 
   .bodi-item{
     display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 12px;
+    grid-template-columns: 1fr; /* everything left-aligned */
+    align-items: start;
+    gap: 10px;
     padding: 12px 12px;
     border-radius: 16px;
     background: rgba(255,255,255,.72);
@@ -96,13 +129,15 @@
     min-width: 0;
   }
 
+  /* Class names: semi-bold (not bold) for better hierarchy */
   .bodi-item__class{
     display: inline-block;
     font-family: var(--font-head);
-    font-weight: 700;
+    font-weight: 600; /* semi-bold */
     color: var(--fg);
     text-decoration: none;
     letter-spacing: -.01em;
+    font-size: 1.03rem;
   }
 
   .bodi-item__class:hover{
@@ -117,22 +152,29 @@
     line-height: 1.35;
   }
 
-  /* Reserve button (schedule-specific, but aligned with your btn system) */
+  .bodi-empty{
+    padding: 8px 2px 2px;
+    font-size: .95rem;
+    opacity: .78;
+  }
+
+  /* Reserve button LEFT-aligned and readable (fix white-on-white) */
   .bodi-item__btn{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: .75rem 1rem;
+    padding: .78rem 1.05rem;
     border-radius: 999px;
     text-decoration: none;
     font-family: var(--font-head);
     font-weight: 700;
     letter-spacing: .01em;
-    color: #fff;
-    background: var(--sage);
+    color: #fff;               /* readable */
+    background: var(--sage);   /* readable */
     box-shadow: 0 10px 28px rgba(131,155,133,.28);
     transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
     white-space: nowrap;
+    width: fit-content;
   }
 
   .bodi-item__btn:hover{
@@ -145,29 +187,21 @@
     transform: translateY(0px);
   }
 
-  .bodi-empty{
-    padding: 8px 2px 2px;
-    font-size: .95rem;
-    opacity: .78;
-  }
-
   .bodi-schedule__foot{
     margin-top: var(--space-3);
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-start; /* left */
   }
 
-  /* Mobile: stack item content, full-width reserve button */
+  /* Mobile: keep everything left, button full width for thumb */
   @media (max-width: 560px){
     .bodi-day{ padding: 12px; }
     .bodi-item{
-      grid-template-columns: 1fr;
-      gap: 10px;
       padding: 12px;
     }
     .bodi-item__btn{
       width: 100%;
-      padding: .85rem 1.1rem;
+      padding: .9rem 1.1rem;
     }
   }
 </style>
@@ -314,3 +348,4 @@
   })();
 </script>
 <!-- ====== /BODIODI: Rolling 7-Day Schedule ====== -->
+
