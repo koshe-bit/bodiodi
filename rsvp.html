@@ -14,8 +14,7 @@
   <link rel="stylesheet" href="assets/global.css?v=1">
 
   <style>
-    /* Page-specific layout (kept small + tidy) */
-    main{ padding-top: 96px; } /* topbar offset */
+    main{ padding-top: 96px; }
 
     .page-head{
       display:flex;
@@ -80,7 +79,7 @@
     }
 
     .card h3{
-      margin:0 0 6px 0;
+      margin:0 0 10px 0;
       font-family:"Inter";
       font-weight:800;
       letter-spacing:-.01em;
@@ -90,25 +89,33 @@
     }
 
     .when{
-      margin:0 0 12px 0;
+      margin:0 0 10px 0;
       font-size:14px;
       color:var(--dk85);
       opacity:.92;
     }
 
-    .row{
+    .classline{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      margin-top:10px;
+      padding:10px 0;
+      border-top:1px solid rgba(0,0,0,.08);
+    }
+    .classline:first-of-type{
+      border-top:0;
+      padding-top:4px;
     }
 
-    .spots{
-      font-size:13px;
-      opacity:.92;
+    .classmeta{
+      min-width:0;
+      font-size:14px;
       color:var(--dk85);
+      opacity:.92;
       white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
     .btn.small{
@@ -117,25 +124,7 @@
       font-size:12px;
     }
 
-    /* Status pills */
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(0,0,0,.10);
-      font-size:12px;
-      font-weight:700;
-      font-family:"Inter";
-      letter-spacing:.06em;
-      text-transform:uppercase;
-      color:var(--dk85);
-      background:rgba(255,255,255,.55);
-    }
-    .pill.ok{ border-color: rgba(58,67,60,.25); }
-    .pill.warn{ border-color: rgba(0,0,0,.18); opacity:.95; }
-
-    /* Modal (same as we agreed) */
+    /* Modal */
     .modal{ position:fixed; inset:0; display:none; z-index:200; }
     .modal.open{ display:block; }
     .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
@@ -178,7 +167,6 @@
 
 <body class="with-topbar">
 
-  <!-- Reuse your topbar structure -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -215,17 +203,12 @@
         <p class="meta">Tap a class, confirm the reminder, and you’re in.</p>
       </div>
 
-      <div class="badge" id="memberBadge">
-        Loading member…
-      </div>
+      <div class="badge" id="memberBadge">Loading member…</div>
     </div>
 
     <div class="rule" aria-hidden="true"></div>
 
-    <!-- Cards container -->
-    <section class="grid" id="classGrid" aria-label="Upcoming classes">
-      <!-- Sample cards (replace with live data later) -->
-    </section>
+    <section class="grid" id="classGrid"></section>
 
     <p style="margin-top:22px; font-size:14px; opacity:.9;">
       Need to purchase a plan or you’re new here? Use the Reserve form on the main site.
@@ -236,21 +219,17 @@
     </p>
   </main>
 
-  <!-- Reserve Confirmation Modal -->
-  <div class="modal" id="confirmModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <!-- Confirmation Modal -->
+  <div class="modal" id="confirmModal">
     <div class="modal-backdrop" data-close="1"></div>
-
     <div class="modal-card">
-      <h3 id="confirmTitle">Quick reminder</h3>
-
+      <h3>Quick reminder</h3>
       <p><strong>Cancel at least 4 hours before class</strong> so someone else can grab the spot.</p>
       <p><strong>Please arrive 5 minutes early</strong> to get settled.</p>
-
       <div class="modal-actions">
-        <button class="btn btn-ghost" type="button" id="cancelConfirm">Nevermind</button>
-        <button class="btn" type="button" id="doConfirm">Confirm spot</button>
+        <button class="btn btn-ghost" id="cancelConfirm">Nevermind</button>
+        <button class="btn" id="doConfirm">Confirm spot</button>
       </div>
-
       <p class="modal-note">By confirming, you agree to the cancellation policy.</p>
     </div>
   </div>
@@ -258,127 +237,92 @@
   <script src="assets/site.js?v=2"></script>
 
   <script>
-    // ===== 0) Basic member context from URL (we’ll wire to backend later) =====
-    // Your personal reserve link will look like: bodiodi.com/rsvp.html?id=XXXX
     const params = new URLSearchParams(location.search);
     const memberId = params.get('id');
+    document.getElementById('memberBadge').textContent =
+      memberId ? 'Member link verified' : 'Missing member link';
 
-    const memberBadge = document.getElementById('memberBadge');
-    memberBadge.textContent = memberId ? 'Member link verified' : 'Missing member link';
+    const TZ = 'America/Detroit';
+    const EMPTY_NOTE = 'No classes at this time, check back later';
 
-    // ===== 1) Render sample classes for now =====
-    const sample = [
-      { class_id:'c1', name:'Kinetix', start_iso: new Date(Date.now()+86400000).toISOString(), spots_left: 2 },
-      { class_id:'c2', name:'Anabolix', start_iso: new Date(Date.now()+2*86400000).toISOString(), spots_left: 1 },
-      { class_id:'c3', name:'Flexion', start_iso: new Date(Date.now()+3*86400000).toISOString(), spots_left: 4 },
-      { class_id:'c4', name:'Tonnix', start_iso: new Date(Date.now()+4*86400000).toISOString(), spots_left: 3 },
-      { class_id:'c5', name:'Rhythmix', start_iso: new Date(Date.now()+5*86400000).toISOString(), spots_left: 0 },
+    const WEEK_TEMPLATE = [
+      { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
+      { weekday:2, classes:[] },
+      { weekday:3, classes:[{ name:'Rhythmix', instructor:'Nicole', time:'6:15p–7:15p' }] },
+      { weekday:4, classes:[{ name:'Anabolix', instructor:'Nicole', time:'6:15p–6:45p' }] },
+      { weekday:5, classes:[] },
+      { weekday:6, classes:[
+        { name:'Rhythmix', instructor:'Nicole', time:'8:30a–9:30a' },
+        { name:'Anabolix', instructor:'Nicole', time:'9:45a–10:15a' }
+      ]},
+      { weekday:7, classes:[{ name:'Kinetix', instructor:'Sarah', time:'3:00p–4:00p' }] }
     ];
 
-    function formatWhen(iso){
-      const d = new Date(iso);
-      return d.toLocaleString(undefined, { weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+    function weekdayNum(d){
+      return {mon:1,tue:2,wed:3,thu:4,fri:5,sat:6,sun:7}[
+        new Intl.DateTimeFormat('en-US',{timeZone:TZ,weekday:'short'})
+          .format(d).toLowerCase()
+      ];
+    }
+
+    function utcNoon(y,m,d){ return new Date(Date.UTC(y,m-1,d,12)); }
+    function addDays(d,n){ return new Date(d.getTime()+n*86400000); }
+
+    function formatDay(d){
+      const w = new Intl.DateTimeFormat('en-US',{timeZone:TZ,weekday:'long'}).format(d);
+      const md = new Intl.DateTimeFormat('en-US',{timeZone:TZ,month:'short',day:'numeric'}).format(d);
+      return `${w} | ${md}`;
+    }
+
+    function buildWeek(){
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat('en-US',{timeZone:TZ,year:'numeric',month:'numeric',day:'numeric'})
+        .formatToParts(now).reduce((a,p)=>(a[p.type]=p.value,a),{});
+      const today = utcNoon(+parts.year,+parts.month,+parts.day);
+      const monday = addDays(today, -(weekdayNum(now)-1));
+
+      return Array.from({length:7},(_,i)=>{
+        const date = addDays(monday,i);
+        const tpl = WEEK_TEMPLATE.find(x=>x.weekday===i+1) || {classes:[]};
+        return { date, header:formatDay(date), classes:tpl.classes };
+      });
     }
 
     const grid = document.getElementById('classGrid');
 
-    function renderCards(list){
-      grid.innerHTML = '';
-      list.forEach(item => {
-        const card = document.createElement('article');
-        card.className = 'card';
-
-        const isFull = item.spots_left <= 0;
-
+    function render(){
+      grid.innerHTML='';
+      buildWeek().forEach(day=>{
+        const card=document.createElement('article');
+        card.className='card';
         card.innerHTML = `
-          <span class="pill ${isFull ? 'warn' : 'ok'}">${isFull ? 'Full' : 'Spots open'}</span>
-          <h3>${item.name}</h3>
-          <p class="when">${formatWhen(item.start_iso)}</p>
-
-          <div class="row">
-            <span class="spots">${isFull ? 'No spots left' : (item.spots_left + ' spot' + (item.spots_left===1?'':'s') + ' left')}</span>
-            <button class="btn small" type="button" ${isFull ? 'disabled' : ''}>
-              ${isFull ? 'Full' : 'Reserve'}
-            </button>
-          </div>
+          <h3>${day.header}</h3>
+          ${day.classes.length ? '' : `<p class="when">${EMPTY_NOTE}</p>`}
+          <div class="day-lines"></div>
         `;
-
-        const btn = card.querySelector('button');
-        if (!isFull){
-          btn.addEventListener('click', () => {
-            onReserveClick({
-              member_id: memberId,
-              class_id: item.class_id,
-              class_name: item.name,
-              class_start_iso: item.start_iso
-            });
-          });
-        }
-
+        const lines = card.querySelector('.day-lines');
+        day.classes.forEach(c=>{
+          const row=document.createElement('div');
+          row.className='classline';
+          row.innerHTML = `
+            <div class="classmeta">${c.name} with ${c.instructor}, ${c.time}</div>
+            <button class="btn small">Reserve</button>
+          `;
+          row.querySelector('button').onclick=()=>openConfirmModal();
+          lines.appendChild(row);
+        });
         grid.appendChild(card);
       });
     }
 
-    renderCards(sample);
+    const modal=document.getElementById('confirmModal');
+    const cancel=document.getElementById('cancelConfirm');
+    function openConfirmModal(){ modal.classList.add('open'); }
+    function closeConfirmModal(){ modal.classList.remove('open'); }
+    cancel.onclick=closeConfirmModal;
+    modal.onclick=e=>e.target.dataset.close && closeConfirmModal();
 
-    // ===== 2) Modal logic (as agreed) =====
-    const modal = document.getElementById('confirmModal');
-    const cancelBtn = document.getElementById('cancelConfirm');
-    const confirmBtn = document.getElementById('doConfirm');
-    let pendingReservation = null;
-
-    function openConfirmModal(payload){
-      pendingReservation = payload;
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeConfirmModal(){
-      pendingReservation = null;
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    modal.addEventListener('click', (e) => {
-      if (e.target && e.target.dataset && e.target.dataset.close) closeConfirmModal();
-    });
-
-    cancelBtn.addEventListener('click', closeConfirmModal);
-
-    confirmBtn.addEventListener('click', async () => {
-      if (!pendingReservation) return;
-
-      // Record explicit acknowledgement
-      pendingReservation.policy_confirmed = true;
-      pendingReservation.policy_confirmed_at = new Date().toISOString();
-
-      // If no member link, we stop here (until backend exists)
-      if (!pendingReservation.member_id){
-        alert('This reserve link is missing your member ID. Once we wire the system, your personal link will include it.');
-        closeConfirmModal();
-        return;
-      }
-
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Confirming…';
-
-      try{
-        // Placeholder for backend call (we’ll wire this later)
-        console.log('Reservation payload:', pendingReservation);
-        alert('Reserved (demo). Next step is wiring Google Sheets + Apps Script.');
-        closeConfirmModal();
-      }catch(err){
-        alert('Hmm — something went wrong saving your reservation. Please try again.');
-        console.error(err);
-      }finally{
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirm spot';
-      }
-    });
-
-    function onReserveClick(payload){
-      openConfirmModal(payload);
-    }
+    render();
   </script>
 </body>
 </html>
