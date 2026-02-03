@@ -14,33 +14,51 @@
   <link rel="stylesheet" href="assets/global.css?v=5">
 
   <style>
-    /* Keep the form full-height but pushed below the topbar */
-    html, body {
-      margin: 0;
-      height: 100%;
-      width: 100%;
-      background: transparent;
+    html, body{
+      margin:0;
+      height:100%;
+      width:100%;
+      background:transparent;
     }
 
-    /* Topbar is fixed in global.css; this creates room for it */
+    /* Create room for fixed topbar + bottom back link */
     .frame-wrap{
-      padding-top: 96px; /* matches what we've been using for topbar offset */
-      height: 100%;
-      box-sizing: border-box;
+      padding-top:96px;     /* topbar offset */
+      padding-bottom:64px;  /* space for back link */
+      height:100%;
+      box-sizing:border-box;
     }
 
     iframe{
-      width: 100%;
-      height: calc(100vh - 96px);
-      border: none;
-      display: block;
+      width:100%;
+      height:calc(100vh - 96px - 64px);
+      border:none;
+      display:block;
     }
 
-    /* Slightly smaller offset on small screens if your topbar height changes there.
-       If your global.css keeps it at 96px always, this won't matter. */
+    /* Back link styling */
+    .back-link{
+      margin:16px auto 0;
+      text-align:center;
+    }
+    .back-link a{
+      font-size:14px;
+      opacity:.85;
+      text-decoration:none;
+    }
+    .back-link a:hover{
+      opacity:1;
+    }
+
+    /* Slightly smaller topbar offset on small screens (if your global.css uses a shorter topbar there) */
     @media (max-width: 640px){
-      .frame-wrap{ padding-top: 88px; }
-      iframe{ height: calc(100vh - 88px); }
+      .frame-wrap{
+        padding-top:88px;
+        padding-bottom:64px;
+      }
+      iframe{
+        height:calc(100vh - 88px - 64px);
+      }
     }
   </style>
 </head>
@@ -76,7 +94,7 @@
     <a href="https://bodiodi.com/pricing.html">Pricing</a>
   </nav>
 
-  <!-- Full-screen embedded form -->
+  <!-- Embedded form + back link -->
   <div class="frame-wrap">
     <iframe
       src="https://docs.google.com/forms/d/e/1FAIpQLScfkXkmtMju_lhwAEuPkqzdBZNptDwJSZn-pwJvJlJyp85nNQ/viewform"
@@ -84,11 +102,13 @@
       scrolling="auto"
       title="Bodiodi Sign Up Form">
     </iframe>
-  </div>
-  <!-- Hamburger behavior -->
-  <script src="assets/site.js?v=2"></script>
-  <p class="back-link">
+
+    <p class="back-link">
       <a href="index.html">← Back</a>
     </p>
+  </div>
+
+  <!-- Hamburger behavior -->
+  <script src="assets/site.js?v=2"></script>
 </body>
 </html>
