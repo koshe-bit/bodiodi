@@ -124,7 +124,7 @@
       font-size:12px;
     }
 
-    /* Modal */
+    /* Modal (same as we agreed) */
     .modal{ position:fixed; inset:0; display:none; z-index:200; }
     .modal.open{ display:block; }
     .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
@@ -167,6 +167,7 @@
 
 <body class="with-topbar">
 
+  <!-- Keep the lighter member feel as-is -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -208,7 +209,7 @@
 
     <div class="rule" aria-hidden="true"></div>
 
-    <section class="grid" id="classGrid"></section>
+    <section class="grid" id="classGrid" aria-label="Upcoming classes"></section>
 
     <p style="margin-top:22px; font-size:14px; opacity:.9;">
       Need to purchase a plan or you’re new here? Use the Reserve form on the main site.
@@ -219,32 +220,42 @@
     </p>
   </main>
 
-  <!-- Confirmation Modal -->
-  <div class="modal" id="confirmModal">
+  <!-- Reserve Confirmation Modal -->
+  <div class="modal" id="confirmModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
     <div class="modal-backdrop" data-close="1"></div>
+
     <div class="modal-card">
-      <h3>Quick reminder</h3>
+      <h3 id="confirmTitle">Quick reminder</h3>
+
       <p><strong>Cancel at least 4 hours before class</strong> so someone else can grab the spot.</p>
       <p><strong>Please arrive 5 minutes early</strong> to get settled.</p>
+
       <div class="modal-actions">
-        <button class="btn btn-ghost" id="cancelConfirm">Nevermind</button>
-        <button class="btn" id="doConfirm">Confirm spot</button>
+        <button class="btn btn-ghost" type="button" id="cancelConfirm">Nevermind</button>
+        <button class="btn" type="button" id="doConfirm">Confirm spot</button>
       </div>
+
       <p class="modal-note">By confirming, you agree to the cancellation policy.</p>
     </div>
   </div>
 
+  <!-- Hamburger behavior -->
   <script src="assets/site.js?v=2"></script>
 
   <script>
+    // ===== 0) Member context from URL =====
+    // Expect: bodiodi.com/rsvp.html?id=XXXX
     const params = new URLSearchParams(location.search);
     const memberId = params.get('id');
-    document.getElementById('memberBadge').textContent =
-      memberId ? 'Member link verified' : 'Missing member link';
 
+    const memberBadge = document.getElementById('memberBadge');
+    memberBadge.textContent = memberId ? 'Member link verified' : 'Missing member link';
+
+    // ===== 1) Weekly template (hardcoded like the public schedule) =====
     const TZ = 'America/Detroit';
     const EMPTY_NOTE = 'No classes at this time, check back later';
 
+    // Mon=1 ... Sun=7
     const WEEK_TEMPLATE = [
       { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
       { weekday:2, classes:[] },
@@ -259,70 +270,144 @@
     ];
 
     function weekdayNum(d){
-      return {mon:1,tue:2,wed:3,thu:4,fri:5,sat:6,sun:7}[
-        new Intl.DateTimeFormat('en-US',{timeZone:TZ,weekday:'short'})
-          .format(d).toLowerCase()
-      ];
+      const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
+        .format(d).toLowerCase();
+      return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
     }
 
-    function utcNoon(y,m,d){ return new Date(Date.UTC(y,m-1,d,12)); }
-    function addDays(d,n){ return new Date(d.getTime()+n*86400000); }
+    function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
+    function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
 
     function formatDay(d){
-      const w = new Intl.DateTimeFormat('en-US',{timeZone:TZ,weekday:'long'}).format(d);
-      const md = new Intl.DateTimeFormat('en-US',{timeZone:TZ,month:'short',day:'numeric'}).format(d);
+      const w  = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'long' }).format(d);
+      const md = new Intl.DateTimeFormat('en-US', { timeZone:TZ, month:'short', day:'numeric' }).format(d);
       return `${w} | ${md}`;
     }
 
     function buildWeek(){
       const now = new Date();
-      const parts = new Intl.DateTimeFormat('en-US',{timeZone:TZ,year:'numeric',month:'numeric',day:'numeric'})
-        .formatToParts(now).reduce((a,p)=>(a[p.type]=p.value,a),{});
-      const today = utcNoon(+parts.year,+parts.month,+parts.day);
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone:TZ, year:'numeric', month:'numeric', day:'numeric'
+      }).formatToParts(now).reduce((a,p)=>(a[p.type]=p.value,a),{});
+
+      const today  = utcNoon(+parts.year, +parts.month, +parts.day);
       const monday = addDays(today, -(weekdayNum(now)-1));
 
-      return Array.from({length:7},(_,i)=>{
-        const date = addDays(monday,i);
-        const tpl = WEEK_TEMPLATE.find(x=>x.weekday===i+1) || {classes:[]};
-        return { date, header:formatDay(date), classes:tpl.classes };
+      return Array.from({length:7}, (_,i) => {
+        const date = addDays(monday, i);
+        const tpl  = WEEK_TEMPLATE.find(x => x.weekday === i+1) || { classes:[] };
+        return { weekday:i+1, date, header:formatDay(date), classes:tpl.classes };
       });
     }
 
     const grid = document.getElementById('classGrid');
 
     function render(){
-      grid.innerHTML='';
-      buildWeek().forEach(day=>{
-        const card=document.createElement('article');
-        card.className='card';
+      grid.innerHTML = '';
+      buildWeek().forEach(day => {
+        const card = document.createElement('article');
+        card.className = 'card';
+
         card.innerHTML = `
           <h3>${day.header}</h3>
           ${day.classes.length ? '' : `<p class="when">${EMPTY_NOTE}</p>`}
           <div class="day-lines"></div>
         `;
+
         const lines = card.querySelector('.day-lines');
-        day.classes.forEach(c=>{
-          const row=document.createElement('div');
-          row.className='classline';
-          row.innerHTML = `
-            <div class="classmeta">${c.name} with ${c.instructor}, ${c.time}</div>
-            <button class="btn small">Reserve</button>
-          `;
-          row.querySelector('button').onclick=()=>openConfirmModal();
-          lines.appendChild(row);
-        });
+
+        if (day.classes.length){
+          day.classes.forEach((c, idx) => {
+            const row = document.createElement('div');
+            row.className = 'classline';
+
+            const label = `${c.name} with ${c.instructor}, ${c.time}`;
+            const classId = `w${day.weekday}_c${idx+1}`;
+
+            row.innerHTML = `
+              <div class="classmeta" title="${label}">${label}</div>
+              <button class="btn small" type="button">Reserve</button>
+            `;
+
+            row.querySelector('button').addEventListener('click', () => {
+              onReserveClick({
+                member_id: memberId,
+                class_id: classId,
+                class_name: c.name,
+                class_day_label: day.header,
+                instructor: c.instructor,
+                time_range: c.time,
+                // date anchor (we can later translate this to a specific event)
+                class_day_iso: day.date.toISOString()
+              });
+            });
+
+            lines.appendChild(row);
+          });
+        }
+
         grid.appendChild(card);
       });
     }
 
-    const modal=document.getElementById('confirmModal');
-    const cancel=document.getElementById('cancelConfirm');
-    function openConfirmModal(){ modal.classList.add('open'); }
-    function closeConfirmModal(){ modal.classList.remove('open'); }
-    cancel.onclick=closeConfirmModal;
-    modal.onclick=e=>e.target.dataset.close && closeConfirmModal();
-
     render();
+
+    // ===== 2) Modal logic (RESTORED) =====
+    const modal = document.getElementById('confirmModal');
+    const cancelBtn = document.getElementById('cancelConfirm');
+    const confirmBtn = document.getElementById('doConfirm');
+    let pendingReservation = null;
+
+    function openConfirmModal(payload){
+      pendingReservation = payload;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeConfirmModal(){
+      pendingReservation = null;
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    modal.addEventListener('click', (e) => {
+      if (e.target && e.target.dataset && e.target.dataset.close) closeConfirmModal();
+    });
+
+    cancelBtn.addEventListener('click', closeConfirmModal);
+
+    confirmBtn.addEventListener('click', async () => {
+      if (!pendingReservation) return;
+
+      pendingReservation.policy_confirmed = true;
+      pendingReservation.policy_confirmed_at = new Date().toISOString();
+
+      if (!pendingReservation.member_id){
+        alert('This reserve link is missing your member ID. Once we wire the system, your personal link will include it.');
+        closeConfirmModal();
+        return;
+      }
+
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Confirming…';
+
+      try{
+        // Placeholder for backend call (we’ll wire this later)
+        console.log('Reservation payload:', pendingReservation);
+        alert('Reserved (demo). Next step is wiring Google Sheets + Apps Script.');
+        closeConfirmModal();
+      }catch(err){
+        alert('Hmm — something went wrong saving your reservation. Please try again.');
+        console.error(err);
+      }finally{
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm spot';
+      }
+    });
+
+    function onReserveClick(payload){
+      openConfirmModal(payload);
+    }
   </script>
 </body>
 </html>
