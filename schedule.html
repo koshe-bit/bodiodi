@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles -->
-  <link rel="stylesheet" href="assets/global.css?v=1">
+  <!-- Global styles (match Classes page) -->
+  <link rel="stylesheet" href="assets/global.css?v=5">
 
   <style>
     main{ padding-top:96px; }
@@ -127,9 +127,10 @@
   </style>
 </head>
 
-<body class="with-topbar">
+<!-- Body class (match Classes page) -->
+<body class="simple-page">
 
-  <!-- Topbar -->
+  <!-- Topbar (exactly like Classes page) -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -150,7 +151,6 @@
     </div>
   </div>
 
-  <!-- Mobile drawer -->
   <nav id="drawer" class="drawer" aria-hidden="true">
     <a href="https://bodiodi.com/schedule.html">Schedule</a>
     <a href="https://bodiodi.com/signup.html">Reserve</a>
@@ -221,7 +221,7 @@
     function formatDay(date){
       const w = new Intl.DateTimeFormat('en-US',{ timeZone:TZ, weekday:'long' }).format(date);
       const md = new Intl.DateTimeFormat('en-US',{ timeZone:TZ, month:'short', day:'numeric' }).format(date);
-      return `${w} • ${md}`;
+      return `${w} | ${md}`;
     }
 
     function buildWeek(){
@@ -262,7 +262,7 @@
             line.innerHTML=`
               <div class="classname">
                 <strong>${c.name}</strong>
-                <span>${c.time} • with ${c.instructor}</span>
+                <span>${c.time} with ${c.instructor}</span>
               </div>
               <a class="btn small" href="${RESERVE_URL}">Reserve</a>
             `;
