@@ -3,22 +3,133 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bodiodi</title>
+  <title>Bodiodi — Class Schedule</title>
 
   <!-- Fonts -->
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles (shared across the site) -->
-  <link rel="stylesheet" href="assets/global.css">
+  <!-- Global styles -->
+  <link rel="stylesheet" href="assets/global.css?v=1">
 
-  <!-- (Optional) Page-specific overrides go after global.css -->
-  <!-- <link rel="stylesheet" href="assets/classes.css"> -->
+  <style>
+    main{ padding-top:96px; }
+
+    .page-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .kicker{
+      margin:0 0 6px 0;
+      font-family:"Inter";
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:var(--dk85);
+      opacity:.9;
+      font-size:12px;
+    }
+
+    .meta{
+      margin:4px 0 0 0;
+      font-size:14px;
+      opacity:.9;
+    }
+
+    .weekline{
+      margin:6px 0 0 0;
+      font-size:14px;
+      color:var(--dk85);
+      opacity:.95;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .card{
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:14px 14px 12px;
+      background:rgba(255,255,255,.72);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+    }
+
+    .card h3{
+      margin:0 0 6px 0;
+      font-family:"Inter";
+      font-weight:800;
+      letter-spacing:-.01em;
+      color:var(--dk);
+      font-size:22px;
+      line-height:1.05;
+    }
+
+    .when{
+      margin:0 0 10px 0;
+      font-size:14px;
+      color:var(--dk85);
+      opacity:.92;
+    }
+
+    .classline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 0;
+      border-top:1px solid rgba(0,0,0,.08);
+    }
+    .classline:first-of-type{
+      border-top:0;
+      padding-top:4px;
+    }
+
+    .classname{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+
+    .classname strong{
+      font-family:"Inter";
+      font-weight:800;
+      letter-spacing:-.01em;
+      color:var(--dk);
+      font-size:15px;
+      line-height:1.1;
+    }
+
+    .classname span{
+      font-size:13px;
+      color:var(--dk85);
+      opacity:.92;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .btn.small{
+      padding:10px 14px;
+      letter-spacing:.10em;
+      font-size:12px;
+      white-space:nowrap;
+    }
+  </style>
 </head>
 
-<body>
+<body class="with-topbar">
 
+  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -27,19 +138,19 @@
 
       <nav class="navlinks">
         <a href="https://bodiodi.com/schedule.html">Schedule</a>
-    <a href="https://bodiodi.com/signup.html">Reserve</a>
-    <a href="https://bodiodi.com/classes.html">Classes</a>
-    <a href="https://bodiodi.com/about.html">About</a>
-    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+        <a href="https://bodiodi.com/signup.html">Reserve</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
       </nav>
 
-      <!-- mobile hamburger -->
       <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
         <span class="hamburger" aria-hidden="true"></span>
       </button>
     </div>
   </div>
 
+  <!-- Mobile drawer -->
   <nav id="drawer" class="drawer" aria-hidden="true">
     <a href="https://bodiodi.com/schedule.html">Schedule</a>
     <a href="https://bodiodi.com/signup.html">Reserve</a>
@@ -48,327 +159,121 @@
     <a href="https://bodiodi.com/pricing.html">Pricing</a>
   </nav>
 
-  
-<!-- ====== BODIODI: Rolling 7-Day Schedule (Single Chunk) ====== -->
-<section class="bodi-schedule">
-  <header class="bodi-schedule__head">
-<p></p>
-    <p></p>
-    <p> <h1 class="h2">Schedule</h1></p>    
-    <p> <class="body bodi-schedule__sub"> Rolling 7-day view. Reserve your spot in seconds.</p>
-  </header>
+  <main>
+    <div class="page-head">
+      <div>
+        <p class="kicker">Schedule</p>
+        <h1 style="margin:0;">Class Schedule</h1>
+        <p class="meta">More classes coming soon, be sure to check back.</p>
+        <p class="weekline" id="weekLine"></p>
+      </div>
+      <div></div>
+    </div>
 
-  <div id="bodiSchedule" class="bodi-schedule__list" aria-live="polite"></div>
+    <div class="rule" aria-hidden="true"></div>
 
-  <div class="bodi-schedule__foot">
-    <a class="btn primary" href="https://bodiodi.com/signup.html">Reserve a class</a>
-  </div>
-</section>
+    <section class="grid" id="dayGrid" aria-label="Weekly schedule"></section>
 
-<style>
-  /* ====== Schedule styles that follow your global system ====== */
-  .bodi-schedule{
-    width: var(--container);
-    margin: 0 auto;
-    padding: var(--space-6) 0;
-  }
+    <p style="margin-top:22px; font-size:14px; opacity:.9;">
+      Want to reserve a spot? Head to the signup page.
+    </p>
 
-  .bodi-schedule__head{
-    display: grid;
-    gap: .5rem;
-    margin-bottom: var(--space-3);
-  }
+    <p style="margin-top:10px;">
+      <a class="btn" href="index.html">Back to home</a>
+    </p>
+  </main>
 
-  .bodi-schedule__sub{
-    max-width: 60ch;
-    opacity: .82;
-  }
+  <script src="assets/site.js?v=2"></script>
 
-  .bodi-schedule__list{
-    display: grid;
-    gap: var(--space-2);
-  }
+  <script>
+    const TZ = 'America/Detroit';
+    const RESERVE_URL = 'https://bodiodi.com/signup.html';
+    const EMPTY_NOTE = 'No classes at this time, check back later';
 
-  /* Day card */
-  .bodi-day{
-    border-radius: 18px;
-    border: 1px solid rgba(0,0,0,.08);
-    background:
-      radial-gradient(900px 500px at 20% 0%, rgba(246,227,218,0.35) 0%, transparent 55%),
-      radial-gradient(700px 500px at 95% 0%, rgba(131,155,133,0.18) 0%, transparent 60%),
-      rgba(255,255,255,.72);
-    backdrop-filter: blur(6px);
-    padding: 14px;
-  }
-
-  /* Align day header items LEFT (date drops under the day label) */
-  .bodi-day__head{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgba(0,0,0,.08);
-  }
-
-  /* Day header slightly larger than class name */
-  .bodi-day__label{
-    margin: 0;
-    font-family: var(--font-head);
-    font-weight: 750;
-    letter-spacing: -.01em;
-    color: var(--sage-dark);
-    font-size: 1.15rem; /* ↑ hierarchy */
-    line-height: 1.2;
-  }
-
-  .bodi-day__date{
-    margin: 0;
-    font-family: var(--font-head);
-    font-weight: 500;
-    opacity: .75;
-    font-size: .98rem;
-  }
-
-  /* Items list */
-  .bodi-day__items{
-    display: grid;
-    gap: 10px;
-  }
-
-  .bodi-item{
-    display: grid;
-    grid-template-columns: 1fr; /* everything left-aligned */
-    align-items: start;
-    gap: 10px;
-    padding: 12px 12px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.72);
-    border: 1px solid rgba(0,0,0,.08);
-  }
-
-  .bodi-item__text{
-    min-width: 0;
-  }
-
-  /* Class names: semi-bold (not bold) for better hierarchy */
-  .bodi-item__class{
-    display: inline-block;
-    font-family: var(--font-head);
-    font-weight: 600; /* semi-bold */
-    color: var(--fg);
-    text-decoration: none;
-    letter-spacing: -.01em;
-    font-size: 1.03rem;
-  }
-
-  .bodi-item__class:hover{
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .bodi-item__meta{
-    margin-top: 3px;
-    font-size: .95rem;
-    opacity: .78;
-    line-height: 1.35;
-  }
-
-  .bodi-empty{
-    padding: 8px 2px 2px;
-    font-size: .95rem;
-    opacity: .78;
-  }
-
-  /* Reserve button LEFT-aligned and readable (fix white-on-white) */
-  .bodi-item__btn{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: .78rem 1.05rem;
-    border-radius: 999px;
-    text-decoration: none;
-    font-family: var(--font-head);
-    font-weight: 700;
-    letter-spacing: .01em;
-    color: var(--sage-dark);               /* readable */
-    background: var(--sage);   /* readable */
-    box-shadow: 0 10px 28px rgba(131,155,133,.28);
-    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
-    white-space: nowrap;
-    width: fit-content;
-  }
-
-  .bodi-item__btn:hover{
-    background: var(--sage-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 14px 34px rgba(131,155,133,.34);
-  }
-
-  .bodi-item__btn:active{
-    transform: translateY(0px);
-  }
-
-  .bodi-schedule__foot{
-    margin-top: var(--space-3);
-    display: flex;
-    justify-content: flex-start; /* left */
-  }
-
-  /* Mobile: keep everything left, button full width for thumb */
-  @media (max-width: 560px){
-    .bodi-day{ padding: 12px; }
-    .bodi-item{
-      padding: 12px;
-    }
-    .bodi-item__btn{
-      width: 100%;
-      padding: .9rem 1.1rem;
-    }
-  }
-</style>
-
-<script>
-  /**
-   * Bodiodi rolling 7-day schedule (template-driven)
-   * - Renders today + next 6 days (rolling)
-   * - Weekly template (same classes each week; dates roll)
-   * - Class name links to classes page (no anchors)
-   * - Reserve button links to signup page
-   */
-
-  (function () {
-    const RESERVE_URL = "https://bodiodi.com/signup.html";
-    const CLASSES_URL = "https://bodiodi.com/classes.html";
-
-    const INSTRUCTORS = {
-      nicole: "Nicole",
-      sarah: "Sarah",
-    };
-
-    // day: 0=Sun ... 6=Sat
-    // time: 24h "HH:MM"
-    // durationMin: used for end-time display
-    const TEMPLATE = [
-      { day: 1, className: "Anabolix", time: "17:30", durationMin: 30, instructor: "nicole" }, // Mon 5:30p–6:00p
-      { day: 3, className: "Rhythmix", time: "18:15", durationMin: 60, instructor: "nicole" }, // Wed 6:15p–7:15p
-      { day: 4, className: "Anabolix", time: "18:15", durationMin: 30, instructor: "nicole" }, // Thu 6:15p–6:45p
-      { day: 6, className: "Rhythmix", time: "08:30", durationMin: 60, instructor: "nicole" }, // Sat 8:30a–9:30a
-      { day: 6, className: "Anabolix", time: "09:45", durationMin: 30, instructor: "nicole" }, // Sat 9:45a–10:15a
-      { day: 0, className: "Kinetix",  time: "15:00", durationMin: 60, instructor: "sarah" },  // Sun 3:00p–4:00p
+    const WEEK_TEMPLATE = [
+      { weekday:1, classes:[{ name:'Anabolix', time:'5:30p', instructor:'Nicole' }] },
+      { weekday:2, classes:[] },
+      { weekday:3, classes:[{ name:'Rhythmix', time:'6:15p–7:15p', instructor:'Nicole' }] },
+      { weekday:4, classes:[{ name:'Anabolix', time:'6:15p–6:45p', instructor:'Nicole' }] },
+      { weekday:5, classes:[] },
+      { weekday:6, classes:[
+        { name:'Rhythmix', time:'8:30a–9:30a', instructor:'Nicole' },
+        { name:'Anabolix', time:'9:45a–10:15a', instructor:'Nicole' }
+      ]},
+      { weekday:7, classes:[{ name:'Kinetix', time:'3:00p–4:00p', instructor:'Sarah' }] }
     ];
 
-    const SHOW_END_TIMES = true; // set false if you want only "5:30p" (no ranges)
-
-    const root = document.getElementById("bodiSchedule");
-    if (!root) return;
-
-    const days = buildRollingDays_(new Date(), 7);
-    root.innerHTML = days.map(d => renderDay_(d, classesForDate_(d.date))).join("");
-
-    function classesForDate_(dateObj) {
-      const dow = dateObj.getDay();
-      return TEMPLATE
-        .filter(x => x.day === dow)
-        .map(x => {
-          const start = combineDateTime_(dateObj, x.time);
-          const end = addMinutes_(start, x.durationMin);
-          return { ...x, start, end };
-        })
-        .sort((a, b) => a.start - b.start);
+    function zonedParts(date){
+      const parts = new Intl.DateTimeFormat('en-US',{
+        timeZone:TZ, year:'numeric', month:'numeric', day:'numeric'
+      }).formatToParts(date);
+      return Object.fromEntries(parts.map(p=>[p.type,p.value]));
     }
 
-    function renderDay_(day, items) {
-      const dateLabel = `${day.month}/${day.day}`;
+    function weekdayNum(date){
+      const wd = new Intl.DateTimeFormat('en-US',{ timeZone:TZ, weekday:'short' }).format(date).toLowerCase();
+      return { mon:1,tue:2,wed:3,thu:4,fri:5,sat:6,sun:7 }[wd];
+    }
 
-      if (!items || items.length === 0) {
-        return `
-          <article class="bodi-day">
-            <div class="bodi-day__head">
-              <p class="bodi-day__label"><b>${escapeHtml_(day.weekday)}</b></p>
-              <p class="bodi-day__date">${dateLabel}</p>
-            </div>
-            <div class="bodi-empty">No classes at this time, check back later</div>
-          </article>
+    function utcNoon(y,m,d){ return new Date(Date.UTC(y,m-1,d,12)); }
+    function addDays(d,n){ return new Date(d.getTime()+n*86400000); }
+
+    function formatDay(date){
+      const w = new Intl.DateTimeFormat('en-US',{ timeZone:TZ, weekday:'long' }).format(date);
+      const md = new Intl.DateTimeFormat('en-US',{ timeZone:TZ, month:'short', day:'numeric' }).format(date);
+      return `${w} • ${md}`;
+    }
+
+    function buildWeek(){
+      const now = new Date();
+      const p = zonedParts(now);
+      const today = utcNoon(+p.year,+p.month,+p.day);
+      const monday = addDays(today, -(weekdayNum(now)-1));
+
+      document.getElementById('weekLine').textContent =
+        `Week of ${new Intl.DateTimeFormat('en-US',{ timeZone:TZ, month:'short', day:'numeric' }).format(monday)}`;
+
+      return Array.from({length:7},(_,i)=>{
+        const date = addDays(monday,i);
+        const tpl = WEEK_TEMPLATE.find(x=>x.weekday===i+1) || { classes:[] };
+        return { date, header:formatDay(date), classes:tpl.classes };
+      });
+    }
+
+    function render(){
+      const grid = document.getElementById('dayGrid');
+      grid.innerHTML='';
+      buildWeek().forEach(day=>{
+        const card=document.createElement('article');
+        card.className='card';
+        const has=day.classes.length>0;
+
+        card.innerHTML=`
+          <h3>${day.header}</h3>
+          <p class="when">${has?'':EMPTY_NOTE}</p>
+          <div class="day-lines"></div>
         `;
-      }
 
-      const rows = items.map(it => {
-        const t1 = formatTime_(it.start);
-        const t2 = formatTime_(it.end);
-        const timeRange = SHOW_END_TIMES ? `${t1}–${t2}` : t1;
-        const instructorName = INSTRUCTORS[it.instructor] || "Instructor";
-
-        return `
-          <div class="bodi-item">
-            <div class="bodi-item__text">
-              <a class="bodi-item__class" href="${CLASSES_URL}">${escapeHtml_(it.className)}</a>
-              <div class="bodi-item__meta">${timeRange} with ${escapeHtml_(instructorName)}</div>
-            </div>
-            <a class="bodi-item__btn" href="${RESERVE_URL}">RESERVE</a>
-          </div>
-        `;
-      }).join("");
-
-      return `
-        <article class="bodi-day">
-          <div class="bodi-day__head">
-            <p class="bodi-day__label"><b>${escapeHtml_(day.weekday)}</b></p>
-            <p class="bodi-day__date">${dateLabel}</p>
-          </div>
-          <div class="bodi-day__items">${rows}</div>
-        </article>
-      `;
+        const lines=card.querySelector('.day-lines');
+        if(has){
+          day.classes.forEach(c=>{
+            const line=document.createElement('div');
+            line.className='classline';
+            line.innerHTML=`
+              <div class="classname">
+                <strong>${c.name}</strong>
+                <span>${c.time} • with ${c.instructor}</span>
+              </div>
+              <a class="btn small" href="${RESERVE_URL}">Reserve</a>
+            `;
+            lines.appendChild(line);
+          });
+        }
+        grid.appendChild(card);
+      });
     }
 
-    function buildRollingDays_(startDate, count) {
-      const out = [];
-      const base = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()); // midnight local
-      for (let i = 0; i < count; i++) {
-        const d = new Date(base);
-        d.setDate(base.getDate() + i);
-        out.push({
-          date: d,
-          weekday: d.toLocaleDateString(undefined, { weekday: "long" }),
-          month: d.getMonth() + 1,
-          day: d.getDate(),
-        });
-      }
-      return out;
-    }
-
-    function combineDateTime_(dateObj, hhmm) {
-      const [hh, mm] = hhmm.split(":").map(Number);
-      return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), hh, mm, 0, 0);
-    }
-
-    function addMinutes_(dateObj, minutes) {
-      const d = new Date(dateObj);
-      d.setMinutes(d.getMinutes() + (Number(minutes) || 0));
-      return d;
-    }
-
-    // Format like 5:30p / 8:30a (matches your examples)
-    function formatTime_(dateObj) {
-      let h = dateObj.getHours();
-      const m = dateObj.getMinutes();
-      const am = h < 12;
-      const suffix = am ? "a" : "p";
-      h = h % 12;
-      if (h === 0) h = 12;
-      return `${h}:${String(m).padStart(2, "0")}${suffix}`;
-    }
-
-    function escapeHtml_(s) {
-      return String(s || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-  })();
-</script>
-<!-- ====== /BODIODI: Rolling 7-Day Schedule ====== -->
-
+    render();
+  </script>
+</body>
+</html>
