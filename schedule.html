@@ -10,4 +10,158 @@
     <a class="sched-reserveAll" href="https://bodiodi.com/signup.html">Reserve a class</a>
   </div>
 </section>
+<style>/* ===== Bodiodi Schedule (rolling 7) ===== */
+.sched-wrap{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 16px 36px;
+}
 
+.sched-head{
+  margin: 10px 0 18px;
+}
+
+.sched-title{
+  margin: 0 0 8px;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: .2px;
+  color: var(--ink);
+}
+
+.sched-sub{
+  margin: 0;
+  color: color-mix(in oklab, var(--ink) 70%, white);
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 58ch;
+}
+
+.sched-list{
+  display: grid;
+  gap: 12px;
+}
+
+.sched-day{
+  border: 1px solid color-mix(in oklab, var(--dk) 18%, white);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  background: rgba(255,255,255,.66);
+  backdrop-filter: blur(6px);
+}
+
+.sched-dayHead{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 2px 10px;
+  border-bottom: 1px solid color-mix(in oklab, var(--dk) 12%, white);
+  margin-bottom: 10px;
+}
+
+.sched-dayLabel{
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 16px;
+  letter-spacing: .2px;
+}
+
+.sched-dateLabel{
+  margin: 0;
+  color: color-mix(in oklab, var(--ink) 68%, white);
+  font-size: 14px;
+}
+
+.sched-items{
+  display: grid;
+  gap: 10px;
+}
+
+.sched-item{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.6);
+  border: 1px solid color-mix(in oklab, var(--dk) 10%, white);
+}
+
+.sched-itemText{
+  min-width: 0;
+}
+
+.sched-classLink{
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 750;
+  letter-spacing: .1px;
+}
+
+.sched-classLink:hover{
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sched-meta{
+  margin-top: 3px;
+  font-size: 14px;
+  color: color-mix(in oklab, var(--ink) 70%, white);
+  line-height: 1.35;
+}
+
+.sched-empty{
+  padding: 10px 6px 2px;
+  color: color-mix(in oklab, var(--ink) 68%, white);
+  font-size: 14px;
+}
+
+.sched-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--dk) 18%, white);
+  background: var(--accent);
+  color: color-mix(in oklab, var(--ink) 88%, black);
+  font-weight: 800;
+  letter-spacing: .2px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sched-btn:active{
+  transform: translateY(1px);
+}
+
+.sched-foot{
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.sched-reserveAll{
+  display: inline-flex;
+  padding: 12px 16px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: white;
+  background: color-mix(in oklab, var(--dk) 92%, black);
+  font-weight: 750;
+}
+
+/* Mobile: stack item content nicely */
+@media (max-width: 540px){
+  .sched-item{
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+  .sched-btn{
+    width: 100%;
+  }
+}
+</style>
