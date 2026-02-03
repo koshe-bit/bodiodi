@@ -1,333 +1,316 @@
-<section class="sched-wrap">
-  <header class="sched-head">
-    <h1 class="sched-title">Schedule</h1>
-    <p class="sched-sub">Rolling 7-day view. Reserve your spot in seconds.</p>
+<!-- ====== BODIODI: Rolling 7-Day Schedule (Single Chunk) ====== -->
+<section class="bodi-schedule">
+  <header class="bodi-schedule__head">
+    <h1 class="h2">Schedule</h1>
+    <p class="body bodi-schedule__sub">Rolling 7-day view. Reserve your spot in seconds.</p>
   </header>
 
-  <div id="bodiSchedule" class="sched-list" aria-live="polite"></div>
+  <div id="bodiSchedule" class="bodi-schedule__list" aria-live="polite"></div>
 
-  <div class="sched-foot">
-    <a class="sched-reserveAll" href="https://bodiodi.com/signup.html">Reserve a class</a>
+  <div class="bodi-schedule__foot">
+    <a class="btn primary" href="https://bodiodi.com/signup.html">Reserve a class</a>
   </div>
 </section>
-<style>/* ===== Bodiodi Schedule (rolling 7) ===== */
-.sched-wrap{
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 18px 16px 36px;
-}
 
-.sched-head{
-  margin: 10px 0 18px;
-}
+<style>
+  /* ====== Schedule styles that follow your global system ====== */
+  .bodi-schedule{
+    width: var(--container);
+    margin: 0 auto;
+    padding: var(--space-6) 0;
+  }
 
-.sched-title{
-  margin: 0 0 8px;
-  font-size: clamp(26px, 3vw, 34px);
-  letter-spacing: .2px;
-  color: var(--ink);
-}
+  .bodi-schedule__head{
+    display: grid;
+    gap: .5rem;
+    margin-bottom: var(--space-3);
+  }
 
-.sched-sub{
-  margin: 0;
-  color: color-mix(in oklab, var(--ink) 70%, white);
-  font-size: 15px;
-  line-height: 1.5;
-  max-width: 58ch;
-}
+  .bodi-schedule__sub{
+    max-width: 60ch;
+    opacity: .82;
+  }
 
-.sched-list{
-  display: grid;
-  gap: 12px;
-}
+  .bodi-schedule__list{
+    display: grid;
+    gap: var(--space-2);
+  }
 
-.sched-day{
-  border: 1px solid color-mix(in oklab, var(--dk) 18%, white);
-  border-radius: 18px;
-  padding: 14px 14px 12px;
-  background: rgba(255,255,255,.66);
-  backdrop-filter: blur(6px);
-}
+  /* Day card */
+  .bodi-day{
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,.08);
+    background:
+      radial-gradient(900px 500px at 20% 0%, rgba(246,227,218,0.35) 0%, transparent 55%),
+      radial-gradient(700px 500px at 95% 0%, rgba(131,155,133,0.18) 0%, transparent 60%),
+      rgba(255,255,255,.72);
+    backdrop-filter: blur(6px);
+    padding: 14px;
+  }
 
-.sched-dayHead{
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 2px 2px 10px;
-  border-bottom: 1px solid color-mix(in oklab, var(--dk) 12%, white);
-  margin-bottom: 10px;
-}
+  .bodi-day__head{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+  }
 
-.sched-dayLabel{
-  margin: 0;
-  font-weight: 700;
-  color: var(--ink);
-  font-size: 16px;
-  letter-spacing: .2px;
-}
+  .bodi-day__label{
+    margin: 0;
+    font-family: var(--font-head);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    color: var(--sage-dark);
+    font-size: 1.02rem;
+  }
 
-.sched-dateLabel{
-  margin: 0;
-  color: color-mix(in oklab, var(--ink) 68%, white);
-  font-size: 14px;
-}
+  .bodi-day__date{
+    margin: 0;
+    font-family: var(--font-head);
+    font-weight: 500;
+    opacity: .75;
+    font-size: .95rem;
+  }
 
-.sched-items{
-  display: grid;
-  gap: 10px;
-}
-
-.sched-item{
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 10px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.6);
-  border: 1px solid color-mix(in oklab, var(--dk) 10%, white);
-}
-
-.sched-itemText{
-  min-width: 0;
-}
-
-.sched-classLink{
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 750;
-  letter-spacing: .1px;
-}
-
-.sched-classLink:hover{
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.sched-meta{
-  margin-top: 3px;
-  font-size: 14px;
-  color: color-mix(in oklab, var(--ink) 70%, white);
-  line-height: 1.35;
-}
-
-.sched-empty{
-  padding: 10px 6px 2px;
-  color: color-mix(in oklab, var(--ink) 68%, white);
-  font-size: 14px;
-}
-
-.sched-btn{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--dk) 18%, white);
-  background: var(--accent);
-  color: color-mix(in oklab, var(--ink) 88%, black);
-  font-weight: 800;
-  letter-spacing: .2px;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.sched-btn:active{
-  transform: translateY(1px);
-}
-
-.sched-foot{
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.sched-reserveAll{
-  display: inline-flex;
-  padding: 12px 16px;
-  border-radius: 14px;
-  text-decoration: none;
-  color: white;
-  background: color-mix(in oklab, var(--dk) 92%, black);
-  font-weight: 750;
-}
-
-/* Mobile: stack item content nicely */
-@media (max-width: 540px){
-  .sched-item{
-    grid-template-columns: 1fr;
+  /* Items list */
+  .bodi-day__items{
+    display: grid;
     gap: 10px;
-    padding: 12px;
   }
-  .sched-btn{
-    width: 100%;
+
+  .bodi-item{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(0,0,0,.08);
   }
-}
+
+  .bodi-item__text{
+    min-width: 0;
+  }
+
+  .bodi-item__class{
+    display: inline-block;
+    font-family: var(--font-head);
+    font-weight: 700;
+    color: var(--fg);
+    text-decoration: none;
+    letter-spacing: -.01em;
+  }
+
+  .bodi-item__class:hover{
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .bodi-item__meta{
+    margin-top: 3px;
+    font-size: .95rem;
+    opacity: .78;
+    line-height: 1.35;
+  }
+
+  /* Reserve button (schedule-specific, but aligned with your btn system) */
+  .bodi-item__btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .75rem 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-family: var(--font-head);
+    font-weight: 700;
+    letter-spacing: .01em;
+    color: #fff;
+    background: var(--sage);
+    box-shadow: 0 10px 28px rgba(131,155,133,.28);
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    white-space: nowrap;
+  }
+
+  .bodi-item__btn:hover{
+    background: var(--sage-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 34px rgba(131,155,133,.34);
+  }
+
+  .bodi-item__btn:active{
+    transform: translateY(0px);
+  }
+
+  .bodi-empty{
+    padding: 8px 2px 2px;
+    font-size: .95rem;
+    opacity: .78;
+  }
+
+  .bodi-schedule__foot{
+    margin-top: var(--space-3);
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  /* Mobile: stack item content, full-width reserve button */
+  @media (max-width: 560px){
+    .bodi-day{ padding: 12px; }
+    .bodi-item{
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 12px;
+    }
+    .bodi-item__btn{
+      width: 100%;
+      padding: .85rem 1.1rem;
+    }
+  }
 </style>
-<body><script>
-/**
- * Bodiodi rolling 7-day schedule (template-driven)
- * - Renders today + next 6 days
- * - Uses a weekly template: same classes each week, dates roll
- * - Class names link to classes.html (no anchors)
- * - Reserve button links to signup.html
- */
 
-(function () {
-  const RESERVE_URL = "https://bodiodi.com/signup.html";
-  const CLASSES_URL = "https://bodiodi.com/classes.html";
+<script>
+  /**
+   * Bodiodi rolling 7-day schedule (template-driven)
+   * - Renders today + next 6 days (rolling)
+   * - Weekly template (same classes each week; dates roll)
+   * - Class name links to classes page (no anchors)
+   * - Reserve button links to signup page
+   */
 
-  // Instructor labels
-  const INSTRUCTORS = {
-    nicole: "Nicole",
-    sarah: "Sarah",
-  };
+  (function () {
+    const RESERVE_URL = "https://bodiodi.com/signup.html";
+    const CLASSES_URL = "https://bodiodi.com/classes.html";
 
-  // Weekly template.
-  // day: 0=Sun ... 6=Sat
-  // time: 24h "HH:MM"
-  // durationMin: used only for display (end time).
-  const TEMPLATE = [
-    { day: 1, className: "Anabolix", time: "17:30", durationMin: 30, instructor: "nicole" }, // Monday 5:30p–6:00p
-    { day: 3, className: "Rhythmix", time: "18:15", durationMin: 60, instructor: "nicole" }, // Wednesday 6:15p–7:15p
-    { day: 4, className: "Anabolix", time: "18:15", durationMin: 30, instructor: "nicole" }, // Thursday 6:15p–6:45p
-    { day: 6, className: "Rhythmix", time: "08:30", durationMin: 60, instructor: "nicole" }, // Saturday 8:30a–9:30a
-    { day: 6, className: "Anabolix", time: "09:45", durationMin: 30, instructor: "nicole" }, // Saturday 9:45a–10:15a
-    { day: 0, className: "Kinetix", time: "15:00", durationMin: 60, instructor: "sarah" },   // Sunday 3:00p–4:00p
-  ];
+    const INSTRUCTORS = {
+      nicole: "Nicole",
+      sarah: "Sarah",
+    };
 
-  const showEndTimes = true; // set false if you want only "5:30p" not ranges.
+    // day: 0=Sun ... 6=Sat
+    // time: 24h "HH:MM"
+    // durationMin: used for end-time display
+    const TEMPLATE = [
+      { day: 1, className: "Anabolix", time: "17:30", durationMin: 30, instructor: "nicole" }, // Mon 5:30p–6:00p
+      { day: 3, className: "Rhythmix", time: "18:15", durationMin: 60, instructor: "nicole" }, // Wed 6:15p–7:15p
+      { day: 4, className: "Anabolix", time: "18:15", durationMin: 30, instructor: "nicole" }, // Thu 6:15p–6:45p
+      { day: 6, className: "Rhythmix", time: "08:30", durationMin: 60, instructor: "nicole" }, // Sat 8:30a–9:30a
+      { day: 6, className: "Anabolix", time: "09:45", durationMin: 30, instructor: "nicole" }, // Sat 9:45a–10:15a
+      { day: 0, className: "Kinetix",  time: "15:00", durationMin: 60, instructor: "sarah" },  // Sun 3:00p–4:00p
+    ];
 
-  const root = document.getElementById("bodiSchedule");
-  if (!root) return;
+    const SHOW_END_TIMES = true; // set false if you want only "5:30p" (no ranges)
 
-  const now = new Date();
-  const days = buildRollingDays_(now, 7);
+    const root = document.getElementById("bodiSchedule");
+    if (!root) return;
 
-  root.innerHTML = days
-    .map((d) => renderDay_(d, classesForDate_(d.date)))
-    .join("");
+    const days = buildRollingDays_(new Date(), 7);
+    root.innerHTML = days.map(d => renderDay_(d, classesForDate_(d.date))).join("");
 
-  function classesForDate_(dateObj) {
-    const dow = dateObj.getDay();
-    return TEMPLATE
-      .filter((x) => x.day === dow)
-      .map((x) => {
-        const start = combineDateTime_(dateObj, x.time);
-        const end = addMinutes_(start, x.durationMin);
-        return { ...x, start, end };
-      })
-      .sort((a, b) => a.start - b.start);
-  }
+    function classesForDate_(dateObj) {
+      const dow = dateObj.getDay();
+      return TEMPLATE
+        .filter(x => x.day === dow)
+        .map(x => {
+          const start = combineDateTime_(dateObj, x.time);
+          const end = addMinutes_(start, x.durationMin);
+          return { ...x, start, end };
+        })
+        .sort((a, b) => a.start - b.start);
+    }
 
-  function renderDay_(day, items) {
-    const dayLabel = `<b>${escapeHtml_(day.weekday)}</b>`;
-    const dateLabel = `${day.month}/${day.day}`;
+    function renderDay_(day, items) {
+      const dateLabel = `${day.month}/${day.day}`;
 
-    if (!items || items.length === 0) {
-      return `
-        <article class="sched-day">
-          <div class="sched-dayHead">
-            <p class="sched-dayLabel">${dayLabel}</p>
-            <p class="sched-dateLabel">${dateLabel}</p>
+      if (!items || items.length === 0) {
+        return `
+          <article class="bodi-day">
+            <div class="bodi-day__head">
+              <p class="bodi-day__label"><b>${escapeHtml_(day.weekday)}</b></p>
+              <p class="bodi-day__date">${dateLabel}</p>
+            </div>
+            <div class="bodi-empty">No classes at this time, check back later</div>
+          </article>
+        `;
+      }
+
+      const rows = items.map(it => {
+        const t1 = formatTime_(it.start);
+        const t2 = formatTime_(it.end);
+        const timeRange = SHOW_END_TIMES ? `${t1}–${t2}` : t1;
+        const instructorName = INSTRUCTORS[it.instructor] || "Instructor";
+
+        return `
+          <div class="bodi-item">
+            <div class="bodi-item__text">
+              <a class="bodi-item__class" href="${CLASSES_URL}">${escapeHtml_(it.className)}</a>
+              <div class="bodi-item__meta">${timeRange} with ${escapeHtml_(instructorName)}</div>
+            </div>
+            <a class="bodi-item__btn" href="${RESERVE_URL}">RESERVE</a>
           </div>
-          <div class="sched-empty">No classes at this time, check back later</div>
+        `;
+      }).join("");
+
+      return `
+        <article class="bodi-day">
+          <div class="bodi-day__head">
+            <p class="bodi-day__label"><b>${escapeHtml_(day.weekday)}</b></p>
+            <p class="bodi-day__date">${dateLabel}</p>
+          </div>
+          <div class="bodi-day__items">${rows}</div>
         </article>
       `;
     }
 
-    const rows = items
-      .map((it) => {
-        const timeStr = formatTime_(it.start);
-        const endStr = formatTime_(it.end);
-        const timeRange = showEndTimes ? `${timeStr}–${endStr}` : timeStr;
-
-        const instructorName = INSTRUCTORS[it.instructor] || "Instructor";
-        const classHref = CLASSES_URL; // no anchors per your request
-
-        return `
-          <div class="sched-item">
-            <div class="sched-itemText">
-              <a class="sched-classLink" href="${classHref}">${escapeHtml_(it.className)}</a>
-              <div class="sched-meta">${timeRange} with ${escapeHtml_(instructorName)}</div>
-            </div>
-            <a class="sched-btn" href="${RESERVE_URL}">RESERVE</a>
-          </div>
-        `;
-      })
-      .join("");
-
-    return `
-      <article class="sched-day">
-        <div class="sched-dayHead">
-          <p class="sched-dayLabel">${dayLabel}</p>
-          <p class="sched-dateLabel">${dateLabel}</p>
-        </div>
-        <div class="sched-items">${rows}</div>
-      </article>
-    `;
-  }
-
-  function buildRollingDays_(startDate, count) {
-    const out = [];
-    const base = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate()
-    ); // midnight local
-    for (let i = 0; i < count; i++) {
-      const d = new Date(base);
-      d.setDate(base.getDate() + i);
-      out.push({
-        date: d,
-        weekday: d.toLocaleDateString(undefined, { weekday: "long" }),
-        month: d.getMonth() + 1,
-        day: d.getDate(),
-      });
+    function buildRollingDays_(startDate, count) {
+      const out = [];
+      const base = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()); // midnight local
+      for (let i = 0; i < count; i++) {
+        const d = new Date(base);
+        d.setDate(base.getDate() + i);
+        out.push({
+          date: d,
+          weekday: d.toLocaleDateString(undefined, { weekday: "long" }),
+          month: d.getMonth() + 1,
+          day: d.getDate(),
+        });
+      }
+      return out;
     }
-    return out;
-  }
 
-  function combineDateTime_(dateObj, hhmm) {
-    const [hh, mm] = hhmm.split(":").map(Number);
-    return new Date(
-      dateObj.getFullYear(),
-      dateObj.getMonth(),
-      dateObj.getDate(),
-      hh,
-      mm,
-      0,
-      0
-    );
-  }
+    function combineDateTime_(dateObj, hhmm) {
+      const [hh, mm] = hhmm.split(":").map(Number);
+      return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), hh, mm, 0, 0);
+    }
 
-  function addMinutes_(dateObj, min) {
-    const d = new Date(dateObj);
-    d.setMinutes(d.getMinutes() + (Number(min) || 0));
-    return d;
-  }
+    function addMinutes_(dateObj, minutes) {
+      const d = new Date(dateObj);
+      d.setMinutes(d.getMinutes() + (Number(minutes) || 0));
+      return d;
+    }
 
-  // Format like 5:30p / 8:30a
-  function formatTime_(dateObj) {
-    let h = dateObj.getHours();
-    const m = dateObj.getMinutes();
-    const am = h < 12;
-    const suffix = am ? "a" : "p";
-    h = h % 12;
-    if (h === 0) h = 12;
-    const mm = String(m).padStart(2, "0");
-    return `${h}:${mm}${suffix}`;
-  }
+    // Format like 5:30p / 8:30a (matches your examples)
+    function formatTime_(dateObj) {
+      let h = dateObj.getHours();
+      const m = dateObj.getMinutes();
+      const am = h < 12;
+      const suffix = am ? "a" : "p";
+      h = h % 12;
+      if (h === 0) h = 12;
+      return `${h}:${String(m).padStart(2, "0")}${suffix}`;
+    }
 
-  function escapeHtml_(s) {
-    return String(s || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-})();
+    function escapeHtml_(s) {
+      return String(s || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  })();
 </script>
-</body>
+<!-- ====== /BODIODI: Rolling 7-Day Schedule ====== -->
