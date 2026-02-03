@@ -165,3 +165,169 @@
   }
 }
 </style>
+<body><script>
+/**
+ * Bodiodi rolling 7-day schedule (template-driven)
+ * - Renders today + next 6 days
+ * - Uses a weekly template: same classes each week, dates roll
+ * - Class names link to classes.html (no anchors)
+ * - Reserve button links to signup.html
+ */
+
+(function () {
+  const RESERVE_URL = "https://bodiodi.com/signup.html";
+  const CLASSES_URL = "https://bodiodi.com/classes.html";
+
+  // Instructor labels
+  const INSTRUCTORS = {
+    nicole: "Nicole",
+    sarah: "Sarah",
+  };
+
+  // Weekly template.
+  // day: 0=Sun ... 6=Sat
+  // time: 24h "HH:MM"
+  // durationMin: used only for display (end time).
+  const TEMPLATE = [
+    { day: 1, className: "Anabolix", time: "17:30", durationMin: 30, instructor: "nicole" }, // Monday 5:30p–6:00p
+    { day: 3, className: "Rhythmix", time: "18:15", durationMin: 60, instructor: "nicole" }, // Wednesday 6:15p–7:15p
+    { day: 4, className: "Anabolix", time: "18:15", durationMin: 30, instructor: "nicole" }, // Thursday 6:15p–6:45p
+    { day: 6, className: "Rhythmix", time: "08:30", durationMin: 60, instructor: "nicole" }, // Saturday 8:30a–9:30a
+    { day: 6, className: "Anabolix", time: "09:45", durationMin: 30, instructor: "nicole" }, // Saturday 9:45a–10:15a
+    { day: 0, className: "Kinetix", time: "15:00", durationMin: 60, instructor: "sarah" },   // Sunday 3:00p–4:00p
+  ];
+
+  const showEndTimes = true; // set false if you want only "5:30p" not ranges.
+
+  const root = document.getElementById("bodiSchedule");
+  if (!root) return;
+
+  const now = new Date();
+  const days = buildRollingDays_(now, 7);
+
+  root.innerHTML = days
+    .map((d) => renderDay_(d, classesForDate_(d.date)))
+    .join("");
+
+  function classesForDate_(dateObj) {
+    const dow = dateObj.getDay();
+    return TEMPLATE
+      .filter((x) => x.day === dow)
+      .map((x) => {
+        const start = combineDateTime_(dateObj, x.time);
+        const end = addMinutes_(start, x.durationMin);
+        return { ...x, start, end };
+      })
+      .sort((a, b) => a.start - b.start);
+  }
+
+  function renderDay_(day, items) {
+    const dayLabel = `<b>${escapeHtml_(day.weekday)}</b>`;
+    const dateLabel = `${day.month}/${day.day}`;
+
+    if (!items || items.length === 0) {
+      return `
+        <article class="sched-day">
+          <div class="sched-dayHead">
+            <p class="sched-dayLabel">${dayLabel}</p>
+            <p class="sched-dateLabel">${dateLabel}</p>
+          </div>
+          <div class="sched-empty">No classes at this time, check back later</div>
+        </article>
+      `;
+    }
+
+    const rows = items
+      .map((it) => {
+        const timeStr = formatTime_(it.start);
+        const endStr = formatTime_(it.end);
+        const timeRange = showEndTimes ? `${timeStr}–${endStr}` : timeStr;
+
+        const instructorName = INSTRUCTORS[it.instructor] || "Instructor";
+        const classHref = CLASSES_URL; // no anchors per your request
+
+        return `
+          <div class="sched-item">
+            <div class="sched-itemText">
+              <a class="sched-classLink" href="${classHref}">${escapeHtml_(it.className)}</a>
+              <div class="sched-meta">${timeRange} with ${escapeHtml_(instructorName)}</div>
+            </div>
+            <a class="sched-btn" href="${RESERVE_URL}">RESERVE</a>
+          </div>
+        `;
+      })
+      .join("");
+
+    return `
+      <article class="sched-day">
+        <div class="sched-dayHead">
+          <p class="sched-dayLabel">${dayLabel}</p>
+          <p class="sched-dateLabel">${dateLabel}</p>
+        </div>
+        <div class="sched-items">${rows}</div>
+      </article>
+    `;
+  }
+
+  function buildRollingDays_(startDate, count) {
+    const out = [];
+    const base = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate()
+    ); // midnight local
+    for (let i = 0; i < count; i++) {
+      const d = new Date(base);
+      d.setDate(base.getDate() + i);
+      out.push({
+        date: d,
+        weekday: d.toLocaleDateString(undefined, { weekday: "long" }),
+        month: d.getMonth() + 1,
+        day: d.getDate(),
+      });
+    }
+    return out;
+  }
+
+  function combineDateTime_(dateObj, hhmm) {
+    const [hh, mm] = hhmm.split(":").map(Number);
+    return new Date(
+      dateObj.getFullYear(),
+      dateObj.getMonth(),
+      dateObj.getDate(),
+      hh,
+      mm,
+      0,
+      0
+    );
+  }
+
+  function addMinutes_(dateObj, min) {
+    const d = new Date(dateObj);
+    d.setMinutes(d.getMinutes() + (Number(min) || 0));
+    return d;
+  }
+
+  // Format like 5:30p / 8:30a
+  function formatTime_(dateObj) {
+    let h = dateObj.getHours();
+    const m = dateObj.getMinutes();
+    const am = h < 12;
+    const suffix = am ? "a" : "p";
+    h = h % 12;
+    if (h === 0) h = 12;
+    const mm = String(m).padStart(2, "0");
+    return `${h}:${mm}${suffix}`;
+  }
+
+  function escapeHtml_(s) {
+    return String(s || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+})();
+</script>
+</body>
