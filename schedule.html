@@ -124,6 +124,68 @@
       font-size:12px;
       white-space:nowrap;
     }
+
+    /* Clickable class name (looks like your normal class label) */
+    .class-pop{
+      display:inline-block;
+      color:inherit;
+      text-decoration:none;
+      cursor:pointer;
+      width:fit-content;
+      max-width:100%;
+    }
+    .class-pop:hover{
+      text-decoration:underline;
+      opacity:.95;
+    }
+
+    /* Popup modal (matches our agreed modal style) */
+    .modal{ position:fixed; inset:0; display:none; z-index:200; }
+    .modal.open{ display:block; }
+    .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
+
+    .modal-card{
+      position:relative;
+      width:min(640px, 92vw);
+      margin: 14vh auto 0;
+      background:#fffaf8;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:18px 18px 14px;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      color:var(--dk);
+      font-family:"Krub", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    .modal-card h3{
+      margin:0 0 8px 0;
+      font-family:"Inter";
+      font-weight:800;
+      letter-spacing:-.01em;
+      color:var(--dk);
+    }
+    .modal-sub{
+      margin:0 0 12px 0;
+      font-size:14px;
+      color:var(--dk85);
+      opacity:.95;
+    }
+    .modal-body p{
+      margin:0 0 10px 0;
+      line-height:1.55;
+      max-width:none;
+      font-size:14px;
+    }
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      margin-top:12px;
+    }
+    .btn-ghost{
+      background:transparent;
+      border:2px solid rgba(58,67,60,.35);
+      color:var(--dk85);
+    }
   </style>
 </head>
 
@@ -174,14 +236,28 @@
 
     <section class="grid" id="dayGrid" aria-label="Weekly schedule"></section>
 
-    <p style="margin-top:22px; font-size:14px; opacity:.9;">
-      
-    </p>
+    <p style="margin-top:22px; font-size:14px; opacity:.9;"></p>
 
     <p style="margin-top:10px;">
       <a class="btn" href="index.html">Back to home</a>
     </p>
   </main>
+
+  <!-- Class Description Popup -->
+  <div class="modal" id="classModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="classModalTitle">
+    <div class="modal-backdrop" data-close="1"></div>
+
+    <div class="modal-card">
+      <h3 id="classModalTitle">Class</h3>
+      <p class="modal-sub" id="classModalSub"></p>
+
+      <div class="modal-body" id="classModalBody"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" id="closeClassModal">Close</button>
+      </div>
+    </div>
+  </div>
 
   <script src="assets/site.js?v=2"></script>
 
@@ -240,9 +316,108 @@
       });
     }
 
+    // ===== Popup: pull descriptions from classes.html (cached) =====
+    const CLASS_SRC_URL = 'https://bodiodi.com/classes.html';
+    let classDescCache = null;
+
+    async function loadClassDescriptions(){
+      if (classDescCache) return classDescCache;
+
+      const res = await fetch(CLASS_SRC_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Could not load class descriptions.');
+
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      // classes.html is structured with <h2>ClassName</h2> then text blocks until next <h2>
+      const map = {};
+      const h2s = Array.from(doc.querySelectorAll('h2'));
+
+      h2s.forEach(h2 => {
+        const name = (h2.textContent || '').trim();
+        if (!name) return;
+
+        const parts = [];
+        let duration = '';
+
+        let el = h2.nextElementSibling;
+        while (el && el.tagName !== 'H2'){
+          const txt = (el.textContent || '').trim();
+          if (txt){
+            // First meaningful line after heading is duration on your page ("1 hour", "30 minutes")
+            if (!duration && (/hour|minutes?/i).test(txt) && txt.length <= 20){
+              duration = txt;
+            } else {
+              parts.push(txt);
+            }
+          }
+          el = el.nextElementSibling;
+        }
+
+        map[name.toLowerCase()] = { name, duration, parts };
+      });
+
+      classDescCache = map;
+      return map;
+    }
+
+    // Modal controls
+    const classModal = document.getElementById('classModal');
+    const classModalTitle = document.getElementById('classModalTitle');
+    const classModalSub = document.getElementById('classModalSub');
+    const classModalBody = document.getElementById('classModalBody');
+    const closeClassModalBtn = document.getElementById('closeClassModal');
+
+    function openClassModal(){
+      classModal.classList.add('open');
+      classModal.setAttribute('aria-hidden', 'false');
+    }
+    function closeClassModal(){
+      classModal.classList.remove('open');
+      classModal.setAttribute('aria-hidden', 'true');
+      classModalTitle.textContent = 'Class';
+      classModalSub.textContent = '';
+      classModalBody.innerHTML = '';
+    }
+
+    classModal.addEventListener('click', (e) => {
+      if (e.target && e.target.dataset && e.target.dataset.close) closeClassModal();
+    });
+    closeClassModalBtn.addEventListener('click', closeClassModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && classModal.classList.contains('open')) closeClassModal();
+    });
+
+    async function showDescriptionFor(className){
+      const map = await loadClassDescriptions();
+      const key = (className || '').toLowerCase();
+      const item = map[key];
+
+      classModalTitle.textContent = className;
+
+      if (!item){
+        classModalSub.textContent = '';
+        classModalBody.innerHTML = `<p>Class description coming soon.</p>`;
+        openClassModal();
+        return;
+      }
+
+      classModalSub.textContent = item.duration ? item.duration : '';
+
+      classModalBody.innerHTML = '';
+      item.parts.forEach(p => {
+        const para = document.createElement('p');
+        para.textContent = p;
+        classModalBody.appendChild(para);
+      });
+
+      openClassModal();
+    }
+
     function render(){
       const grid = document.getElementById('dayGrid');
       grid.innerHTML='';
+
       buildWeek().forEach(day=>{
         const card=document.createElement('article');
         card.className='card';
@@ -261,24 +436,37 @@
             line.className='classline';
             line.innerHTML=`
               <div class="classname">
-                <strong>${c.name}</strong>
+                <a class="class-pop" href="#" data-class="${c.name}">
+                  <strong>${c.name}</strong>
+                </a>
                 <span>${c.time} with ${c.instructor}</span>
               </div>
               <a class="btn small" href="${RESERVE_URL}">Reserve</a>
             `;
+
+            const link = line.querySelector('.class-pop');
+            link.addEventListener('click', async (e) => {
+              e.preventDefault();
+              try{
+                await showDescriptionFor(c.name);
+              }catch(err){
+                console.error(err);
+                classModalTitle.textContent = c.name;
+                classModalSub.textContent = '';
+                classModalBody.innerHTML = `<p>Couldn’t load the description right now. Please try again.</p>`;
+                openClassModal();
+              }
+            });
+
             lines.appendChild(line);
           });
         }
+
         grid.appendChild(card);
       });
     }
 
     render();
   </script>
-   </div>
-
-    <p class="back-link">
-      <a href="index.html">← Back</a>
-    </p>
 </body>
 </html>
