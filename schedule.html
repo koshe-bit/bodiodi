@@ -1,91 +1,13 @@
-erve<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bodiodi — Schedule</title>
+<section class="sched-wrap">
+  <header class="sched-head">
+    <h1 class="sched-title">Schedule</h1>
+    <p class="sched-sub">Rolling 7-day view. Reserve your spot in seconds.</p>
+  </header>
 
-  <!-- Fonts (same as home) -->
-  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
+  <div id="bodiSchedule" class="sched-list" aria-live="polite"></div>
 
-  <!-- Shared brand styles FIRST -->
-  <link rel="stylesheet" href="assets/global.css">
-
-  <!-- Page-specific styles LAST -->
-  <link rel="stylesheet" href="assets/schedule.css">
-</head>
-<body>
-
-  <!-- IDENTICAL TOPBAR/DRAWER MARKUP FROM HOME -->
-  <div class="topbar">
-    <div class="topbar-inner">
-      <p class="brand">
-        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
-      </p>
-
-      <nav class="navlinks">
-        <a href="schedule.html">Schedule</a>
-        <a href="signup.html">Reserve</a>
-        <a href="classes.html">Classes</a>
-        <a href="about.html">About</a>
-        <a href="pricing.html">Pricing</a>
-      </nav>
-
-      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
-        <span class="hamburger" aria-hidden="true"></span>
-      </button>
-    </div>
+  <div class="sched-foot">
+    <a class="sched-reserveAll" href="https://bodiodi.com/signup.html">Reserve a class</a>
   </div>
+</section>
 
-  <nav id="drawer" class="drawer" aria-hidden="true">
-    <a href="schedule.html">Schedule</a>
-    <a href="signup.html">Reserve</a>
-    <a href="classes.html">Classes</a>
-    <a href="about.html">About</a>
-    <a href="pricing.html">Pricing</a>
-  </nav>
-
-  <!-- PAGE CONTENT -->
-  <main class="wrap">
-    <header class="pagehead">
-      <h1>Schedule</h1>
-      <p class="small muted">Times shown in your local timezone</p>
-    </header>
-
-    <!-- Controls (optional; your JS can wire these) -->
-    <div class="controls" id="controls">
-      <button class="btn" id="prevBtn">← Prev</button>
-      <button class="btn" id="todayBtn">This week</button>
-      <button class="btn" id="nextBtn">Next →</button>
-      <div class="seg" role="tablist" aria-label="View mode">
-        <button class="seg-btn active" id="weekViewBtn" role="tab" aria-selected="true">Week</button>
-        <button class="seg-btn" id="dayViewBtn" role="tab" aria-selected="false">Day</button>
-      </div>
-    </div>
-
-    <!-- Calendar mounts here -->
-    <section id="calendar"></section>
-
-    <div class="status" id="status"></div>
-  </main>
-
-  <!-- Shared drawer behavior -->
-  <script src="assets/site.js"></script>
-
-  <!-- Schedule logic (your calendar fetch/render) -->
-  <script type="module" src="assets/schedule.js"></script>
-</body>
-</html>
-
-    </div>
-
-    <p class="back-link">
-      <a href="index.html">← Back</a>
-    </p>
-  </main>
-
-  <script src="assets/site.js?v=2"></script>
-</body>
-</html>
