@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bodiodi — About</title>
+
+  <!-- Fonts (match site) -->
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Krub:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Global styles (match your repo path) -->
+  <link rel="stylesheet" href="assets/global.css" />
+
+  <style>
+    /* Page-only styling that should “sit inside” your global system */
+    main.about {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+
+    .about-hero {
+      display: grid;
+      gap: 18px;
+      padding: 18px 0 10px;
+    }
+
+    .about-hero h1 {
+      margin: 0;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .about-kicker {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      flex-wrap: wrap;
+      opacity: 0.92;
+    }
+
+    .about-kicker .name {
+      font-weight: 600;
+    }
+
+    .about-kicker .role {
+      opacity: 0.85;
+    }
+
+    .about-copy {
+      display: grid;
+      gap: 14px;
+      max-width: 72ch;
+    }
+
+    .about-copy p {
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    .about-card {
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    /* Back button */
+    .back-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0 0;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.7);
+      text-decoration: none;
+      color: inherit;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .back-btn:hover {
+      border-color: rgba(0,0,0,0.18);
+      transform: translateY(-1px);
+    }
+    .back-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+    }
+
+    /* Mobile drawer (hamburger) */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+      z-index: 90;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100dvh;
+      width: min(86vw, 360px);
+      background: rgba(255,255,255,0.92);
+      border-left: 1px solid rgba(0,0,0,0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transform: translateX(102%);
+      transition: transform 220ms ease;
+      z-index: 100;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 18px;
+      gap: 12px;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer .drawer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .drawer .drawer-title {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      opacity: 0.9;
+    }
+    .drawer .drawer-close {
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.75);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      color: inherit;
+    }
+    .drawer nav {
+      display: grid;
+      gap: 10px;
+      padding-top: 6px;
+    }
+    .drawer nav a {
+      display: block;
+      padding: 12px 12px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.6);
+    }
+    .drawer nav a:hover { border-color: rgba(0,0,0,0.14); }
+
+    /* If your global.css already handles top padding for fixed topbar, keep this class */
+    body.with-topbar main { padding-top: 96px; }
+
+    /* Simple “active” state */
+    .is-active { font-weight: 600; }
+
+    /* Optional: hide desktop nav on small screens if your global doesn't already */
+    @media (max-width: 860px) {
+      .desktop-nav { display: none !important; }
+      .hamburger { display: inline-flex !important; }
+    }
+    @media (min-width: 861px) {
+      .hamburger { display: none !important; }
+    }
+  </style>
+</head>
+
+<body class="with-topbar">
+  <!-- TOPBAR (match your site structure) -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Bodiodi home">
+        <!-- Use your existing SVG if you have it -->
+        <img src="assets/bodiodilogo.svg" alt="Bodiodi" />
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="desktop-nav">
+        <a href="schedule.html">Schedule</a>
+        <a href="signup.html">Reserve</a>
+        <a href="classes.html">Classes</a>
+        <a class="is-active" href="about.html" aria-current="page">About</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+
+      <!-- Mobile hamburger -->
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-controls="mobileDrawer" aria-expanded="false">
+        <!-- simple icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile drawer -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="drawer-top">
+      <div class="drawer-title">Menu</div>
+      <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">Close</button>
+    </div>
+
+    <nav aria-label="Mobile navigation">
+      <a href="schedule.html">Schedule</a>
+      <a href="signup.html">Reserve</a>
+      <a href="classes.html">Classes</a>
+      <a class="is-active" href="about.html" aria-current="page">About</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
+
+    <div style="opacity:.7; font-size: 0.95rem; padding-top: 6px;">
+      Smaller classes. Better training.
+    </div>
+  </aside>
+
+  <main class="about">
+    <div class="back-row">
+      <a class="back-btn" href="javascript:history.back()" aria-label="Go back">
+        <svg class="back-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </a>
+    </div>
+
+    <section class="about-hero">
+      <h1>About</h1>
+
+      <div class="about-kicker">
+        <span class="name">Nicole Kosheba</span>
+        <span class="role">Group Trainer / Owner</span>
+      </div>
+
+      <div class="about-card">
+        <div class="about-copy">
+          <p>
+            I’ve been leading group fitness classes since 2011, working with people across Grand Rapids in studios,
+            workplaces, and community spaces. For the past decade, I taught at CKO Kickboxing, and I’ve also led
+            after-work programs for local businesses like Custer Furniture and Rockford Construction. Over the years,
+            I’ve coached hundreds of bodies, personalities, energy levels, and life stages—and that experience has
+            shaped how I train people today.
+          </p>
+
+          <p>
+            The gym has always been my happy place. It’s where I go to reset, release stress, and reconnect with myself.
+            But what I’ve learned is this: movement is better when it’s shared. I created Bodiodi to be a space where you
+            can show up exactly as you are and take what you need that day. Maybe you’re tired and want to zone out.
+            Maybe you’re energized and ready to push. Either way, you don’t have to perform or prove anything here.
+            My job is to guide you through training that’s functional, healthy, and genuinely fun—so you leave feeling
+            stronger, clearer, and more like yourself.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Mobile drawer logic (kept simple + reliable)
+    const btn = document.getElementById('hamburgerBtn');
+    const drawer = document.getElementById('mobileDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const closeBtn = document.getElementById('drawerCloseBtn');
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      overlay.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
+      btn.setAttribute('aria-expanded', 'true');
+      document.documentElement.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      btn.setAttribute('aria-expanded', 'false');
+      document.documentElement.style.overflow = '';
+    }
+
+    btn?.addEventListener('click', openDrawer);
+    overlay?.addEventListener('click', closeDrawer);
+    closeBtn?.addEventListener('click', closeDrawer);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+  </script>
+</body>
+</html>
