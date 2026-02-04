@@ -14,58 +14,33 @@
   <link rel="stylesheet" href="assets/global.css?v=5">
 
   <style>
-    html, body{
-      margin:0;
-      height:100%;
-      width:100%;
-      background:transparent;
-    }
+    main{ padding-top:96px; }
 
-    /* Create room for fixed topbar + bottom back link */
-    .frame-wrap{
-      padding-top:96px;     /* topbar offset */
-      padding-bottom:64px;  /* space for back link */
-      height:100%;
-      box-sizing:border-box;
+    .frame{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      overflow:hidden;
+      background:rgba(255,255,255,.72);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
     }
 
     iframe{
       width:100%;
-      height:calc(100vh - 96px - 64px);
-      border:none;
+      height: min(78vh, 980px);
+      border:0;
       display:block;
+      background:#fff;
     }
 
-    /* Back link styling */
-    .back-link{
-      margin:16px auto 0;
-      text-align:center;
-    }
-    .back-link a{
-      font-size:14px;
-      opacity:.85;
-      text-decoration:none;
-    }
-    .back-link a:hover{
-      opacity:1;
-    }
-
-    /* Slightly smaller topbar offset on small screens (if your global.css uses a shorter topbar there) */
     @media (max-width: 640px){
-      .frame-wrap{
-        padding-top:88px;
-        padding-bottom:64px;
-      }
-      iframe{
-        height:calc(100vh - 88px - 64px);
-      }
+      main{ padding-top:88px; }
+      iframe{ height: 82vh; }
     }
   </style>
 </head>
 
 <body class="simple-page">
 
-  <!-- Topbar (exactly like Classes page) -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -94,21 +69,21 @@
     <a href="https://bodiodi.com/pricing.html">Pricing</a>
   </nav>
 
-  <!-- Embedded form + back link -->
-  <div class="frame-wrap">
-    <iframe
-      src="https://docs.google.com/forms/d/e/1FAIpQLScfkXkmtMju_lhwAEuPkqzdBZNptDwJSZn-pwJvJlJyp85nNQ/viewform"
-      allowfullscreen
-      scrolling="auto"
-      title="Bodiodi Sign Up Form">
-    </iframe>
+  <main>
+    <div class="frame">
+      <iframe
+        src="https://docs.google.com/forms/d/e/1FAIpQLScfkXkmtMju_lhwAEuPkqzdBZNptDwJSZn-pwJvJlJyp85nNQ/viewform"
+        allowfullscreen
+        scrolling="auto"
+        title="Bodiodi Sign Up Form">
+      </iframe>
+    </div>
 
-    <p class="back-link">
-      <a href="index.html">← Back</a>
+    <p style="margin-top:14px;">
+      <a class="btn" href="index.html">Back to home</a>
     </p>
-  </div>
+  </main>
 
-  <!-- Hamburger behavior -->
   <script src="assets/site.js?v=2"></script>
 </body>
 </html>
