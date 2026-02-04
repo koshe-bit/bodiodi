@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="assets/global.css?v=1">
 
   <style>
-    main{ padding-top: 96px; }
+    main{ padding-top: 96px; } /* topbar offset */
 
     .page-head{
       display:flex;
@@ -89,42 +89,28 @@
     }
 
     .when{
-      margin:0 0 10px 0;
+      margin:0 0 12px 0;
       font-size:14px;
       color:var(--dk85);
       opacity:.92;
     }
 
-    .classline{
+    .row{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding:10px 0;
-      border-top:1px solid rgba(0,0,0,.08);
-    }
-    .classline:first-of-type{
-      border-top:0;
-      padding-top:4px;
-    }
-
-    .classmeta{
-      min-width:0;
-      font-size:14px;
-      color:var(--dk85);
-      opacity:.92;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      margin-top:10px;
     }
 
     .btn.small{
       padding:10px 14px;
       letter-spacing:.10em;
       font-size:12px;
+      white-space:nowrap;
     }
 
-    /* Modal (same as we agreed) */
+    /* Modal */
     .modal{ position:fixed; inset:0; display:none; z-index:200; }
     .modal.open{ display:block; }
     .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
@@ -167,7 +153,7 @@
 
 <body class="with-topbar">
 
-  <!-- Keep the lighter member feel as-is -->
+  <!-- Reuse your topbar structure (member view look stays as-is via your existing CSS) -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -239,23 +225,24 @@
     </div>
   </div>
 
-  <!-- Hamburger behavior -->
   <script src="assets/site.js?v=2"></script>
 
   <script>
-    // ===== 0) Member context from URL =====
-    // Expect: bodiodi.com/rsvp.html?id=XXXX
+    // =========================
+    // REQUIRED: Paste your Apps Script Web App URL here (ends in /exec)
+    // =========================
+    const RSVP_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+    const TZ = 'America/Detroit';
+
+    // Member context from URL: bodiodi.com/rsvp.html?id=XXXX
     const params = new URLSearchParams(location.search);
     const memberId = params.get('id');
 
     const memberBadge = document.getElementById('memberBadge');
     memberBadge.textContent = memberId ? 'Member link verified' : 'Missing member link';
 
-    // ===== 1) Weekly template (hardcoded like the public schedule) =====
-    const TZ = 'America/Detroit';
-    const EMPTY_NOTE = 'No classes at this time, check back later';
-
-    // Mon=1 ... Sun=7
+    // --- Weekly template (same as schedule; Monday end time updated) ---
     const WEEK_TEMPLATE = [
       { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
       { weekday:2, classes:[] },
@@ -278,81 +265,101 @@
     function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
     function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
 
-    function formatDay(d){
+    function formatDayPipe(d){
       const w  = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'long' }).format(d);
       const md = new Intl.DateTimeFormat('en-US', { timeZone:TZ, month:'short', day:'numeric' }).format(d);
       return `${w} | ${md}`;
     }
 
+    function zonedParts(date){
+      return new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' })
+        .formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
+    }
+
+    // Build current week (Mon–Sun) in America/Detroit
     function buildWeek(){
       const now = new Date();
-      const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone:TZ, year:'numeric', month:'numeric', day:'numeric'
-      }).formatToParts(now).reduce((a,p)=>(a[p.type]=p.value,a),{});
-
-      const today  = utcNoon(+parts.year, +parts.month, +parts.day);
+      const p = zonedParts(now);
+      const today  = utcNoon(+p.year, +p.month, +p.day);
       const monday = addDays(today, -(weekdayNum(now)-1));
 
       return Array.from({length:7}, (_,i) => {
         const date = addDays(monday, i);
         const tpl  = WEEK_TEMPLATE.find(x => x.weekday === i+1) || { classes:[] };
-        return { weekday:i+1, date, header:formatDay(date), classes:tpl.classes };
+        return { date, dayLabel: formatDayPipe(date), classes: tpl.classes };
       });
+    }
+
+    // Flatten into individual cards (one per class occurrence)
+    function buildCards(){
+      const days = buildWeek();
+      const out = [];
+      days.forEach(day => {
+        day.classes.forEach(c => {
+          // ClassID = ClassName|YYYY-MM-DD|TimeRange  (unique per occurrence)
+          const ymd = day.date.toISOString().slice(0,10);
+          const classId = `${c.name}|${ymd}|${c.time}`;
+
+          out.push({
+            class_id: classId,
+            class_name: c.name,
+            instructor: c.instructor,
+            time_range: c.time,
+            day_label: day.dayLabel,
+            class_start_iso: day.date.toISOString()
+          });
+        });
+      });
+      return out;
     }
 
     const grid = document.getElementById('classGrid');
 
-    function render(){
+    function renderCards(list){
       grid.innerHTML = '';
-      buildWeek().forEach(day => {
+      list.forEach(item => {
         const card = document.createElement('article');
         card.className = 'card';
 
+        // b. Bold = Day of week + date
+        // c. Below = "ClassName with Instructor, TimeRange"
+        const line = `${item.class_name} with ${item.instructor}, ${item.time_range}`;
+
         card.innerHTML = `
-          <h3>${day.header}</h3>
-          ${day.classes.length ? '' : `<p class="when">${EMPTY_NOTE}</p>`}
-          <div class="day-lines"></div>
+          <h3>${item.day_label}</h3>
+          <p class="when">${line}</p>
+          <div class="row">
+            <span></span>
+            <button class="btn small" type="button">Reserve</button>
+          </div>
         `;
 
-        const lines = card.querySelector('.day-lines');
-
-        if (day.classes.length){
-          day.classes.forEach((c, idx) => {
-            const row = document.createElement('div');
-            row.className = 'classline';
-
-            const label = `${c.name} with ${c.instructor}, ${c.time}`;
-            const classId = `w${day.weekday}_c${idx+1}`;
-
-            row.innerHTML = `
-              <div class="classmeta" title="${label}">${label}</div>
-              <button class="btn small" type="button">Reserve</button>
-            `;
-
-            row.querySelector('button').addEventListener('click', () => {
-              onReserveClick({
-                member_id: memberId,
-                class_id: classId,
-                class_name: c.name,
-                class_day_label: day.header,
-                instructor: c.instructor,
-                time_range: c.time,
-                // date anchor (we can later translate this to a specific event)
-                class_day_iso: day.date.toISOString()
-              });
-            });
-
-            lines.appendChild(row);
+        card.querySelector('button').addEventListener('click', () => {
+          onReserveClick({
+            member_id: memberId,
+            class_id: item.class_id,
+            class_name: item.class_name,
+            class_start_iso: item.class_start_iso,
+            policy_confirmed: false,
+            policy_confirmed_at: ''
           });
-        }
+        });
 
         grid.appendChild(card);
       });
+
+      // In case a day has no classes at all, we still show something? (Optional)
+      if (!list.length){
+        const empty = document.createElement('article');
+        empty.className = 'card';
+        empty.innerHTML = `<h3>No classes listed</h3><p class="when">Check back soon.</p>`;
+        grid.appendChild(empty);
+      }
     }
 
-    render();
+    renderCards(buildCards());
 
-    // ===== 2) Modal logic (RESTORED) =====
+    // ===== Modal + save =====
     const modal = document.getElementById('confirmModal');
     const cancelBtn = document.getElementById('cancelConfirm');
     const confirmBtn = document.getElementById('doConfirm');
@@ -383,8 +390,13 @@
       pendingReservation.policy_confirmed_at = new Date().toISOString();
 
       if (!pendingReservation.member_id){
-        alert('This reserve link is missing your member ID. Once we wire the system, your personal link will include it.');
+        alert('This reserve link is missing your member ID. Your personal link must include ?id=XXXX.');
         closeConfirmModal();
+        return;
+      }
+
+      if (!RSVP_ENDPOINT || RSVP_ENDPOINT.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')){
+        alert('RSVP backend not configured. Paste your Apps Script Web App URL into RSVP_ENDPOINT.');
         return;
       }
 
@@ -392,14 +404,27 @@
       confirmBtn.textContent = 'Confirming…';
 
       try{
-        // Placeholder for backend call (we’ll wire this later)
-        console.log('Reservation payload:', pendingReservation);
-        alert('Reserved (demo). Next step is wiring Google Sheets + Apps Script.');
+        const res = await fetch(RSVP_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(pendingReservation)
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok){
+          const msg = (data && data.error) ? data.error : 'Sorry — something went wrong saving your reservation.';
+          alert(msg);
+          return;
+        }
+
+        alert('Reserved!');
         closeConfirmModal();
-      }catch(err){
-        alert('Hmm — something went wrong saving your reservation. Please try again.');
+
+      } catch (err){
         console.error(err);
-      }finally{
+        alert('Network error saving your reservation. Please try again.');
+      } finally{
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Confirm spot';
       }
