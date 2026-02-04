@@ -153,7 +153,7 @@
 
 <body class="with-topbar">
 
-  <!-- Reuse your topbar structure (member view look stays as-is via your existing CSS) -->
+  <!-- Member topbar (you said keep this slightly lighter look as-is) -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -206,7 +206,7 @@
     </p>
   </main>
 
-  <!-- Reserve Confirmation Modal -->
+  <!-- Confirmation Modal -->
   <div class="modal" id="confirmModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
     <div class="modal-backdrop" data-close="1"></div>
 
@@ -228,21 +228,17 @@
   <script src="assets/site.js?v=2"></script>
 
   <script>
-    // =========================
-    // REQUIRED: Paste your Apps Script Web App URL here (ends in /exec)
-    // =========================
-    const RSVP_ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
-
+    const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwo7CPbyZ78CEa0_DArxijt2DqQAtlH1IcTsd4uweOAmO7Bi-bORlaqFfc2Q7LYOxHbZw/exec';
     const TZ = 'America/Detroit';
 
-    // Member context from URL: bodiodi.com/rsvp.html?id=XXXX
+    // member link: rsvp.html?id=XXXX
     const params = new URLSearchParams(location.search);
     const memberId = params.get('id');
 
     const memberBadge = document.getElementById('memberBadge');
     memberBadge.textContent = memberId ? 'Member link verified' : 'Missing member link';
 
-    // --- Weekly template (same as schedule; Monday end time updated) ---
+    // Same schedule as schedule page (with Monday corrected)
     const WEEK_TEMPLATE = [
       { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
       { weekday:2, classes:[] },
@@ -262,6 +258,11 @@
       return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
     }
 
+    function zonedParts(date){
+      return new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' })
+        .formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
+    }
+
     function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
     function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
 
@@ -271,12 +272,6 @@
       return `${w} | ${md}`;
     }
 
-    function zonedParts(date){
-      return new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' })
-        .formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
-    }
-
-    // Build current week (Mon–Sun) in America/Detroit
     function buildWeek(){
       const now = new Date();
       const p = zonedParts(now);
@@ -290,13 +285,12 @@
       });
     }
 
-    // Flatten into individual cards (one per class occurrence)
     function buildCards(){
       const days = buildWeek();
       const out = [];
       days.forEach(day => {
         day.classes.forEach(c => {
-          // ClassID = ClassName|YYYY-MM-DD|TimeRange  (unique per occurrence)
+          // ClassID = ClassName|YYYY-MM-DD|TimeRange (unique per occurrence)
           const ymd = day.date.toISOString().slice(0,10);
           const classId = `${c.name}|${ymd}|${c.time}`;
 
@@ -321,8 +315,6 @@
         const card = document.createElement('article');
         card.className = 'card';
 
-        // b. Bold = Day of week + date
-        // c. Below = "ClassName with Instructor, TimeRange"
         const line = `${item.class_name} with ${item.instructor}, ${item.time_range}`;
 
         card.innerHTML = `
@@ -339,27 +331,17 @@
             member_id: memberId,
             class_id: item.class_id,
             class_name: item.class_name,
-            class_start_iso: item.class_start_iso,
-            policy_confirmed: false,
-            policy_confirmed_at: ''
+            class_start_iso: item.class_start_iso
           });
         });
 
         grid.appendChild(card);
       });
-
-      // In case a day has no classes at all, we still show something? (Optional)
-      if (!list.length){
-        const empty = document.createElement('article');
-        empty.className = 'card';
-        empty.innerHTML = `<h3>No classes listed</h3><p class="when">Check back soon.</p>`;
-        grid.appendChild(empty);
-      }
     }
 
     renderCards(buildCards());
 
-    // ===== Modal + save =====
+    // Modal + save
     const modal = document.getElementById('confirmModal');
     const cancelBtn = document.getElementById('cancelConfirm');
     const confirmBtn = document.getElementById('doConfirm');
@@ -386,17 +368,9 @@
     confirmBtn.addEventListener('click', async () => {
       if (!pendingReservation) return;
 
-      pendingReservation.policy_confirmed = true;
-      pendingReservation.policy_confirmed_at = new Date().toISOString();
-
       if (!pendingReservation.member_id){
         alert('This reserve link is missing your member ID. Your personal link must include ?id=XXXX.');
         closeConfirmModal();
-        return;
-      }
-
-      if (!RSVP_ENDPOINT || RSVP_ENDPOINT.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')){
-        alert('RSVP backend not configured. Paste your Apps Script Web App URL into RSVP_ENDPOINT.');
         return;
       }
 
@@ -404,10 +378,21 @@
       confirmBtn.textContent = 'Confirming…';
 
       try{
+        const nowIso = new Date().toISOString();
+
+        const payload = {
+          member_id: pendingReservation.member_id,
+          class_id: pendingReservation.class_id,
+          class_name: pendingReservation.class_name || pendingReservation.class_id,
+          class_start_iso: pendingReservation.class_start_iso,
+          policy_confirmed: true,
+          policy_confirmed_at: nowIso
+        };
+
         const res = await fetch(RSVP_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(pendingReservation)
+          body: JSON.stringify(payload)
         });
 
         const data = await res.json().catch(() => ({}));
@@ -431,6 +416,7 @@
     });
 
     function onReserveClick(payload){
+      // show reminder modal
       openConfirmModal(payload);
     }
   </script>
