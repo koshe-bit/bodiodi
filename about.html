@@ -1,100 +1,156 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Bodiodi — About</title>
 
   <!-- Fonts -->
-  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Krub:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles -->
-  <link rel="stylesheet" href="assets/global.css" />
+  <!-- Global styles (match Classes page) -->
+  <link rel="stylesheet" href="assets/global.css?v=5">
+
+  <style>
+    main{ padding-top:96px; }
+
+    .page-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .kicker{
+      margin:0 0 6px 0;
+      font-family:"Inter";
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:var(--dk85);
+      opacity:.9;
+      font-size:12px;
+    }
+
+    .meta{
+      margin:4px 0 0 0;
+      font-size:14px;
+      opacity:.9;
+    }
+
+    .about-card{
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:16px 16px 14px;
+      background:rgba(255,255,255,.72);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+    }
+
+    .about-title{
+      margin:0;
+      font-family:"Inter";
+      font-weight:800;
+      letter-spacing:-.01em;
+      color:var(--dk);
+      font-size:26px;
+      line-height:1.05;
+    }
+
+    .about-sub{
+      margin:8px 0 0 0;
+      font-size:14px;
+      color:var(--dk85);
+      opacity:.92;
+    }
+
+    .about-body{
+      margin-top:12px;
+      font-size:15px;
+      line-height:1.6;
+      color:var(--dk);
+      opacity:.96;
+    }
+
+    .about-body p{
+      margin:0 0 12px 0;
+      max-width:72ch;
+    }
+    .about-body p:last-child{ margin-bottom:0; }
+  </style>
 </head>
 
-<body class="with-topbar">
+<body class="simple-page">
 
-  <!-- ===== TOP NAV (MATCHES EXISTING SITE) ===== -->
-  <header class="topbar">
+  <!-- Topbar (exactly like Classes page) -->
+  <div class="topbar">
     <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
 
-      <a href="index.html" class="logo">
-        BODIODI
-      </a>
-
-      <nav class="nav-links">
-        <a href="schedule.html">Schedule</a>
-        <a href="signup.html">Reserve</a>
-        <a href="classes.html">Classes</a>
-        <a href="about.html" class="active">About</a>
-        <a href="pricing.html">Pricing</a>
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+        <a href="https://bodiodi.com/signup.html">Reserve</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
       </nav>
 
-      <button class="menu-toggle" aria-label="Open menu">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
       </button>
-
     </div>
-  </header>
-
-  <!-- ===== MOBILE MENU ===== -->
-  <div class="mobile-menu">
-    <a href="schedule.html">Schedule</a>
-    <a href="signup.html">Reserve</a>
-    <a href="classes.html">Classes</a>
-    <a href="about.html" class="active">About</a>
-    <a href="pricing.html">Pricing</a>
   </div>
 
-  <!-- ===== MAIN CONTENT ===== -->
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Reserve</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+  </nav>
+
   <main>
+    <div class="page-head">
+      <div>
+        <p class="kicker">About</p>
+        <h1 class="about-title">Nicole Kosheba</h1>
+        <p class="meta">Group Trainer / Owner</p>
+      </div>
+      <div></div>
+    </div>
 
-    <a href="javascript:history.back()" class="back-link">
-      ← Back
-    </a>
+    <div class="rule" aria-hidden="true"></div>
 
-    <section class="page-content">
+    <section class="about-card" aria-label="About Nicole">
+      <div class="about-body">
+        <p>
+          I’ve been leading group fitness classes since 2011, working with people across Grand Rapids in studios,
+          workplaces, and community spaces. For the past decade, I taught at CKO Kickboxing, and I’ve also led
+          after-work programs for local businesses like Custer Furniture and Rockford Construction. Over the years,
+          I’ve coached hundreds of bodies, personalities, energy levels, and life stages—and that experience has
+          shaped how I train people today.
+        </p>
 
-      <h1>About</h1>
-
-      <p class="about-name">
-        <strong>Nicole Kosheba</strong>, Group Trainer / Owner
-      </p>
-
-      <p>
-        I’ve been leading group fitness classes since 2011, working with people across Grand Rapids in studios,
-        workplaces, and community spaces. For the past decade, I taught at CKO Kickboxing, and I’ve also led
-        after-work programs for local businesses like Custer Furniture and Rockford Construction. Over the years,
-        I’ve coached hundreds of bodies, personalities, energy levels, and life stages—and that experience has
-        shaped how I train people today.
-      </p>
-
-      <p>
-        The gym has always been my happy place. It’s where I go to reset, release stress, and reconnect with myself.
-        But what I’ve learned is this: movement is better when it’s shared. I created Bodiodi to be a space where you
-        can show up exactly as you are and take what you need that day. Maybe you’re tired and want to zone out.
-        Maybe you’re energized and ready to push. Either way, you don’t have to perform or prove anything here.
-        My job is to guide you through training that’s functional, healthy, and genuinely fun—so you leave feeling
-        stronger, clearer, and more like yourself.
-      </p>
-
+        <p>
+          The gym has always been my happy place. It’s where I go to reset, release stress, and reconnect with myself.
+          But what I’ve learned is this: movement is better when it’s shared. I created Bodiodi to be a space where you
+          can show up exactly as you are and take what you need that day. Maybe you’re tired and want to zone out.
+          Maybe you’re energized and ready to push. Either way, you don’t have to perform or prove anything here.
+          My job is to guide you through training that’s functional, healthy, and genuinely fun—so you leave feeling
+          stronger, clearer, and more like yourself.
+        </p>
+      </div>
     </section>
+
+    <p style="margin-top:10px;">
+      <a class="btn" href="index.html">Back to home</a>
+    </p>
   </main>
 
-  <!-- ===== MOBILE MENU SCRIPT (MATCHES OTHER PAGES) ===== -->
-  <script>
-    const toggle = document.querySelector('.menu-toggle');
-    const menu = document.querySelector('.mobile-menu');
-
-    toggle.addEventListener('click', () => {
-      menu.classList.toggle('open');
-    });
-  </script>
-
+  <script src="assets/site.js?v=2"></script>
 </body>
 </html>
