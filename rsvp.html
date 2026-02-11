@@ -228,197 +228,280 @@
   <script src="assets/site.js?v=2"></script>
 
   <script>
-const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwfcvQo2XuLngKj68oNZfnfRA2caEOjlOhn9NVOhaoOQeVjSQacL3_hBYg4sn3tpjIjiA/exec';
-    const TZ = 'America/Detroit';
+  const RSVP_ENDPOINT = 'PASTE_NEW_WEB_APP_EXEC_URL_HERE';
+  const TZ = 'America/Detroit';
 
-    // member link: rsvp.html?id=XXXX
-    const params = new URLSearchParams(location.search);
-    const memberId = params.get('id');
+  const params = new URLSearchParams(location.search);
+  const memberId = params.get('id');
 
-    const memberBadge = document.getElementById('memberBadge');
-    memberBadge.textContent = memberId ? 'Member link verified' : 'Missing member link';
+  const memberBadge = document.getElementById('memberBadge');
+  memberBadge.textContent = memberId ? 'Checking member…' : 'Missing member link';
 
-    // Same schedule as schedule page (with Monday corrected)
-    const WEEK_TEMPLATE = [
-      { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
-      { weekday:2, classes:[] },
-      { weekday:3, classes:[{ name:'Rhythmix', instructor:'Nicole', time:'6:15p–7:15p' }] },
-      { weekday:4, classes:[{ name:'Anabolix', instructor:'Nicole', time:'6:15p–6:45p' }] },
-      { weekday:5, classes:[] },
-      { weekday:6, classes:[
-        { name:'Rhythmix', instructor:'Nicole', time:'8:30a–9:30a' },
-        { name:'Anabolix', instructor:'Nicole', time:'9:45a–10:15a' }
-      ]},
-      { weekday:7, classes:[{ name:'Kinetix', instructor:'Sarah', time:'3:00p–4:00p' }] }
-    ];
+  // Validate member via lookup so we can display name/plan
+  async function loadMember(){
+    if (!memberId) return null;
+    try{
+      const url = new URL(RSVP_ENDPOINT);
+      url.searchParams.set('action', 'lookup');
+      url.searchParams.set('memberId', memberId);
 
-    function weekdayNum(d){
-      const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
-        .format(d).toLowerCase();
-      return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
+      const res = await fetch(url.toString(), { method:'GET' });
+      const data = await res.json().catch(()=> ({}));
+
+      if (!res.ok || !data.ok || !data.found) return null;
+
+      const m = data.member || {};
+      memberBadge.textContent = (m.DisplayName ? m.DisplayName : 'Member') + (m.PlanType ? ` · ${m.PlanType}` : '');
+      return m;
+    }catch(_){
+      return null;
     }
+  }
 
-    function zonedParts(date){
-      return new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' })
-        .formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
-    }
+  // Same weekly template you had
+  const WEEK_TEMPLATE = [
+    { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
+    { weekday:2, classes:[] },
+    { weekday:3, classes:[{ name:'Rhythmix', instructor:'Nicole', time:'6:15p–7:15p' }] },
+    { weekday:4, classes:[{ name:'Anabolix', instructor:'Nicole', time:'6:15p–6:45p' }] },
+    { weekday:5, classes:[] },
+    { weekday:6, classes:[
+      { name:'Rhythmix', instructor:'Nicole', time:'8:30a–9:30a' },
+      { name:'Anabolix', instructor:'Nicole', time:'9:45a–10:15a' }
+    ]},
+    { weekday:7, classes:[{ name:'Kinetix', instructor:'Sarah', time:'3:00p–4:00p' }] }
+  ];
 
-    function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
-    function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
+  function weekdayNum(d){
+    const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
+      .format(d).toLowerCase();
+    return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
+  }
 
-    function formatDayPipe(d){
-      const w  = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'long' }).format(d);
-      const md = new Intl.DateTimeFormat('en-US', { timeZone:TZ, month:'short', day:'numeric' }).format(d);
-      return `${w} | ${md}`;
-    }
+  function zonedParts(date){
+    return new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' })
+      .formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
+  }
 
-    function buildWeek(){
-      const now = new Date();
-      const p = zonedParts(now);
-      const today  = utcNoon(+p.year, +p.month, +p.day);
-      const monday = addDays(today, -(weekdayNum(now)-1));
+  // Use "UTC noon trick" so date math is stable, but we'll compute ClassStartISO precisely below.
+  function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
+  function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
 
-      return Array.from({length:7}, (_,i) => {
-        const date = addDays(monday, i);
-        const tpl  = WEEK_TEMPLATE.find(x => x.weekday === i+1) || { classes:[] };
-        return { date, dayLabel: formatDayPipe(date), classes: tpl.classes };
-      });
-    }
+  function formatDayPipe(d){
+    const w  = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'long' }).format(d);
+    const md = new Intl.DateTimeFormat('en-US', { timeZone:TZ, month:'short', day:'numeric' }).format(d);
+    return `${w} | ${md}`;
+  }
 
-    function buildCards(){
-      const days = buildWeek();
-      const out = [];
-      days.forEach(day => {
-        day.classes.forEach(c => {
-          // ClassID = ClassName|YYYY-MM-DD|TimeRange (unique per occurrence)
-          const ymd = day.date.toISOString().slice(0,10);
-          const classId = `${c.name}|${ymd}|${c.time}`;
+  function buildWeek(){
+    const now = new Date();
+    const p = zonedParts(now);
+    const today  = utcNoon(+p.year, +p.month, +p.day);
+    const monday = addDays(today, -(weekdayNum(now)-1));
 
-          out.push({
-            class_id: classId,
-            class_name: c.name,
-            instructor: c.instructor,
-            time_range: c.time,
-            day_label: day.dayLabel,
-            class_start_iso: day.date.toISOString()
-          });
-        });
-      });
-      return out;
-    }
-
-    const grid = document.getElementById('classGrid');
-
-    function renderCards(list){
-      grid.innerHTML = '';
-      list.forEach(item => {
-        const card = document.createElement('article');
-        card.className = 'card';
-
-        const line = `${item.class_name} with ${item.instructor}, ${item.time_range}`;
-
-        card.innerHTML = `
-          <h3>${item.day_label}</h3>
-          <p class="when">${line}</p>
-          <div class="row">
-            <span></span>
-            <button class="btn small" type="button">Reserve</button>
-          </div>
-        `;
-
-        card.querySelector('button').addEventListener('click', () => {
-          onReserveClick({
-            member_id: memberId,
-            class_id: item.class_id,
-            class_name: item.class_name,
-            class_start_iso: item.class_start_iso
-          });
-        });
-
-        grid.appendChild(card);
-      });
-    }
-
-    renderCards(buildCards());
-
-    // Modal + save
-    const modal = document.getElementById('confirmModal');
-    const cancelBtn = document.getElementById('cancelConfirm');
-    const confirmBtn = document.getElementById('doConfirm');
-    let pendingReservation = null;
-
-    function openConfirmModal(payload){
-      pendingReservation = payload;
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeConfirmModal(){
-      pendingReservation = null;
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    modal.addEventListener('click', (e) => {
-      if (e.target && e.target.dataset && e.target.dataset.close) closeConfirmModal();
+    return Array.from({length:7}, (_,i) => {
+      const date = addDays(monday, i);
+      const tpl  = WEEK_TEMPLATE.find(x => x.weekday === i+1) || { classes:[] };
+      return { date, dayLabel: formatDayPipe(date), classes: tpl.classes };
     });
+  }
 
-    cancelBtn.addEventListener('click', closeConfirmModal);
+  // Parse start time from "5:30p–6:00p" (en dash) or "5:30p-6:00p"
+  function parseStartTime(timeRange){
+    const raw = String(timeRange || '').trim().toLowerCase();
+    const s = raw.replace(/[–—]/g,'-').replace(/\s+/g,'');
+    const start = s.split('-')[0] || '';
+    const m = start.match(/^(\d{1,2})(?::(\d{2}))?([ap])$/);
+    if (!m) return null;
 
-    confirmBtn.addEventListener('click', async () => {
-      if (!pendingReservation) return;
+    let hh = parseInt(m[1],10);
+    const mm = m[2] ? parseInt(m[2],10) : 0;
+    const ap = m[3];
 
-      if (!pendingReservation.member_id){
-        alert('This reserve link is missing your member ID. Your personal link must include ?id=XXXX.');
-        closeConfirmModal();
-        return;
-      }
+    if (ap === 'p' && hh !== 12) hh += 12;
+    if (ap === 'a' && hh === 12) hh = 0;
 
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Confirming…';
+    return { hh, mm };
+  }
 
-      try{
-        const nowIso = new Date().toISOString();
+  // Build ISO string for Detroit local date+time (returns an ISO string with offset)
+  async function detroitISOForDateAndTime(yyyyMmDd, hh, mm){
+    // We need an offset-aware ISO. Easiest: ask the web app to format? But we’ll do it locally:
+    // Create a Date in local time, then render in America/Detroit via Intl parts and rebuild.
+    // We'll compute the offset by formatting and parsing.
+    const base = new Date(`${yyyyMmDd}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`);
+    // This "base" is in browser local timezone; we need Detroit time. We'll do a timezone parts trick:
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: TZ,
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit',
+      hour12:false
+    });
+    const parts = fmt.formatToParts(base).reduce((a,p)=>(a[p.type]=p.value,a),{});
+    const y = parts.year, mo = parts.month, d = parts.day;
+    const H = parts.hour, M = parts.minute, S = parts.second;
+    // Construct a "pretend UTC" date from Detroit parts
+    const detroitAsUTC = new Date(Date.UTC(+y, +mo-1, +d, +H, +M, +S));
+    // Now get Detroit offset at that instant by comparing formatted timeZoneName shortOffset (supported in modern Safari)
+    const offFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, timeZoneName:'shortOffset' });
+    const offParts = offFmt.formatToParts(detroitAsUTC);
+    const tzName = (offParts.find(p=>p.type==='timeZoneName')||{}).value || 'GMT-00:00';
+    const off = tzName.replace('GMT','').replace('UTC','') || '-00:00';
+    const offset = off.includes(':') ? off : (off.length===3 ? off + ':00' : off);
 
-        const payload = {
-          member_id: pendingReservation.member_id,
-          class_id: pendingReservation.class_id,
-          class_name: pendingReservation.class_name || pendingReservation.class_id,
-          class_start_iso: pendingReservation.class_start_iso,
-          policy_confirmed: true,
-          policy_confirmed_at: nowIso
-        };
+    return `${y}-${mo}-${d}T${H}:${M}:${S}${offset}`;
+  }
 
-        const res = await fetch(RSVP_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
+  function buildCards(){
+    const days = buildWeek();
+    const out = [];
+
+    for (const day of days){
+      for (const c of day.classes){
+        const ymd = day.date.toISOString().slice(0,10);
+
+        // Keep your ClassID format: Name|YYYY-MM-DD|TimeRange
+        const classId = `${c.name}|${ymd}|${c.time}`;
+
+        out.push({
+          class_id: classId,
+          class_name: c.name,
+          instructor: c.instructor,
+          time_range: c.time,
+          day_label: day.dayLabel,
+          ymd
         });
+      }
+    }
+    return out;
+  }
 
-        const data = await res.json().catch(() => ({}));
+  const grid = document.getElementById('classGrid');
 
-        if (!res.ok || !data.ok){
-          const msg = (data && data.error) ? data.error : 'Sorry — something went wrong saving your reservation.';
-          alert(msg);
+  function renderCards(list){
+    grid.innerHTML = '';
+    list.forEach(item => {
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const line = `${item.class_name} with ${item.instructor}, ${item.time_range}`;
+
+      card.innerHTML = `
+        <h3>${item.day_label}</h3>
+        <p class="when">${line}</p>
+        <div class="row">
+          <span></span>
+          <button class="btn small" type="button">Reserve</button>
+        </div>
+      `;
+
+      card.querySelector('button').addEventListener('click', async () => {
+        const t = parseStartTime(item.time_range);
+        if (!t){
+          alert('Could not parse class start time. Please contact Bodiodi.');
           return;
         }
 
-        alert('Reserved!');
-        closeConfirmModal();
+        const classStartISO = await detroitISOForDateAndTime(item.ymd, t.hh, t.mm);
 
-      } catch (err){
-        console.error(err);
-        alert('Network error saving your reservation. Please try again.');
-      } finally{
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirm spot';
-      }
+        onReserveClick({
+          member_id: memberId,
+          class_id: item.class_id,
+          class_name: item.class_name,
+          class_start_iso: classStartISO
+        });
+      });
+
+      grid.appendChild(card);
     });
+  }
 
-    function onReserveClick(payload){
-      // show reminder modal
-      openConfirmModal(payload);
+  renderCards(buildCards());
+
+  // Modal + save (unchanged)
+  const modal = document.getElementById('confirmModal');
+  const cancelBtn = document.getElementById('cancelConfirm');
+  const confirmBtn = document.getElementById('doConfirm');
+  let pendingReservation = null;
+
+  function openConfirmModal(payload){
+    pendingReservation = payload;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeConfirmModal(){
+    pendingReservation = null;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  modal.addEventListener('click', (e) => {
+    if (e.target && e.target.dataset && e.target.dataset.close) closeConfirmModal();
+  });
+
+  cancelBtn.addEventListener('click', closeConfirmModal);
+
+  confirmBtn.addEventListener('click', async () => {
+    if (!pendingReservation) return;
+
+    if (!pendingReservation.member_id){
+      alert('This reserve link is missing your member ID. Your personal link must include ?id=XXXX.');
+      closeConfirmModal();
+      return;
     }
-  </script>
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Confirming…';
+
+    try{
+      const nowIso = new Date().toISOString();
+
+      const payload = {
+        member_id: pendingReservation.member_id,
+        class_id: pendingReservation.class_id,
+        class_name: pendingReservation.class_name || pendingReservation.class_id,
+        class_start_iso: pendingReservation.class_start_iso,
+        policy_confirmed: true,
+        policy_confirmed_at: nowIso
+      };
+
+      const res = await fetch(RSVP_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok){
+        const msg = (data && data.error) ? data.error : 'Sorry — something went wrong saving your reservation.';
+        alert(msg);
+        return;
+      }
+
+      alert('Reserved!');
+      closeConfirmModal();
+
+    } catch (err){
+      console.error(err);
+      alert('Network error saving your reservation. Please try again.');
+    } finally{
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm spot';
+    }
+  });
+
+  function onReserveClick(payload){
+    openConfirmModal(payload);
+  }
+
+  // Kick off member lookup
+  (async () => {
+    const m = await loadMember();
+    if (!m && memberId) memberBadge.textContent = 'Member link not found';
+    if (!memberId) memberBadge.textContent = 'Missing member link';
+  })();
+</script>
 </body>
 </html>
