@@ -10,147 +10,147 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles -->
-  <link rel="stylesheet" href="assets/style.css">
-
-  <!-- Site JS (for hamburger toggle if used elsewhere) -->
-  <script src="assets/site.js" defer></script>
+  <!-- Global styles (match your site) -->
+  <link rel="stylesheet" href="assets/global.css?v=5">
 
   <style>
     main{ padding-top:96px; }
 
-    .faq-section{
-      max-width: 760px;
+    /* Keep this minimal so it inherits your real site look */
+    .page-head{
+      padding: 0 0 var(--space-3);
     }
 
-    .faq-section p{
-      margin: 0;
+    .faq-wrap{
+      max-width: 820px;
     }
 
-    .faq-section p + p{
-      margin-top: var(--space-3);
+    .faq-card{
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 18px;
+      padding: var(--space-4);
+      backdrop-filter: blur(6px);
     }
 
-    .faq-image{
+    .faq-card p{ margin: 0; }
+    .faq-card p + p{ margin-top: var(--space-3); }
+
+    .faq-img{
       margin-top: var(--space-4);
-      border-radius: 12px;
       width: 100%;
       height: auto;
-      display: block;
+      border-radius: 14px;
+      display:block;
+      border: 1px solid rgba(0,0,0,.06);
     }
 
-    .back-home{
+    .back-row{
+      display:flex;
+      justify-content:center;
       margin-top: var(--space-6);
-      display: flex;
-      justify-content: center;
     }
   </style>
 </head>
 
 <body>
 
-<!-- ====== NAV ====== -->
-<header class="topbar">
-  <div class="topbar-inner container">
-    <a href="index.html" class="brand">Bodiodi</a>
+  <!-- ===== Topbar (COPY THIS EXACTLY from your Classes/Schedule page if your class names differ) ===== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Bodiodi Home">
+        bodiodi
+      </a>
 
-    <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="classes.html">Classes</a>
-      <a href="schedule.html">Schedule</a>
-      <a href="signup.html">Sign Up</a>
-      <a href="about.html">About</a>
-    </nav>
+      <nav class="topnav" aria-label="Primary">
+        <a href="classes.html">Classes</a>
+        <a href="schedule.html">Schedule</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="about.html">About</a>
+      </nav>
 
-    <button class="nav-toggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </div>
-</header>
-
-<!-- ====== MAIN ====== -->
-<main>
-  <section class="container faq-section stack">
-    <h2 class="h2">Before You Arrive</h2>
-
-    <p class="body">
-      Here are a few quick things to know before your class so you can arrive feeling relaxed and ready to move:
-    </p>
-
-    <p class="body">
-      <strong>Arrive early</strong><br/>
-      First time with us? Please arrive 15 minutes early. Returning or drop-in clients should arrive at least 5 minutes before class so we can start on time.
-    </p>
-
-    <p class="body">
-      <strong>Studio access</strong><br/>
-      Doors unlock 20 minutes before class. When you arrive, please sign in on the iPad mounted on the wall to the right.
-    </p>
-
-    <p class="body">
-      <strong>What to wear</strong><br/>
-      Wear whatever you feel comfortable moving in. In winter or on rainy days, please bring a clean pair of workout shoes to change into.
-    </p>
-
-    <p class="body">
-      <strong>Changing room &amp; restroom</strong><br/>
-      A changing area is available upstairs. Restroom access is limited — details are posted in-studio if needed.
-    </p>
-
-    <p class="body">
-      <strong>Cancellations</strong><br/>
-      If something comes up, please text Nicole at <strong>616-443-2011</strong> at least 4 hours before class start.
-      Late cancellations are non-refundable (punchcards will use one punch).
-    </p>
-
-    <p class="body">
-      <strong>Parking</strong><br/>
-      Driveway parking is limited. If possible, we encourage walking or biking.
-      Street parking is free and usually easy to find.
-    </p>
-
-    <p class="body">
-      At the end of class, we’ll ask you to do a quick wipe-down of any equipment you used —
-      teamwork makes the dream work 🙂
-    </p>
-
-    <p class="body">
-      If you have any questions before class, don’t hesitate to reach out.
-      We are excited to move with you. See you soon!
-    </p>
-
-    <p class="body">
-      <strong>IMPORTANT</strong><br/>
-      If you are doing a drop-in and still need to make your payment, please note that your reservation
-      is not official until payment is received.
-      First-time free trial clients are all set.
-    </p>
-
-    <p class="body">
-      <strong>Location</strong><br/>
-      The studio is located in a renovated three-stall carriage house.
-      The address is <strong>611 Madison Ave SE</strong>, but the garage entrance is around the corner off
-      <strong>Pleasant St SE</strong>.
-    </p>
-
-    <img
-      src="assets/611-map.jpg"
-      alt="Map showing Bodiodi studio location near Pleasant St SE"
-      class="faq-image"
-    />
-
-    <div class="back-home">
-      <a href="index.html" class="btn ghost">Back to home</a>
+      <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-  </section>
-</main>
 
-<!-- ====== FOOTER ====== -->
-<footer class="footer">
-  <p class="small">© Bodiodi</p>
-</footer>
+    <div id="mobileMenu" class="mobile-drawer" hidden>
+      <nav class="mobile-nav" aria-label="Mobile">
+        <a href="classes.html">Classes</a>
+        <a href="schedule.html">Schedule</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="container faq-wrap">
+      <div class="page-head">
+        <h1 class="page-title">FAQs</h1>
+        <p class="page-sub">A few quick things to know so you can arrive feeling relaxed and ready to move.</p>
+      </div>
+
+      <div class="faq-card">
+        <p><strong>Arrive early</strong><br/>
+        First time with us? Please arrive 15 minutes early. Returning or drop-in clients should arrive at least 5 minutes before class so we can start on time.</p>
+
+        <p><strong>Studio access</strong><br/>
+        Doors unlock 20 minutes before class. When you arrive, please sign in on the iPad mounted on the wall to the right.</p>
+
+        <p><strong>What to wear</strong><br/>
+        Wear whatever you feel comfortable moving in. In winter or on rainy days, please bring a clean pair of workout shoes to change into.</p>
+
+        <p><strong>Changing room &amp; restroom</strong><br/>
+        A changing area is available upstairs. Restroom access is limited — details are posted in-studio if needed.</p>
+
+        <p><strong>Cancellations</strong><br/>
+        If something comes up, please text Nicole at <strong>616-443-2011</strong> at least 4 hours before class start.
+        Late cancellations are non-refundable (punchcards will use one punch).</p>
+
+        <p><strong>Parking</strong><br/>
+        Driveway parking is limited. If possible, we encourage walking or biking. Street parking is free and usually easy to find.</p>
+
+        <p>At the end of class, we’ll ask you to do a quick wipe-down of any equipment you used — teamwork makes the dream work 🙂</p>
+
+        <p>If you have any questions before class, don’t hesitate to reach out. We are excited to move with you. See you soon!</p>
+
+        <p><strong>*** IMPORTANT ***</strong><br/>
+        If you are doing a drop-in and still need to make your payment, your reservation is not official until payment is received.
+        First time free trial people, you are all set.</p>
+
+        <p><strong>LOCATION:</strong><br/>
+        The studio space is located in the renovated 3-stall carriage house. The address is <strong>611 Madison Ave SE</strong>,
+        but the garage where you need to go is located around the corner off <strong>Pleasant St. SE</strong>. See map below.</p>
+
+        <img class="faq-img" src="assets/611%20Map.jpg" alt="Map to Bodiodi — 611 Madison Ave SE (garage entrance off Pleasant St SE)">
+      </div>
+
+      <div class="back-row">
+        <a class="back-home" href="index.html">Back to home</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Minimal hamburger toggler (only if your global/site JS isn’t already handling it)
+    (function(){
+      const btn = document.querySelector('.hamburger');
+      const drawer = document.getElementById('mobileMenu');
+      if(!btn || !drawer) return;
+
+      btn.addEventListener('click', () => {
+        const open = drawer.hasAttribute('hidden') ? false : true;
+        if(open){
+          drawer.setAttribute('hidden','');
+          btn.setAttribute('aria-expanded','false');
+        }else{
+          drawer.removeAttribute('hidden');
+          btn.setAttribute('aria-expanded','true');
+        }
+      });
+    })();
+  </script>
 
 </body>
 </html>
