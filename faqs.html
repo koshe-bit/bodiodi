@@ -3,54 +3,46 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bodiodi — FAQs</title>
+  <title>Bodiodi — Classes</title>
 
   <!-- Fonts -->
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles (match your site) -->
+  <!-- Global styles -->
   <link rel="stylesheet" href="assets/global.css?v=5">
+</head>
 
-  <style>
-    main{ padding-top:96px; }
+<body class="simple-page">
 
-    /* Keep this minimal so it inherits your real site look */
-    .page-head{
-      padding: 0 0 var(--space-3);
-    }
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
 
-    .faq-wrap{
-      max-width: 820px;
-    }
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+        <a href="https://bodiodi.com/signup.html">Reserve</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
+      </nav>
 
-    .faq-card{
-      background: rgba(255,255,255,.55);
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 18px;
-      padding: var(--space-4);
-      backdrop-filter: blur(6px);
-    }
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
 
-    .faq-card p{ margin: 0; }
-    .faq-card p + p{ margin-top: var(--space-3); }
-
-    .faq-img{
-      margin-top: var(--space-4);
-      width: 100%;
-      height: auto;
-      border-radius: 14px;
-      display:block;
-      border: 1px solid rgba(0,0,0,.06);
-    }
-
-    .back-row{
-      display:flex;
-      justify-content:center;
-      margin-top: var(--space-6);
-    }
-  </style>
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Reserve</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+  </nav>
 </head>
 
 <body>
