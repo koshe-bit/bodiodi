@@ -41,10 +41,10 @@ body{
 }
 
 /* ====== Containers ====== */
-.container{ width: var(--container); margin: 0 auto; padding: var(--space-6) 0; }
+.container{ width: var(--container); margin: 2 auto; padding: var(--space-6) 0; }
 .stack > * + *{ margin-top: var(--space-3); }
 .grid-2{ display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
-@media (min-width: 900px){ .grid-2{ grid-template-columns: 1fr 1fr; } }
+@media (min-width: 700px){ .grid-2{ grid-template-columns: 1fr 1fr; } }
 
 /* ====== Hero ====== */
 .hero{
