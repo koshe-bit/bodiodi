@@ -49,19 +49,25 @@
     }
 
     .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:14px;
-      margin-top:14px;
-    }
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:14px;
+
+  /* NEW: make the schedule feel intentional */
+  justify-items:center;
+}
 
     .card{
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:16px;
-      padding:14px 14px 12px;
-      background:rgba(255,255,255,.72);
-      box-shadow:0 10px 24px rgba(0,0,0,.06);
-    }
+  /* NEW: sculptural width */
+  width:min(760px, 100%);
+
+  border:1px solid rgba(0,0,0,.10);
+  border-radius:16px;
+  padding:16px 18px 14px; /* slightly more intentional padding */
+  background:rgba(255,255,255,.72);
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
+}
 
     .card h3{
       margin:0 0 6px 0;
