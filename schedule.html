@@ -16,6 +16,13 @@
   <style>
     main{ padding-top:96px; }
 
+    /* NEW: one consistent left-aligned column for the whole page */
+    .schedule-wrap{
+      width: min(640px, 100%);
+      margin-left: 0;
+      margin-right: auto;
+    }
+
     .page-head{
       display:flex;
       align-items:flex-end;
@@ -49,25 +56,21 @@
     }
 
     .grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:14px;
-  margin-top:14px;
-
-  /* NEW: make the schedule feel intentional */
-  justify-items:center;
-}
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;            /* slightly more breathable rhythm */
+      margin-top:18px;
+      width:100%;          /* fill the schedule-wrap */
+    }
 
     .card{
-  /* NEW: sculptural width */
-  width:min(600px, 100%);
-
-  border:1px solid rgba(0,0,0,.10);
-  border-radius:16px;
-  padding:16px 18px 14px; /* slightly more intentional padding */
-  background:rgba(255,255,255,.72);
-  box-shadow:0 10px 24px rgba(0,0,0,.06);
-}
+      width:100%;          /* NEW: let the wrap control width */
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:16px 18px 14px;
+      background:rgba(255,255,255,.72);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+    }
 
     .card h3{
       margin:0 0 6px 0;
@@ -224,23 +227,28 @@
   </nav>
 
   <main>
-    <div class="page-head">
-      <div>
-        <p class="kicker">Schedule</p>
-        <h1 style="margin:0;">Class Schedule</h1>
-        <p class="meta">More classes coming soon, be sure to check back.</p>
-        <p class="weekline" id="weekLine"></p>
+    <!-- NEW: wrap header + rule + cards + button so everything shares one left edge -->
+    <div class="schedule-wrap">
+
+      <div class="page-head">
+        <div>
+          <p class="kicker">Schedule</p>
+          <h1 style="margin:0;">Class Schedule</h1>
+          <p class="meta">More classes coming soon, be sure to check back.</p>
+          <p class="weekline" id="weekLine"></p>
+        </div>
+        <div></div>
       </div>
-      <div></div>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="grid" id="dayGrid" aria-label="Weekly schedule"></section>
+
+      <p style="margin-top:12px;">
+        <a class="btn" href="index.html">Back to home</a>
+      </p>
+
     </div>
-
-    <div class="rule" aria-hidden="true"></div>
-
-    <section class="grid" id="dayGrid" aria-label="Weekly schedule"></section>
-
-    <p style="margin-top:10px;">
-      <a class="btn" href="index.html">Back to home</a>
-    </p>
   </main>
 
   <!-- Description Modal -->
@@ -255,7 +263,6 @@
 
       <div class="modal-actions">
         <button class="btn btn-ghost" type="button" id="closeDesc">Close</button>
-  
       </div>
 
       <p class="modal-note">Descriptions pulled from the Classes page.</p>
@@ -266,7 +273,7 @@
 
   <script>
     const TZ = 'America/Detroit';
-  
+
     const EMPTY_NOTE = 'No classes at this time, check back later';
 
     const WEEK_TEMPLATE = [
@@ -421,7 +428,6 @@
                 </button>
                 <span>${c.time} with ${c.instructor}</span>
               </div>
-          
             `;
 
             line.querySelector('button').addEventListener('click', () => {
