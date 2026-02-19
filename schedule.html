@@ -437,58 +437,69 @@
     }
 
     async function render(){
-      const grid = document.getElementById('dayGrid');
-      grid.innerHTML='';
+  const grid = document.getElementById('dayGrid');
 
-      let tpl;
-      try{
-        tpl = await loadWeekTemplateFromBackend();
-      } catch(e){
-        console.error(e);
-        tpl = Array.from({length:7},(_,i)=>({ weekday:i+1, classes:[] }));
-      }
+  // show a loading state instead of "no classes"
+  grid.innerHTML = `
+    <article class="card">
+      <h3>Loading…</h3>
+      <p class="when">Fetching this week’s schedule.</p>
+    </article>
+  `;
 
-      const week = buildWeek();
-      const merged = week.map((d, i) => ({
-        ...d,
-        classes: (tpl[i] && tpl[i].classes) ? tpl[i].classes : []
-      }));
+  let tpl;
+  try{
+    tpl = await loadWeekTemplateFromBackend();
+  } catch(e){
+    console.error(e);
+    tpl = Array.from({length:7},(_,i)=>({ weekday:i+1, classes:[] }));
+  }
 
-      merged.forEach(day=>{
-        const card=document.createElement('article');
-        card.className='card';
-        const has=day.classes.length>0;
+  // now render the real week
+  grid.innerHTML = '';
+  const week = buildWeek();
 
-        card.innerHTML=`
-          <h3>${day.header}</h3>
-          <p class="when">${has?'':EMPTY_NOTE}</p>
-          <div class="day-lines"></div>
+  const merged = week.map((d, i) => ({
+    ...d,
+    classes: (tpl[i] && tpl[i].classes) ? tpl[i].classes : []
+  }));
+
+  merged.forEach(day=>{
+    const card=document.createElement('article');
+    card.className='card';
+    const has=day.classes.length>0;
+
+    card.innerHTML=`
+      <h3>${day.header}</h3>
+      <p class="when">${has?'':EMPTY_NOTE}</p>
+      <div class="day-lines"></div>
+    `;
+
+    const lines=card.querySelector('.day-lines');
+    if(has){
+      day.classes.forEach(c=>{
+        const line=document.createElement('div');
+        line.className='classline';
+        line.innerHTML=`
+          <div class="classname">
+            <button type="button" aria-label="View description for ${c.name}">
+              <strong>${c.name}</strong>
+            </button>
+            <span>${c.time} with ${c.instructor}</span>
+          </div>
         `;
 
-        const lines=card.querySelector('.day-lines');
-        if(has){
-          day.classes.forEach(c=>{
-            const line=document.createElement('div');
-            line.className='classline';
-            line.innerHTML=`
-              <div class="classname">
-                <button type="button" aria-label="View description for ${c.name}">
-                  <strong>${c.name}</strong>
-                </button>
-                <span>${c.time} with ${c.instructor}</span>
-              </div>
-            `;
+        line.querySelector('button').addEventListener('click', () => {
+          showClassDescription(c.name);
+        });
 
-            line.querySelector('button').addEventListener('click', () => {
-              showClassDescription(c.name);
-            });
-
-            lines.appendChild(line);
-          });
-        }
-        grid.appendChild(card);
+        lines.appendChild(line);
       });
     }
+    grid.appendChild(card);
+  });
+}
+
 
     render();
   </script>
