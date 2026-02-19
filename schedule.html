@@ -276,18 +276,53 @@
 
     const EMPTY_NOTE = 'No classes at this time, check back later';
 
-    const WEEK_TEMPLATE = [
-      { weekday:1, classes:[{ name:'Anabolix', time:'5:30p–6:00p', instructor:'Nicole' }] },
-      { weekday:2, classes:[] },
-      { weekday:3, classes:[{ name:'Rhythmix', time:'6:15p–7:15p', instructor:'Nicole' }] },
-      { weekday:4, classes:[{ name:'Anabolix', time:'6:15p–6:45p', instructor:'Nicole' }] },
-      { weekday:5, classes:[] },
-      { weekday:6, classes:[
-        { name:'Rhythmix', time:'8:30a–9:30a', instructor:'Nicole' },
-        { name:'Anabolix', time:'9:45a–10:15a', instructor:'Nicole' }
-      ]},
-      { weekday:7, classes:[{ name:'Kinetix', time:'3:00p–4:00p', instructor:'Sarah' }] }
-    ];
+    /* NEW: your live Apps Script web app (exec) */
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyHqHeUS--cfAxGkbsD179aB8rhnTptirrAUZkp0BjXo5Ve7GY3GqOYKECngU0d1bFKHQ/exec';
+
+    function weekdayNumFromName(name){
+      const n = String(name||'').trim().toLowerCase();
+      return { monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6, sunday:7 }[n] || null;
+    }
+
+    function formatTimeFromISO(iso){
+      if (!iso) return '';
+      const d = new Date(iso);
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: TZ,
+        hour: 'numeric',
+        minute: '2-digit'
+      }).format(d);
+    }
+
+    async function loadWeekTemplateFromBackend(){
+      const url = `${BACKEND_URL}?action=schedule`;
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('Schedule API failed.');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Schedule API returned ok:false');
+
+      const buckets = new Map(); // weekdayNum -> classes[]
+      for (const r of (data.rows || [])){
+        const wnum = weekdayNumFromName(r.weekday);
+        if (!wnum) continue;
+
+        const start = formatTimeFromISO(r.start);
+        const end   = formatTimeFromISO(r.end);
+        const time  = (start && end) ? `${start}–${end}` : '';
+
+        if (!buckets.has(wnum)) buckets.set(wnum, []);
+        buckets.get(wnum).push({
+          name: r.className,
+          time,
+          instructor: r.instructor || ''
+        });
+      }
+
+      return Array.from({length:7}, (_,i) => ({
+        weekday: i+1,
+        classes: buckets.get(i+1) || []
+      }));
+    }
 
     function zonedParts(date){
       const parts = new Intl.DateTimeFormat('en-US',{
@@ -321,8 +356,7 @@
 
       return Array.from({length:7},(_,i)=>{
         const date = addDays(monday,i);
-        const tpl = WEEK_TEMPLATE.find(x=>x.weekday===i+1) || { classes:[] };
-        return { date, header:formatDay(date), classes:tpl.classes };
+        return { date, header:formatDay(date), classes:[] };
       });
     }
 
@@ -402,10 +436,25 @@
       }
     }
 
-    function render(){
+    async function render(){
       const grid = document.getElementById('dayGrid');
       grid.innerHTML='';
-      buildWeek().forEach(day=>{
+
+      let tpl;
+      try{
+        tpl = await loadWeekTemplateFromBackend();
+      } catch(e){
+        console.error(e);
+        tpl = Array.from({length:7},(_,i)=>({ weekday:i+1, classes:[] }));
+      }
+
+      const week = buildWeek();
+      const merged = week.map((d, i) => ({
+        ...d,
+        classes: (tpl[i] && tpl[i].classes) ? tpl[i].classes : []
+      }));
+
+      merged.forEach(day=>{
         const card=document.createElement('article');
         card.className='card';
         const has=day.classes.length>0;
