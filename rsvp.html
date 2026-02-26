@@ -258,24 +258,17 @@
     }
   }
 
-  // Same weekly template you had
-  const WEEK_TEMPLATE = [
-    { weekday:1, classes:[{ name:'Anabolix', instructor:'Nicole', time:'5:30p–6:00p' }] },
-    { weekday:2, classes:[] },
-    { weekday:3, classes:[{ name:'Rhythmix', instructor:'Nicole', time:'6:15p–7:15p' }] },
-    { weekday:4, classes:[{ name:'Anabolix', instructor:'Nicole', time:'6:15p–6:45p' }] },
-    { weekday:5, classes:[] },
-    { weekday:6, classes:[
-      { name:'Rhythmix', instructor:'Nicole', time:'8:30a–9:30a' },
-      { name:'Anabolix', instructor:'Nicole', time:'9:45a–10:15a' }
-    ]},
-    { weekday:7, classes:[{ name:'Kinetix', instructor:'Sarah', time:'3:00p–4:00p' }] }
-  ];
-
-  function weekdayNum(d){
-    const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
-      .format(d).toLowerCase();
-    return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
+  function weekdayNumFromName(name){
+    const n = String(name || '').trim().toLowerCase();
+    return {
+      monday:1, mon:1,
+      tuesday:2, tue:2, tues:2,
+      wednesday:3, wed:3,
+      thursday:4, thu:4, thur:4, thurs:4,
+      friday:5, fri:5,
+      saturday:6, sat:6,
+      sunday:7, sun:7
+    }[n] || 0;
   }
 
   function zonedParts(date){
@@ -283,7 +276,13 @@
       .formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
   }
 
-  // Use "UTC noon trick" so date math is stable, but we'll compute ClassStartISO precisely below.
+  function weekdayNumToday(d){
+    const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
+      .format(d).toLowerCase();
+    return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
+  }
+
+  // Use "UTC noon trick" so date math is stable
   function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
   function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
 
@@ -293,17 +292,22 @@
     return `${w} | ${md}`;
   }
 
-  function buildWeek(){
-    const now = new Date();
-    const p = zonedParts(now);
-    const today  = utcNoon(+p.year, +p.month, +p.day);
-    const monday = addDays(today, -(weekdayNum(now)-1));
+  function timeRangeFromISO(startIso, endIso){
+    const d1 = new Date(startIso);
+    const d2 = new Date(endIso);
 
-    return Array.from({length:7}, (_,i) => {
-      const date = addDays(monday, i);
-      const tpl  = WEEK_TEMPLATE.find(x => x.weekday === i+1) || { classes:[] };
-      return { date, dayLabel: formatDayPipe(date), classes: tpl.classes };
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: TZ,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
     });
+
+    const a = fmt.format(d1).toLowerCase().replace(/\s/g,'');
+    const b = fmt.format(d2).toLowerCase().replace(/\s/g,'');
+    // Convert "5:30pm" -> "5:30p"
+    const short = (s) => s.replace('am','a').replace('pm','p');
+    return `${short(a)}–${short(b)}`;
   }
 
   // Parse start time from "5:30p–6:00p" (en dash) or "5:30p-6:00p"
@@ -326,11 +330,7 @@
 
   // Build ISO string for Detroit local date+time (returns an ISO string with offset)
   async function detroitISOForDateAndTime(yyyyMmDd, hh, mm){
-    // We need an offset-aware ISO. Easiest: ask the web app to format? But we’ll do it locally:
-    // Create a Date in local time, then render in America/Detroit via Intl parts and rebuild.
-    // We'll compute the offset by formatting and parsing.
     const base = new Date(`${yyyyMmDd}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`);
-    // This "base" is in browser local timezone; we need Detroit time. We'll do a timezone parts trick:
     const fmt = new Intl.DateTimeFormat('en-US', {
       timeZone: TZ,
       year:'numeric', month:'2-digit', day:'2-digit',
@@ -340,9 +340,8 @@
     const parts = fmt.formatToParts(base).reduce((a,p)=>(a[p.type]=p.value,a),{});
     const y = parts.year, mo = parts.month, d = parts.day;
     const H = parts.hour, M = parts.minute, S = parts.second;
-    // Construct a "pretend UTC" date from Detroit parts
+
     const detroitAsUTC = new Date(Date.UTC(+y, +mo-1, +d, +H, +M, +S));
-    // Now get Detroit offset at that instant by comparing formatted timeZoneName shortOffset (supported in modern Safari)
     const offFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, timeZoneName:'shortOffset' });
     const offParts = offFmt.formatToParts(detroitAsUTC);
     const tzName = (offParts.find(p=>p.type==='timeZoneName')||{}).value || 'GMT-00:00';
@@ -352,27 +351,78 @@
     return `${y}-${mo}-${d}T${H}:${M}:${S}${offset}`;
   }
 
-  function buildCards(){
-    const days = buildWeek();
-    const out = [];
+  async function fetchScheduleRows(){
+    try{
+      const url = new URL(RSVP_ENDPOINT);
+      url.searchParams.set('action', 'schedule');
 
-    for (const day of days){
-      for (const c of day.classes){
-        const ymd = day.date.toISOString().slice(0,10);
+      const res = await fetch(url.toString(), { method:'GET' });
+      const data = await res.json().catch(()=> ({}));
+      if (!res.ok || !data.ok) return [];
+      return Array.isArray(data.rows) ? data.rows : [];
+    }catch(_){
+      return [];
+    }
+  }
+
+  function buildCardsFromScheduleRows(rows){
+    // Map schedule rows by weekday number
+    const byW = new Map();
+    rows.forEach(r => {
+      const wd = weekdayNumFromName(r.weekday);
+      if (!wd) return;
+      if (!byW.has(wd)) byW.set(wd, []);
+      byW.get(wd).push({
+        name: String(r.className || '').trim(),
+        instructor: String(r.instructor || '').trim(),
+        startISO: r.start,
+        endISO: r.end
+      });
+    });
+
+    // Sort each weekday by start time
+    for (const [wd, list] of byW.entries()){
+      list.sort((a,b) => {
+        const ta = a.startISO ? new Date(a.startISO).getTime() : 0;
+        const tb = b.startISO ? new Date(b.startISO).getTime() : 0;
+        return ta - tb;
+      });
+      byW.set(wd, list);
+    }
+
+    // Build the current week (Mon–Sun)
+    const now = new Date();
+    const p = zonedParts(now);
+    const today  = utcNoon(+p.year, +p.month, +p.day);
+    const monday = addDays(today, -(weekdayNumToday(now)-1));
+
+    const out = [];
+    for (let i=0;i<7;i++){
+      const date = addDays(monday, i);
+      const ymd = date.toISOString().slice(0,10);
+      const dayLabel = formatDayPipe(date);
+      const wd = i+1;
+      const classes = byW.get(wd) || [];
+
+      for (const c of classes){
+        const timeRange = (c.startISO && c.endISO)
+          ? timeRangeFromISO(c.startISO, c.endISO)
+          : '';
 
         // Keep your ClassID format: Name|YYYY-MM-DD|TimeRange
-        const classId = `${c.name}|${ymd}|${c.time}`;
+        const classId = `${c.name}|${ymd}|${timeRange}`;
 
         out.push({
           class_id: classId,
           class_name: c.name,
           instructor: c.instructor,
-          time_range: c.time,
-          day_label: day.dayLabel,
+          time_range: timeRange,
+          day_label: dayLabel,
           ymd
         });
       }
     }
+
     return out;
   }
 
@@ -414,9 +464,11 @@
 
       grid.appendChild(card);
     });
-  }
 
-  renderCards(buildCards());
+    if (!list.length){
+      grid.innerHTML = `<p style="grid-column:1/-1; margin:8px 0 0 0; opacity:.85;">No upcoming classes right now. Please check back soon.</p>`;
+    }
+  }
 
   // Modal + save (unchanged)
   const modal = document.getElementById('confirmModal');
@@ -496,11 +548,15 @@
     openConfirmModal(payload);
   }
 
-  // Kick off member lookup
+  // Kick off member lookup + schedule fetch
   (async () => {
     const m = await loadMember();
     if (!m && memberId) memberBadge.textContent = 'Member link not found';
     if (!memberId) memberBadge.textContent = 'Missing member link';
+
+    const rows = await fetchScheduleRows();
+    const cards = buildCardsFromScheduleRows(rows);
+    renderCards(cards);
   })();
 </script>
 </body>
