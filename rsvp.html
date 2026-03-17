@@ -246,7 +246,7 @@
   const memberBadge = document.getElementById('memberBadge');
   memberBadge.textContent = memberId ? 'Checking member…' : 'Missing member link';
 
-  // Validate member via lookup so we can display name/plan
+  // Validate member via lookup so we can display name/plan/details
   async function loadMember(){
     if (!memberId) return null;
     try{
@@ -260,7 +260,37 @@
       if (!res.ok || !data.ok || !data.found) return null;
 
       const m = data.member || {};
-      memberBadge.textContent = (m.DisplayName ? m.DisplayName : 'Member') + (m.PlanType ? ` · ${m.PlanType}` : '');
+      const badgeParts = [];
+      badgeParts.push(m.DisplayName ? m.DisplayName : 'Member');
+
+      const planType = String(m.PlanType || '').trim();
+      if (planType) badgeParts.push(planType);
+
+      const planLower = planType.toLowerCase();
+
+      if (planLower === 'punchcard') {
+        const punchesRemaining = Number(m.PunchesRemaining);
+        const punchesTotal = Number(m.PunchesTotal);
+
+        if (Number.isFinite(punchesRemaining) && Number.isFinite(punchesTotal)) {
+          badgeParts.push(`${punchesRemaining}/${punchesTotal} Punches Remaining`);
+        }
+      }
+
+      if (planLower === 'monthly' && m.MonthlyActiveUntil) {
+        const d = new Date(m.MonthlyActiveUntil);
+        if (!isNaN(d.getTime())) {
+          const formatted = new Intl.DateTimeFormat('en-US', {
+            timeZone: TZ,
+            month: 'long',
+            day: 'numeric'
+          }).format(d);
+
+          badgeParts.push(`Active Until ${formatted}`);
+        }
+      }
+
+      memberBadge.textContent = badgeParts.join(' · ');
       return m;
     }catch(_){
       return null;
