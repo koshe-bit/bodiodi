@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NNWFJEYNW7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNWFJEYNW7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NNWFJEYNW7');
+  </script>
 
-  gtag('config', 'G-NNWFJEYNW7');
-</script>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Bodiodi — About</title>
@@ -19,11 +19,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global styles (match Classes page) -->
+  <!-- Global styles -->
   <link rel="stylesheet" href="assets/global.css?v=5">
 
   <style>
     main{ padding-top:96px; }
+
+    .trainer-section{
+      margin-bottom:56px; /* spacing between bios */
+    }
 
     .page-head{
       display:flex;
@@ -87,13 +91,26 @@
       margin:0 0 12px 0;
       max-width:72ch;
     }
+
     .about-body p:last-child{ margin-bottom:0; }
+
+    /* NEW: smaller subheadings for Sarah */
+    .subhead{
+      font-family:"Inter";
+      font-weight:700;
+      font-size:13px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin:18px 0 6px 0;
+      color:var(--dk85);
+      opacity:.9;
+    }
   </style>
 </head>
 
 <body class="simple-page">
 
-  <!-- Topbar (exactly like Classes page) -->
+  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -109,8 +126,8 @@
         <a href="https://bodiodi.com/faqs.html">FAQs</a>
       </nav>
 
-      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
-        <span class="hamburger" aria-hidden="true"></span>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer">
+        <span class="hamburger"></span>
       </button>
     </div>
   </div>
@@ -125,78 +142,98 @@
   </nav>
 
   <main>
-    <div class="page-head">
-      <div>
-        <p class="kicker">About</p>
-        <h1 class="about-title">Nicole Kosheba</h1>
-        <p class="meta">Group Trainer / Owner</p>
+
+    <!-- NICOLE -->
+    <section class="trainer-section">
+
+      <div class="page-head">
+        <div>
+          <p class="kicker">About</p>
+          <h1 class="about-title">Nicole Kosheba</h1>
+          <p class="meta">Group Trainer / Owner</p>
+        </div>
       </div>
-      <div></div>
-    </div>
 
-    <div class="rule" aria-hidden="true"></div>
+      <div class="rule"></div>
 
-    <section class="about-card" aria-label="About Nicole">
-      <div class="about-body">
-        <p>
-          I’ve been leading group fitness classes since 2011, working with people across Grand Rapids in studios,
-          workplaces, and community spaces. For the past decade, I taught at CKO Kickboxing, and I’ve also led
-          after-work programs for local businesses like Custer Furniture and Rockford Construction. Over the years,
-          I’ve coached hundreds of bodies, personalities, energy levels, and life stages—and that experience has
-          shaped how I train people today.
-        </p>
+      <div class="about-card">
+        <div class="about-body">
+          <p>
+            I’ve been leading group fitness classes since 2011, working with people across Grand Rapids in studios,
+            workplaces, and community spaces. For the past decade, I taught at CKO Kickboxing, and I’ve also led
+            after-work programs for local businesses like Custer Furniture and Rockford Construction. Over the years,
+            I’ve coached hundreds of bodies, personalities, energy levels, and life stages—and that experience has
+            shaped how I train people today.
+          </p>
 
-        <p>
-          The gym has always been my happy place. It’s where I go to reset, release stress, and reconnect with myself.
-          But what I’ve learned is this: movement is better when it’s shared. I created Bodiodi to be a space where you
-          can show up exactly as you are and take what you need that day. Maybe you’re tired and want to zone out.
-          Maybe you’re energized and ready to push. Either way, you don’t have to perform or prove anything here.
-          My job is to guide you through training that’s functional, healthy, and genuinely fun so you leave feeling
-          stronger, clearer, and more like yourself.
-        </p>
+          <p>
+            The gym has always been my happy place. It’s where I go to reset, release stress, and reconnect with myself.
+            But what I’ve learned is this: movement is better when it’s shared. I created Bodiodi to be a space where you
+            can show up exactly as you are and take what you need that day. Maybe you’re tired and want to zone out.
+            Maybe you’re energized and ready to push. Either way, you don’t have to perform or prove anything here.
+            My job is to guide you through training that’s functional, healthy, and genuinely fun so you leave feeling
+            stronger, clearer, and more like yourself.
+          </p>
+        </div>
       </div>
+
     </section>
 
-    <h1 class="about-title">Sarah Wasvick</h1>
-        <p class="meta">Personal Trainer, Yoga Instructor</p>
+    <!-- SARAH -->
+    <section class="trainer-section">
+
+      <div class="page-head">
+        <div>
+          <h1 class="about-title">Sarah Wasvick</h1>
+          <p class="meta">Personal Trainer · Yoga Instructor</p>
+        </div>
       </div>
-      <div></div>
-    </div>
 
-    <div class="rule" aria-hidden="true"></div>
+      <div class="rule"></div>
 
-    <section class="about-card" aria-label="About Nicole">
-      <div class="about-body">
-        <p>
-          Personal trainer and yoga instructor with a B.S. in Exercise and Health Science and more than 15 years in the
-          fitness industry—7 of those dedicated to personal training. I teach with an approachable, longevity-first mindset 
-          because I believe everyone has the right and ability to enjoy movement at any stage of life.
-        </p>
-        <h2>My Approach</h2>
-        <p>I train at the intersection of biomechanics and fun. That means workouts and classes that are grounded in how the body 
-          actually moves—safe, effective, and designed to build resilience over time—while still being enjoyable and accessible. 
-          I don’t chase trends; I help you build sustainable strength, mobility, and joy in movement so your body can be nourished 
-          and celebrated for years to come.</p>
-        <h2>What to Expect</h2>
-        <p>Personalized programs that respect your history, goals, and current abilities
-A mix of strength, mobility, and movement practice informed by biomechanics
-Yoga sessions that emphasize breath, alignment, and restorative resilience
-Clear progressions and practical cues so every session feels challenging but doable
-Encouragement, humor, and real-world tools to keep fitness part of your life—not a short-lived phase</p>
+      <div class="about-card">
+        <div class="about-body">
 
-        <h2>Who I Work With</h2>
-        <p>
-          I coach people who want to move better, feel stronger, and keep doing the activities they love—whether you’re returning from injury, 
-          training for longevity, or simply want a more joyful relationship with fitness.
+          <p>
+            Personal trainer and yoga instructor with a B.S. in Exercise and Health Science and more than 15 years in the
+            fitness industry—7 of those dedicated to personal training. I teach with an approachable, longevity-first mindset 
+            because I believe everyone has the right and ability to enjoy movement at any stage of life.
+          </p>
 
-Let’s build a movement practice that lasts.
-        </p>
+          <div class="subhead">My Approach</div>
+          <p>
+            I train at the intersection of biomechanics and fun. That means workouts and classes that are grounded in how the body 
+            actually moves—safe, effective, and designed to build resilience over time—while still being enjoyable and accessible. 
+            I don’t chase trends; I help you build sustainable strength, mobility, and joy in movement so your body can be nourished 
+            and celebrated for years to come.
+          </p>
+
+          <div class="subhead">What to Expect</div>
+          <p>
+            Personalized programs that respect your history, goals, and current abilities.<br>
+            A mix of strength, mobility, and movement practice informed by biomechanics.<br>
+            Yoga sessions that emphasize breath, alignment, and restorative resilience.<br>
+            Clear progressions and practical cues so every session feels challenging but doable.<br>
+            Encouragement, humor, and real-world tools to keep fitness part of your life—not a short-lived phase.
+          </p>
+
+          <div class="subhead">Who I Work With</div>
+          <p>
+            I coach people who want to move better, feel stronger, and keep doing the activities they love—whether you’re returning from injury, 
+            training for longevity, or simply want a more joyful relationship with fitness.
+          </p>
+
+          <p>Let’s build a movement practice that lasts.</p>
+
+        </div>
       </div>
+
     </section>
 
     <p style="margin-top:10px;">
       <a class="btn" href="index.html">Back to home</a>
     </p>
+
   </main>
 
   <script src="assets/site.js?v=2"></script>
