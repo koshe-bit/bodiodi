@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNWFJEYNW7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NNWFJEYNW7');
+  </script>
+
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Bodiodi — Reserve</title>
@@ -8,182 +17,646 @@
   <!-- Fonts -->
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Global Styles -->
-  <link rel="stylesheet" href="assets/global.css?v=5">
+  <!-- Global styles -->
+  <link rel="stylesheet" href="assets/global.css?v=1">
 
   <style>
-    .reserve-wrap {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 24px;
+    main{ padding-top:96px; } /* topbar offset */
+
+    .page-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
     }
 
-    .member-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      font-size: 14px;
-      color: #666;
+    .page-head-copy{
+      flex:1 1 auto;
+      min-width:0;
     }
 
-    .class-card {
-      border: 1px solid #eee;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 16px;
-      background: #fff;
+    .kicker{
+      margin:0 0 6px 0;
+      font-family:"Inter";
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:var(--dk85);
+      opacity:.9;
+      font-size:12px;
     }
 
-    .class-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+    .meta{
+      margin:0;
+      max-width:none;
+      font-size:14px;
+      opacity:.9;
+      line-height:1.45;
     }
 
-    .class-info {
-      flex: 1;
-      min-width: 200px;
+    .meta + .meta{
+      margin-top:6px;
     }
 
-    .class-name {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 4px;
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.10);
+      background:rgba(255,255,255,.55);
+      backdrop-filter:saturate(120%) blur(6px);
+      -webkit-backdrop-filter:saturate(120%) blur(6px);
+      font-size:14px;
+      color:var(--dk);
+      white-space:normal;
+      text-align:left;
+      line-height:1.35;
+      max-width:420px;
     }
 
-    .class-time {
-      font-size: 14px;
-      color: #777;
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
     }
 
-    .reserve-btn {
-      background: #EDEC87;
-      border: none;
-      border-radius: 999px;
-      padding: 10px 18px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
+    .card{
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:14px 14px 12px;
+      background:rgba(255,255,255,.72);
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
     }
 
-    .reserve-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    .card h3{
+      margin:0 0 10px 0;
+      font-family:"Inter";
+      font-weight:800;
+      letter-spacing:-.01em;
+      color:var(--dk);
+      font-size:22px;
+      line-height:1.05;
     }
 
-    /* NEW STATUS TEXT */
-    .class-status {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #999;
-      font-weight: 400;
+    .when{
+      margin:0 0 12px 0;
+      font-size:14px;
+      color:var(--dk85);
+      opacity:.92;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .btn.small{
+      padding:10px 14px;
+      letter-spacing:.10em;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    /* Modal */
+    .modal{ position:fixed; inset:0; display:none; z-index:200; }
+    .modal.open{ display:block; }
+    .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
+    .modal-card{
+      position:relative;
+      width:min(560px, 92vw);
+      margin: 14vh auto 0;
+      background:#fffaf8;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:18px 18px 14px;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      color:var(--dk);
+      font-family:"Krub", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    .modal-card h3{
+      margin:0 0 10px 0;
+      font-family:"Inter";
+      font-weight:800;
+      letter-spacing:-.01em;
+      color:var(--dk);
+    }
+    .modal-card p{ margin:0 0 10px 0; line-height:1.5; max-width:none; }
+    .modal-actions{
+      display:flex; gap:10px; justify-content:flex-end;
+      margin-top:12px;
+    }
+    .btn-ghost{
+      background:transparent;
+      border:2px solid rgba(58,67,60,.35);
+      color:var(--dk85);
+    }
+    .modal-note{
+      margin:10px 0 0 0;
+      font-size:13px;
+      opacity:.82;
+    }
+
+    /* Mobile-only layout fix */
+    @media (max-width: 700px){
+      .page-head{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+      }
+
+      .badge{
+        width:100%;
+        max-width:none;
+        border-radius:16px;
+      }
+    }
+
+    @media (max-width: 640px){
+      main{ padding-top:88px; }
+
+      .page-head{
+        margin-bottom:14px;
+      }
+
+      .page-head h1{
+        line-height:1.05;
+      }
+
+      .meta,
+      .badge{
+        font-size:13.5px;
+      }
+
+      .modal-card{
+        margin:10vh auto 0;
+      }
+
+      .modal-actions{
+        flex-direction:column-reverse;
+      }
+
+      .modal-actions .btn{
+        width:100%;
+      }
     }
   </style>
 </head>
 
-<body>
-  <div class="reserve-wrap">
+<body class="with-topbar">
 
-    <div class="member-bar" id="memberBar">
-      Loading member...
+  <!-- Member topbar (keep this slightly lighter look as-is) -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
+
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+        <a href="https://bodiodi.com/signup.html">Join</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
+        <a href="https://bodiodi.com/faqs.html">FAQs</a>
+      </nav>
+
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
     </div>
-
-    <div id="classList"></div>
-
   </div>
 
-<script>
-const API_URL = "YOUR_WEB_APP_URL_HERE";
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Join</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+    <a href="https://bodiodi.com/faqs.html">FAQs</a>
+  </nav>
 
-/* ---------- GET MEMBER ---------- */
-async function getMember(memberId) {
-  const res = await fetch(`${API_URL}?action=lookup&memberId=${memberId}`);
-  return await res.json();
-}
-
-/* ---------- GET SCHEDULE ---------- */
-async function getSchedule() {
-  const res = await fetch(`${API_URL}?action=schedule`);
-  return await res.json();
-}
-
-/* ---------- RSVP ---------- */
-async function reserve(classItem, memberId) {
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      member_id: memberId,
-      class_id: classItem.classId,
-      class_name: classItem.className,
-      class_start_iso: classItem.classStartISO,
-      policy_confirmed: true
-    })
-  });
-
-  // refresh schedule after booking
-  init();
-}
-
-/* ---------- RENDER ---------- */
-function renderClasses(classes, memberId) {
-  const container = document.getElementById("classList");
-  container.innerHTML = "";
-
-  classes.forEach(cls => {
-    const card = document.createElement("div");
-    card.className = "class-card";
-
-    card.innerHTML = `
-      <div class="class-row">
-        <div class="class-info">
-          <div class="class-name">${cls.className}</div>
-          <div class="class-time">${formatTime(cls.classStartISO)}</div>
-        </div>
-
-        <button class="reserve-btn" ${cls.isFull ? "disabled" : ""}>
-          ${cls.isFull ? "Full" : "Reserve"}
-        </button>
+  <main>
+    <div class="page-head">
+      <div class="page-head-copy">
+        <p class="kicker">Members</p>
+        <h1 style="margin:0;">Reserve your spot</h1>
+        <p class="meta">Tap a class, confirm the reminder, and you’re in.</p>
+        <p class="meta">* MORNING CLASSES * Please be sure to reserve your spot at least 24 hrs before class start.</p>
       </div>
 
-      <div class="class-status">${cls.statusLabel || ""}</div>
-    `;
+      <div class="badge" id="memberBadge">Loading member...</div>
+    </div>
 
-    const btn = card.querySelector("button");
+    <div class="rule" aria-hidden="true"></div>
 
-    if (!cls.isFull) {
-      btn.addEventListener("click", () => reserve(cls, memberId));
+    <section class="grid" id="classGrid" aria-label="Upcoming classes"></section>
+
+    <p style="margin-top:22px; font-size:14px; opacity:.9;">
+      Need to purchase a plan or refill your punchcard? Fill out <a href="https://bodiodi.com/signup.html">this form</a> and make your payment via venmo.
+    </p>
+
+    <p style="margin-top:10px;">
+      <a class="btn" href="index.html">Home</a>
+    </p>
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div class="modal" id="confirmModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-backdrop" data-close="1"></div>
+
+    <div class="modal-card">
+      <h3 id="confirmTitle">Quick reminder</h3>
+
+      <p><strong>Cancel at least 4 hours before class</strong> so someone else can grab the spot.</p>
+      <p><strong>Please arrive 5 minutes early</strong> to get settled.</p>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" id="cancelConfirm">Nevermind</button>
+        <button class="btn" type="button" id="doConfirm">Confirm spot</button>
+      </div>
+
+      <p class="modal-note">By confirming, you agree to the cancellation policy.</p>
+    </div>
+  </div>
+
+  <script src="assets/site.js?v=2"></script>
+
+  <script>
+  const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycbyHqHeUS--cfAxGkbsD179aB8rhnTptirrAUZkp0BjXo5Ve7GY3GqOYKECngU0d1bFKHQ/exec";
+  const TZ = 'America/Detroit';
+
+  const params = new URLSearchParams(location.search);
+  const memberId = params.get('id');
+
+  const memberBadge = document.getElementById('memberBadge');
+  memberBadge.textContent = memberId ? 'Checking member...' : 'Missing member link';
+
+  // Validate member via lookup so we can display name/plan/details
+  async function loadMember(){
+    if (!memberId) return null;
+    try{
+      const url = new URL(RSVP_ENDPOINT);
+      url.searchParams.set('action', 'lookup');
+      url.searchParams.set('memberId', memberId);
+
+      const res = await fetch(url.toString(), { method:'GET' });
+      const data = await res.json().catch(function(){ return {}; });
+
+      if (!res.ok || !data.ok || !data.found) return null;
+
+      const m = data.member || {};
+      const badgeParts = [];
+      badgeParts.push(m.DisplayName ? m.DisplayName : 'Member');
+
+      const planType = String(m.PlanType || '').trim();
+      if (planType) badgeParts.push(planType);
+
+      const planLower = planType.toLowerCase();
+
+      if (planLower === 'punchcard') {
+        const punchesRemaining = Number(m.PunchesRemaining);
+        const punchesTotal = Number(m.PunchesTotal);
+
+        if (Number.isFinite(punchesRemaining) && Number.isFinite(punchesTotal)) {
+          badgeParts.push(punchesRemaining + '/' + punchesTotal + ' Punches Remaining');
+        }
+      }
+
+      if (planLower === 'monthly' && m.MonthlyActiveUntil) {
+        const d = new Date(m.MonthlyActiveUntil);
+        if (!isNaN(d.getTime())) {
+          const formatted = new Intl.DateTimeFormat('en-US', {
+            timeZone: TZ,
+            month: 'long',
+            day: 'numeric'
+          }).format(d);
+
+          badgeParts.push('Active Until ' + formatted);
+        }
+      }
+
+      memberBadge.textContent = badgeParts.join(' · ');
+      return m;
+    }catch(_){
+      return null;
+    }
+  }
+
+  function weekdayNumFromName(name){
+    const n = String(name || '').trim().toLowerCase();
+    return {
+      monday:1, mon:1,
+      tuesday:2, tue:2, tues:2,
+      wednesday:3, wed:3,
+      thursday:4, thu:4, thur:4, thurs:4,
+      friday:5, fri:5,
+      saturday:6, sat:6,
+      sunday:7, sun:7
+    }[n] || 0;
+  }
+
+  function zonedParts(date){
+    return new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' })
+      .formatToParts(date).reduce(function(a,p){ a[p.type]=p.value; return a; }, {});
+  }
+
+  function weekdayNumToday(d){
+    const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
+      .format(d).toLowerCase();
+    return { mon:1, tue:2, wed:3, thu:4, fri:5, sat:6, sun:7 }[wd];
+  }
+
+  // Use "UTC noon trick" so date math is stable
+  function utcNoon(y,m,d){ return new Date(Date.UTC(y, m-1, d, 12)); }
+  function addDays(d,n){ return new Date(d.getTime() + n*86400000); }
+
+  function formatDayPipe(d){
+    const w  = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'long' }).format(d);
+    const md = new Intl.DateTimeFormat('en-US', { timeZone:TZ, month:'short', day:'numeric' }).format(d);
+    return w + ' | ' + md;
+  }
+
+  function timeRangeFromISO(startIso, endIso){
+    const d1 = new Date(startIso);
+    const d2 = new Date(endIso);
+
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: TZ,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+
+    const a = fmt.format(d1).toLowerCase().replace(/\s/g,'');
+    const b = fmt.format(d2).toLowerCase().replace(/\s/g,'');
+    const short = function(s){ return s.replace('am','a').replace('pm','p'); };
+    return short(a) + '–' + short(b);
+  }
+
+  // Parse start time from "5:30p–6:00p" (en dash) or "5:30p-6:00p"
+  function parseStartTime(timeRange){
+    const raw = String(timeRange || '').trim().toLowerCase();
+    const s = raw.replace(/[–—]/g,'-').replace(/\s+/g,'');
+    const start = s.split('-')[0] || '';
+    const m = start.match(/^(\d{1,2})(?::(\d{2}))?([ap])$/);
+    if (!m) return null;
+
+    let hh = parseInt(m[1],10);
+    const mm = m[2] ? parseInt(m[2],10) : 0;
+    const ap = m[3];
+
+    if (ap === 'p' && hh !== 12) hh += 12;
+    if (ap === 'a' && hh === 12) hh = 0;
+
+    return { hh: hh, mm: mm };
+  }
+
+  // Build ISO string for Detroit local date+time (returns an ISO string with offset)
+  async function detroitISOForDateAndTime(yyyyMmDd, hh, mm){
+    const base = new Date(yyyyMmDd + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00');
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: TZ,
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit',
+      hour12:false
+    });
+    const parts = fmt.formatToParts(base).reduce(function(a,p){ a[p.type]=p.value; return a; }, {});
+    const y = parts.year, mo = parts.month, d = parts.day;
+    const H = parts.hour, M = parts.minute, S = parts.second;
+
+    const detroitAsUTC = new Date(Date.UTC(+y, +mo-1, +d, +H, +M, +S));
+    const offFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, timeZoneName:'shortOffset' });
+    const offParts = offFmt.formatToParts(detroitAsUTC);
+    const tzName = (offParts.find(function(p){ return p.type === 'timeZoneName'; }) || {}).value || 'GMT-00:00';
+    const off = tzName.replace('GMT','').replace('UTC','') || '-00:00';
+    const offset = off.includes(':') ? off : (off.length===3 ? off + ':00' : off);
+
+    return y + '-' + mo + '-' + d + 'T' + H + ':' + M + ':' + S + offset;
+  }
+
+  async function fetchScheduleRows(){
+    try{
+      const url = new URL(RSVP_ENDPOINT);
+      url.searchParams.set('action', 'schedule');
+
+      const res = await fetch(url.toString(), { method:'GET' });
+      const data = await res.json().catch(function(){ return {}; });
+      if (!res.ok || !data.ok) return [];
+      return Array.isArray(data.rows) ? data.rows : [];
+    }catch(_){
+      return [];
+    }
+  }
+
+  function buildCardsFromScheduleRows(rows){
+    // Map schedule rows by weekday number
+    const byW = new Map();
+    rows.forEach(function(r){
+      const wd = weekdayNumFromName(r.weekday);
+      if (!wd) return;
+      if (!byW.has(wd)) byW.set(wd, []);
+      byW.get(wd).push({
+        name: String(r.className || '').trim(),
+        instructor: String(r.instructor || '').trim(),
+        startISO: r.start,
+        endISO: r.end
+      });
+    });
+
+    // Sort each weekday by start time
+    for (const entry of byW.entries()){
+      const wd = entry[0];
+      const list = entry[1];
+      list.sort(function(a,b){
+        const ta = a.startISO ? new Date(a.startISO).getTime() : 0;
+        const tb = b.startISO ? new Date(b.startISO).getTime() : 0;
+        return ta - tb;
+      });
+      byW.set(wd, list);
     }
 
-    container.appendChild(card);
+    // Build the current week (Mon–Sun)
+    const now = new Date();
+    const p = zonedParts(now);
+    const today  = utcNoon(+p.year, +p.month, +p.day);
+    const monday = addDays(today, -(weekdayNumToday(now)-1));
+
+    const out = [];
+    for (let i=0;i<7;i++){
+      const date = addDays(monday, i);
+      const ymd = date.toISOString().slice(0,10);
+      const dayLabel = formatDayPipe(date);
+      const wd = i+1;
+      const classes = byW.get(wd) || [];
+
+      for (const c of classes){
+        const timeRange = (c.startISO && c.endISO)
+          ? timeRangeFromISO(c.startISO, c.endISO)
+          : '';
+
+        // Keep your ClassID format: Name|YYYY-MM-DD|TimeRange
+        const classId = c.name + '|' + ymd + '|' + timeRange;
+
+        out.push({
+          class_id: classId,
+          class_name: c.name,
+          instructor: c.instructor,
+          time_range: timeRange,
+          day_label: dayLabel,
+          ymd: ymd
+        });
+      }
+    }
+
+    return out;
+  }
+
+  const grid = document.getElementById('classGrid');
+
+  function renderCards(list){
+    grid.innerHTML = '';
+    list.forEach(function(item){
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const line = item.class_name + ' with ' + item.instructor + ', ' + item.time_range;
+
+      card.innerHTML =
+        '<h3>' + item.day_label + '</h3>' +
+        '<p class="when">' + line + '</p>' +
+        '<div class="row">' +
+          '<span></span>' +
+          '<button class="btn small" type="button">Reserve</button>' +
+        '</div>';
+
+      card.querySelector('button').addEventListener('click', async function(){
+        const t = parseStartTime(item.time_range);
+        if (!t){
+          alert('Could not parse class start time. Please contact Bodiodi.');
+          return;
+        }
+
+        const classStartISO = await detroitISOForDateAndTime(item.ymd, t.hh, t.mm);
+
+        onReserveClick({
+          member_id: memberId,
+          class_id: item.class_id,
+          class_name: item.class_name,
+          class_start_iso: classStartISO
+        });
+      });
+
+      grid.appendChild(card);
+    });
+
+    if (!list.length){
+      grid.innerHTML = '<p style="grid-column:1/-1; margin:8px 0 0 0; opacity:.85;">No upcoming classes right now. Please check back soon.</p>';
+    }
+  }
+
+  // Modal + save (unchanged)
+  const modal = document.getElementById('confirmModal');
+  const cancelBtn = document.getElementById('cancelConfirm');
+  const confirmBtn = document.getElementById('doConfirm');
+  let pendingReservation = null;
+
+  function openConfirmModal(payload){
+    pendingReservation = payload;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeConfirmModal(){
+    pendingReservation = null;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  modal.addEventListener('click', function(e){
+    if (e.target && e.target.dataset && e.target.dataset.close) closeConfirmModal();
   });
-}
 
-/* ---------- TIME FORMAT ---------- */
-function formatTime(iso) {
-  const d = new Date(iso);
-  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-}
+  cancelBtn.addEventListener('click', closeConfirmModal);
 
-/* ---------- INIT ---------- */
-async function init() {
-  const params = new URLSearchParams(window.location.search);
-  const memberId = params.get("id");
+  confirmBtn.addEventListener('click', async function(){
+    if (!pendingReservation) return;
 
-  const member = await getMember(memberId);
-  const schedule = await getSchedule();
+    if (!pendingReservation.member_id){
+      alert('This reserve link is missing your member ID. Your personal link must include ?id=XXXX.');
+      closeConfirmModal();
+      return;
+    }
 
-  document.getElementById("memberBar").innerText =
-    `${member.first} ${member.last} · ${member.planType}`;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Confirming...';
 
-  renderClasses(schedule, memberId);
-}
+    try{
+      const nowIso = new Date().toISOString();
 
-init();
-</script>
+      const payload = {
+        member_id: pendingReservation.member_id,
+        class_id: pendingReservation.class_id,
+        class_name: pendingReservation.class_name || pendingReservation.class_id,
+        class_start_iso: pendingReservation.class_start_iso,
+        policy_confirmed: true,
+        policy_confirmed_at: nowIso
+      };
 
+      const res = await fetch(RSVP_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(function(){ return {}; });
+
+      if (!res.ok || !data.ok){
+        const msg = (data && data.error) ? data.error : 'Sorry — something went wrong saving your reservation.';
+        alert(msg);
+        return;
+      }
+
+      alert('Reserved!');
+      closeConfirmModal();
+
+    } catch (err){
+      console.error(err);
+      alert('Network error saving your reservation. Please try again.');
+    } finally{
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm spot';
+    }
+  });
+
+  function onReserveClick(payload){
+    openConfirmModal(payload);
+  }
+
+  // Kick off member lookup + schedule fetch
+  (async function(){
+    const m = await loadMember();
+    if (!m && memberId) memberBadge.textContent = 'Member link not found';
+    if (!memberId) memberBadge.textContent = 'Missing member link';
+
+    const rows = await fetchScheduleRows();
+    const cards = buildCardsFromScheduleRows(rows);
+    renderCards(cards);
+  })();
+  </script>
 </body>
 </html>
