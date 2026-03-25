@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNWFJEYNW7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NNWFJEYNW7');
+  </script>
+
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bodiodi</title>
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Global styles -->
+  <link rel="stylesheet" href="assets/global.css">
+
+  <style>
+    /* =========================================================
+       INDEX PAGE — MUSCLE GRID / FIELD OF TENSION OVERRIDES
+       Keeps your Bodiodi system, but introduces:
+       - relaxed / contracted zones
+       - anchor-based alignment
+       - controlled overlap
+       - tonal layering
+       - subtle tension lines
+    ========================================================= */
+
+    :root{
+      --page-max: 1280px;
+      --content-max: 1200px;
+      --anchor-left: clamp(24px, 6vw, 88px);
+      --anchor-right: clamp(24px, 6vw, 88px);
+
+      --relaxed-y: clamp(88px, 11vw, 150px);
+      --contracted-y: clamp(52px, 6vw, 84px);
+
+      --tone-1: rgba(68,79,70,.035);
+      --tone-2: rgba(68,79,70,.06);
+      --tone-3: rgba(68,79,70,.09);
+      --line-soft: rgba(68,79,70,.10);
+      --line-mid: rgba(68,79,70,.16);
+      --glow: rgba(237,236,135,.18);
+
+      --hero-copy-max: 620px;
+      --panel-copy-max: 560px;
+      --about-copy-max: 720px;
+    }
+
+    body{
+      overflow-x:hidden;
+    }
+
+    /* ---------- shared section behavior ---------- */
+
+    .tension-wrap{
+      position:relative;
+      isolation:isolate;
+    }
+
+    .tension-wrap::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.8;
+      background:
+        linear-gradient(118deg,
+          transparent 0%,
+          transparent 14%,
+          rgba(68,79,70,.025) 14.4%,
+          transparent 15.2%,
+          transparent 29%,
+          rgba(68,79,70,.03) 29.4%,
+          transparent 30.2%,
+          transparent 47%,
+          rgba(68,79,70,.02) 47.3%,
+          transparent 48.2%,
+          transparent 100%);
+      mix-blend-mode:multiply;
+    }
+
+    .section-inner,
+    .hero-inner,
+    .panel-inner,
+    .about-inner{
+      position:relative;
+      z-index:2;
+      max-width:var(--page-max);
+      margin:0 auto;
+    }
+
+    /* ---------- hero: relaxed state ---------- */
+
+    .hero{
+      position:relative;
+      padding:
+        calc(var(--relaxed-y) + 32px)
+        var(--anchor-right)
+        calc(var(--relaxed-y) + 18px)
+        var(--anchor-left);
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 72% 32%, var(--glow) 0%, transparent 28%),
+        radial-gradient(circle at 20% 78%, rgba(68,79,70,.045) 0%, transparent 36%);
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      left:clamp(14px, 3vw, 40px);
+      right:clamp(14px, 3vw, 40px);
+      bottom:0;
+      height:1px;
+      background:linear-gradient(90deg, transparent, var(--line-mid), transparent);
+      z-index:1;
+    }
+
+    .hero-inner{
+      display:grid;
+      grid-template-columns:minmax(0, 1.15fr) minmax(340px, .95fr);
+      align-items:end;
+      gap:clamp(28px, 4vw, 64px);
+      min-height:clamp(520px, 72vh, 760px);
+    }
+
+    .logo-outline{
+      position:relative;
+      z-index:1;
+      align-self:stretch;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      min-height:340px;
+      pointer-events:none;
+    }
+
+    .logo-outline h1{
+      margin:0;
+      font-family:"fit-tamil-variable", Inter, sans-serif;
+      font-size:clamp(5.2rem, 16vw, 14rem);
+      line-height:.88;
+      letter-spacing:.015em;
+      color:transparent;
+      -webkit-text-stroke:1px rgba(68,79,70,.17);
+      text-stroke:1px rgba(68,79,70,.17);
+      transform:translateX(clamp(-8px, -1vw, -18px));
+      opacity:.92;
+    }
+
+    .hero-copy{
+      position:relative;
+      z-index:3;
+      max-width:var(--hero-copy-max);
+      margin-left:auto;
+      margin-right:0;
+      padding-bottom:clamp(14px, 2vw, 30px);
+    }
+
+    .hero-copy::before{
+      content:"";
+      position:absolute;
+      width:clamp(140px, 18vw, 220px);
+      height:clamp(140px, 18vw, 220px);
+      right:clamp(-24px, -3vw, -46px);
+      top:clamp(-30px, -3vw, -50px);
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(68,79,70,.055) 0%, rgba(68,79,70,.022) 48%, transparent 72%);
+      z-index:-1;
+      filter:blur(2px);
+    }
+
+    .hero-copy .h1{
+      margin:0 0 18px;
+      max-width:12ch;
+      line-height:.94;
+      letter-spacing:-.03em;
+      text-wrap:balance;
+      position:relative;
+    }
+
+    .hero-copy .sub{
+      max-width:28ch;
+      margin:0 0 26px;
+      font-size:clamp(1rem, 1.35vw, 1.1rem);
+      line-height:1.6;
+      color:rgba(68,79,70,.82);
+    }
+
+    .btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+    }
+
+    /* ---------- connective rule between hero + panel ---------- */
+
+    .tension-rule{
+      position:relative;
+      height:64px;
+      margin-top:-8px;
+      margin-bottom:-28px;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    .tension-rule::before,
+    .tension-rule::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      height:1px;
+      background:linear-gradient(90deg, transparent, var(--line-mid), transparent);
+      transform:translateY(-50%);
+    }
+
+    .tension-rule::before{
+      left:6vw;
+      width:38vw;
+    }
+
+    .tension-rule::after{
+      right:8vw;
+      width:24vw;
+    }
+
+    .tension-rule span{
+      position:absolute;
+      left:54%;
+      top:50%;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:rgba(68,79,70,.18);
+      transform:translate(-50%, -50%);
+      box-shadow:0 0 0 10px rgba(68,79,70,.035);
+    }
+
+    /* ---------- middle panel: contracted state ---------- */
+
+    .panel{
+      position:relative;
+      padding:
+        calc(var(--contracted-y) + 16px)
+        var(--anchor-right)
+        calc(var(--contracted-y) + 18px)
+        var(--anchor-left);
+      margin-top:-8px;
+      z-index:4;
+      overflow:visible;
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      left:clamp(18px, 4vw, 42px);
+      right:clamp(18px, 4vw, 42px);
+      top:0;
+      bottom:0;
+      border-radius:32px;
+      background:
+        radial-gradient(circle at 20% 32%, rgba(237,236,135,.12) 0%, transparent 24%),
+        radial-gradient(circle at 78% 68%, rgba(68,79,70,.055) 0%, transparent 28%),
+        linear-gradient(135deg, rgba(68,79,70,.04), rgba(68,79,70,.015));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.45),
+        0 18px 50px rgba(68,79,70,.05);
+      z-index:0;
+    }
+
+    .panel::after{
+      content:"";
+      position:absolute;
+      inset:18px;
+      border-radius:28px;
+      pointer-events:none;
+      z-index:1;
+      background:
+        linear-gradient(115deg,
+          transparent 0%,
+          transparent 10%,
+          rgba(68,79,70,.045) 10.4%,
+          transparent 11.2%,
+          transparent 24%,
+          rgba(68,79,70,.05) 24.4%,
+          transparent 25.2%,
+          transparent 41%,
+          rgba(68,79,70,.035) 41.4%,
+          transparent 42.1%,
+          transparent 59%,
+          rgba(68,79,70,.04) 59.5%,
+          transparent 60.2%,
+          transparent 100%);
+      opacity:.9;
+    }
+
+    .panel-inner{
+      display:grid;
+      grid-template-columns:minmax(220px, 360px) minmax(0, 1fr);
+      gap:clamp(26px, 4vw, 70px);
+      align-items:center;
+      position:relative;
+      z-index:2;
+    }
+
+    .figure{
+      position:relative;
+      min-height:260px;
+      display:grid;
+      place-items:center;
+    }
+
+    .figure::before{
+      content:"";
+      position:absolute;
+      width:clamp(210px, 26vw, 320px);
+      height:clamp(210px, 26vw, 320px);
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(68,79,70,.075) 0%, rgba(68,79,70,.02) 52%, transparent 74%);
+      filter:blur(1px);
+    }
+
+    /* dense bodies / distributed anchors */
+    .figure::after{
+      content:"";
+      position:absolute;
+      inset:18% 17%;
+      background:
+        radial-gradient(circle, rgba(68,79,70,.7) 0 5px, transparent 6px) 10% 18%/33% 33% no-repeat,
+        radial-gradient(circle, rgba(68,79,70,.55) 0 5px, transparent 6px) 54% 14%/33% 33% no-repeat,
+        radial-gradient(circle, rgba(68,79,70,.6) 0 5px, transparent 6px) 28% 50%/33% 33% no-repeat,
+        radial-gradient(circle, rgba(68,79,70,.68) 0 5px, transparent 6px) 70% 48%/33% 33% no-repeat,
+        radial-gradient(circle, rgba(68,79,70,.58) 0 5px, transparent 6px) 42% 82%/33% 33% no-repeat;
+      opacity:.75;
+    }
+
+    .sqO, .sqL, .sqS{
+      position:absolute;
+      border-radius:999px;
+      border:1px solid rgba(68,79,70,.14);
+      background:linear-gradient(135deg, rgba(255,255,255,.38), rgba(68,79,70,.035));
+      backdrop-filter:blur(2px);
+    }
+
+    .sqO{
+      width:clamp(220px, 22vw, 300px);
+      height:clamp(130px, 14vw, 190px);
+      transform:rotate(-28deg) translate(-8px, -4px);
+      box-shadow:0 18px 34px rgba(68,79,70,.05);
+    }
+
+    .sqL{
+      width:clamp(180px, 19vw, 240px);
+      height:clamp(92px, 9vw, 126px);
+      transform:rotate(28deg) translate(26px, -12px);
+      opacity:.92;
+    }
+
+    .sqS{
+      width:clamp(112px, 12vw, 150px);
+      height:clamp(112px, 12vw, 150px);
+      transform:translate(52px, 46px);
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(237,236,135,.22), rgba(68,79,70,.035));
+      box-shadow:0 10px 20px rgba(68,79,70,.05);
+    }
+
+    .panel-copy{
+      max-width:var(--panel-copy-max);
+      position:relative;
+      padding-top:10px;
+    }
+
+    .panel-copy::before{
+      content:"";
+      position:absolute;
+      left:-30px;
+      top:0;
+      width:1px;
+      height:calc(100% + 12px);
+      background:linear-gradient(180deg, transparent, var(--line-mid), transparent);
+      opacity:.8;
+    }
+
+    .panel-copy h2{
+      margin:0 0 16px;
+      max-width:12ch;
+      line-height:.96;
+      letter-spacing:-.03em;
+    }
+
+    .panel-copy p{
+      margin:0;
+      line-height:1.7;
+      color:rgba(68,79,70,.86);
+    }
+
+    .panel-copy .link{
+      white-space:nowrap;
+    }
+
+    /* ---------- soft bridge instead of hard divider ---------- */
+
+    .rule{
+      height:74px;
+      width:min(1240px, calc(100% - 48px));
+      margin:2px auto -18px;
+      position:relative;
+      background:none;
+    }
+
+    .rule::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(ellipse at center,
+          rgba(68,79,70,.08) 0%,
+          rgba(68,79,70,.03) 22%,
+          transparent 62%);
+      transform:scaleX(.86);
+      filter:blur(10px);
+      opacity:.55;
+    }
+
+    .rule::after{
+      content:"";
+      position:absolute;
+      left:10%;
+      right:10%;
+      top:50%;
+      height:1px;
+      transform:translateY(-50%);
+      background:linear-gradient(90deg, transparent, rgba(68,79,70,.12), transparent);
+    }
+
+    /* ---------- about: relaxed again ---------- */
+
+    .section{
+      position:relative;
+      padding:
+        calc(var(--relaxed-y) - 4px)
+        var(--anchor-right)
+        var(--relaxed-y)
+        var(--anchor-left);
+      overflow:hidden;
+    }
+
+    .section::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 16% 28%, rgba(68,79,70,.04) 0%, transparent 30%),
+        radial-gradient(circle at 80% 72%, rgba(237,236,135,.10) 0%, transparent 26%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .about-inner{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) minmax(120px, 280px);
+      gap:clamp(22px, 3vw, 60px);
+      align-items:start;
+      position:relative;
+      z-index:2;
+    }
+
+    .content-col{
+      max-width:var(--about-copy-max);
+      position:relative;
+    }
+
+    .content-col::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:-28px;
+      width:clamp(90px, 16vw, 180px);
+      height:1px;
+      background:linear-gradient(90deg, rgba(68,79,70,.22), transparent);
+    }
+
+    .content-col h2{
+      margin:0 0 18px;
+      max-width:11ch;
+      line-height:.96;
+      letter-spacing:-.03em;
+    }
+
+    .content-col p{
+      margin:0;
+      line-height:1.78;
+      max-width:64ch;
+      color:rgba(68,79,70,.86);
+    }
+
+    .about-node{
+      position:relative;
+      min-height:220px;
+      display:block;
+    }
+
+    .about-node::before{
+      content:"";
+      position:absolute;
+      right:8%;
+      top:10%;
+      width:clamp(120px, 16vw, 180px);
+      height:clamp(120px, 16vw, 180px);
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(68,79,70,.08) 0%, rgba(68,79,70,.02) 50%, transparent 68%);
+    }
+
+    .about-node::after{
+      content:"";
+      position:absolute;
+      right:16%;
+      top:22%;
+      width:clamp(54px, 6vw, 74px);
+      height:clamp(54px, 6vw, 74px);
+      border-radius:50%;
+      background:rgba(68,79,70,.14);
+      box-shadow:
+        0 0 0 18px rgba(68,79,70,.035),
+        -110px 48px 0 -18px rgba(68,79,70,.10),
+        -70px 120px 0 -22px rgba(68,79,70,.08);
+      opacity:.7;
+    }
+
+    .strip{
+      height:28px;
+      background:linear-gradient(90deg, transparent, rgba(68,79,70,.08), transparent);
+      opacity:.65;
+    }
+
+    /* ---------- responsive ---------- */
+
+    @media (max-width: 1080px){
+      .hero-inner{
+        grid-template-columns:1fr;
+        align-items:start;
+      }
+
+      .logo-outline{
+        min-height:auto;
+      }
+
+      .hero-copy{
+        margin-left:0;
+        max-width:700px;
+      }
+
+      .panel-inner{
+        grid-template-columns:1fr;
+      }
+
+      .panel-copy::before{
+        display:none;
+      }
+
+      .about-inner{
+        grid-template-columns:1fr;
+      }
+
+      .about-node{
+        min-height:120px;
+      }
+    }
+
+    @media (max-width: 760px){
+      .hero{
+        padding-top:calc(var(--relaxed-y) - 10px);
+        padding-bottom:calc(var(--relaxed-y) - 16px);
+      }
+
+      .hero-inner{
+        gap:26px;
+        min-height:auto;
+      }
+
+      .logo-outline h1{
+        font-size:clamp(4rem, 19vw, 6.5rem);
+        line-height:.9;
+      }
+
+      .hero-copy .h1,
+      .panel-copy h2,
+      .content-col h2{
+        max-width:none;
+      }
+
+      .tension-rule{
+        height:42px;
+        margin-bottom:-8px;
+      }
+
+      .tension-rule::before{
+        left:20px;
+        width:42%;
+      }
+
+      .tension-rule::after{
+        right:20px;
+        width:20%;
+      }
+
+      .panel{
+        padding-top:52px;
+        padding-bottom:52px;
+      }
+
+      .panel::before{
+        left:12px;
+        right:12px;
+        border-radius:24px;
+      }
+
+      .panel::after{
+        inset:12px;
+        border-radius:20px;
+      }
+
+      .figure{
+        min-height:220px;
+      }
+
+      .section{
+        padding-top:72px;
+        padding-bottom:82px;
+      }
+
+      .content-col p{
+        line-height:1.72;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
+
+      <nav class="navlinks">
+        <a href="https://bodiodi.com/schedule.html">Schedule</a>
+        <a href="https://bodiodi.com/signup.html">Join</a>
+        <a href="https://bodiodi.com/classes.html">Classes</a>
+        <a href="https://bodiodi.com/about.html">About</a>
+        <a href="https://bodiodi.com/pricing.html">Pricing</a>
+        <a href="https://bodiodi.com/faqs.html">FAQs</a>
+      </nav>
+
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Join</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+    <a href="https://bodiodi.com/faqs.html">FAQs</a>
+  </nav>
+
+  <header class="hero tension-wrap">
+    <div class="hero-inner">
+      <div class="logo-outline" aria-hidden="true">
+        <h1>BODIODI</h1>
+      </div>
+
+      <div class="hero-copy">
+        <h2 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h2>
+        <p class="sub">Spots go fast. Grab yours now.</p>
+        <div class="btn-row">
+          <a class="btn" href="https://bodiodi.com/schedule.html">Class Schedule</a>
+          <a class="btn" href="https://bodiodi.com/signup.html">Join</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="tension-rule" aria-hidden="true">
+    <span></span>
+  </div>
+
+  <section class="panel tension-wrap" id="classes">
+    <div class="panel-inner">
+      <div class="figure" aria-hidden="true">
+        <div class="sqO"></div>
+        <div class="sqL"></div>
+        <div class="sqS"></div>
+      </div>
+
+      <div class="panel-copy">
+        <h2>FIND YOUR FORMULA</h2>
+        <p>
+          Progress looks different for everyone. Rebuilding your foundation? Start with Kinetix
+          to restore range and function. Craving intensity? Anabolix delivers that beat-driven burn.
+          Every class is intentional—grounded in science, fueled by rhythm.
+          <a class="link" href="classes.html">Learn more —</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule" aria-hidden="true"></div>
+
+  <section id="about" class="section tension-wrap">
+    <div class="about-inner">
+      <div class="content-col">
+        <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
+        <p>
+          Yes, it’s technically a garage. And it’s also one of the best workouts you’ll find
+          in 400 square feet. The studio is tucked inside a converted carriage house right here
+          in Heritage Hill. Think small-scale, design-driven, and thoughtfully equipped — proper
+          ventilation, soft Marmoleum flooring, and warm lighting that feels more boutique than
+          basement. Some might call it unexpectedly elevated. Classes are small, scheduled, and
+          intentionally personal — because this is training built for real people, not crowds.
+        </p>
+      </div>
+
+      <div class="about-node" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="strip" id="contact"></div>
+
+  <script src="assets/site.js?v=2"></script>
+</body>
+</html>
