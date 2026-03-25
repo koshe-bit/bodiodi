@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bodiodi Mesh Lab</title>
+
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/global.css">
+
+  <style>
+    :root{
+      --bg: #fffaf8;
+      --dk: #444F46;
+      --accent: #EDEC87;
+
+      --hero-pad-x: clamp(24px, 6vw, 84px);
+      --hero-pad-top: clamp(90px, 13vw, 150px);
+      --hero-pad-bottom: clamp(80px, 12vw, 130px);
+      --hero-max: 1280px;
+      --copy-max: 600px;
+
+      --mesh-opacity: .62;
+      --mesh-blur: 18px;
+
+      --field-strength: 1;
+      --idle-opacity: .22;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--dk);
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ---------- optional simple nav so the page stands alone ---------- */
+
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: color-mix(in srgb, var(--bg) 82%, white 18%);
+      border-bottom: 1px solid rgba(68,79,70,.07);
+    }
+
+    .topbar-inner{
+      max-width: var(--hero-max);
+      margin: 0 auto;
+      padding: 14px var(--hero-pad-x);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-logo{
+      height: 26px;
+      width: auto;
+      display: block;
+    }
+
+    .navlinks{
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .navlinks a{
+      text-decoration: none;
+      color: rgba(68,79,70,.82);
+      font-family: Inter, sans-serif;
+      font-size: 14px;
+      letter-spacing: .01em;
+    }
+
+    .navlinks a:hover{
+      color: var(--dk);
+    }
+
+    /* ---------- hero ---------- */
+
+    .hero{
+      position: relative;
+      isolation: isolate;
+      overflow: clip;
+      min-height: min(88vh, 880px);
+      display: grid;
+      align-items: end;
+      padding:
+        var(--hero-pad-top)
+        var(--hero-pad-x)
+        var(--hero-pad-bottom)
+        var(--hero-pad-x);
+    }
+
+    .hero-inner{
+      max-width: var(--hero-max);
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, .95fr);
+      gap: clamp(26px, 4vw, 64px);
+      align-items: end;
+      position: relative;
+      z-index: 3;
+    }
+
+    .logo-outline{
+      position: relative;
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .logo-outline h1{
+      margin: 0;
+      font-family: "fit-tamil-variable", Inter, sans-serif;
+      font-size: clamp(4.8rem, 15vw, 13rem);
+      line-height: .88;
+      letter-spacing: .012em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(68,79,70,.14);
+      text-stroke: 1px rgba(68,79,70,.14);
+      transform: translateX(clamp(-6px, -1vw, -18px));
+      opacity: .95;
+    }
+
+    .hero-copy{
+      max-width: var(--copy-max);
+      margin-left: auto;
+      position: relative;
+      z-index: 4;
+    }
+
+    .hero-copy .eyebrow{
+      display: inline-block;
+      margin: 0 0 18px;
+      font-family: Inter, sans-serif;
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(68,79,70,.52);
+    }
+
+    .hero-copy .h1{
+      margin: 0 0 16px;
+      font-family: Inter, sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.4rem, 6.2vw, 5.8rem);
+      line-height: .94;
+      letter-spacing: -.04em;
+      max-width: 11ch;
+      text-wrap: balance;
+    }
+
+    .hero-copy .sub{
+      margin: 0 0 26px;
+      font-family: Krub, sans-serif;
+      font-size: clamp(1rem, 1.35vw, 1.12rem);
+      line-height: 1.7;
+      color: rgba(68,79,70,.8);
+      max-width: 30ch;
+    }
+
+    .btn-row{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn{
+      appearance: none;
+      border: 1px solid rgba(68,79,70,.12);
+      background: rgba(255,255,255,.56);
+      color: var(--dk);
+      text-decoration: none;
+      padding: 13px 18px;
+      border-radius: 999px;
+      font-family: Inter, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      transition: transform .24s ease, background-color .24s ease, border-color .24s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.74);
+      border-color: rgba(68,79,70,.2);
+    }
+
+    /* ---------- invisible mesh rendering layers ---------- */
+
+    .mesh-wrap{
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .mesh-canvas{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      opacity: var(--mesh-opacity);
+      filter: blur(var(--mesh-blur));
+      transform: scale(1.02);
+    }
+
+    /* soft base atmosphere */
+    .mesh-atmosphere{
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 72%, rgba(68,79,70,.05), transparent 32%),
+        radial-gradient(circle at 76% 26%, rgba(237,236,135,.13), transparent 24%),
+        radial-gradient(circle at 60% 62%, rgba(68,79,70,.035), transparent 36%);
+      mix-blend-mode: multiply;
+      opacity: .9;
+    }
+
+    .mesh-pressure{
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: .9;
+      background:
+        radial-gradient(
+          circle 220px at var(--mx, 50%) var(--my, 50%),
+          rgba(68,79,70,.11),
+          rgba(68,79,70,.05) 24%,
+          rgba(68,79,70,.02) 38%,
+          transparent 66%
+        ),
+        radial-gradient(
+          circle 420px at var(--mx, 50%) var(--my, 50%),
+          rgba(237,236,135,.12),
+          rgba(237,236,135,.05) 28%,
+          transparent 62%
+        );
+      transition: opacity .35s ease;
+    }
+
+    /* subtle tissue sheen */
+    .mesh-sheen{
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: .35;
+      background:
+        linear-gradient(
+          116deg,
+          transparent 0%,
+          transparent 10%,
+          rgba(255,255,255,.22) 14%,
+          transparent 20%,
+          transparent 34%,
+          rgba(255,255,255,.16) 38%,
+          transparent 44%,
+          transparent 100%
+        );
+      mix-blend-mode: screen;
+    }
+
+    /* light grounding line */
+    .hero::after{
+      content: "";
+      position: absolute;
+      left: clamp(20px, 4vw, 44px);
+      right: clamp(20px, 4vw, 44px);
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(68,79,70,.14), transparent);
+      z-index: 3;
+    }
+
+    /* ---------- lower content block so page feels real ---------- */
+
+    .after{
+      padding: 72px var(--hero-pad-x) 110px;
+    }
+
+    .after-inner{
+      max-width: var(--hero-max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
+      gap: clamp(28px, 5vw, 80px);
+      align-items: start;
+    }
+
+    .after h2{
+      margin: 0 0 16px;
+      font-family: Inter, sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: .95;
+      letter-spacing: -.04em;
+      max-width: 12ch;
+    }
+
+    .after p{
+      margin: 0;
+      font-family: Krub, sans-serif;
+      line-height: 1.75;
+      color: rgba(68,79,70,.82);
+      max-width: 60ch;
+    }
+
+    .note{
+      padding-top: 8px;
+      font-family: Inter, sans-serif;
+      font-size: 13px;
+      line-height: 1.7;
+      letter-spacing: .01em;
+      color: rgba(68,79,70,.55);
+    }
+
+    @media (max-width: 920px){
+      .hero-inner,
+      .after-inner{
+        grid-template-columns: 1fr;
+      }
+
+      .logo-outline{
+        min-height: auto;
+      }
+
+      .hero-copy{
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 640px){
+      .topbar-inner{
+        justify-content: center;
+      }
+
+      .navlinks{
+        display: none;
+      }
+
+      .hero{
+        min-height: 76vh;
+      }
+
+      .logo-outline h1{
+        font-size: clamp(4rem, 20vw, 6.8rem);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .mesh-canvas,
+      .mesh-pressure,
+      .btn{
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      <nav class="navlinks">
+        <a href="#">Schedule</a>
+        <a href="#">Join</a>
+        <a href="#">Classes</a>
+        <a href="#">About</a>
+        <a href="#">Pricing</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero" id="hero">
+    <div class="mesh-wrap" aria-hidden="true">
+      <canvas class="mesh-canvas" id="meshCanvas"></canvas>
+      <div class="mesh-atmosphere"></div>
+      <div class="mesh-pressure" id="meshPressure"></div>
+      <div class="mesh-sheen"></div>
+    </div>
+
+    <div class="hero-inner">
+      <div class="logo-outline" aria-hidden="true">
+        <h1>BODIODI</h1>
+      </div>
+
+      <div class="hero-copy">
+        <span class="eyebrow">Mesh Lab / Invisible Tension Field</span>
+        <h2 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h2>
+        <p class="sub">
+          This version explores a hidden muscular field beneath the surface — not seen directly,
+          but felt through subtle contraction, pressure, and release.
+        </p>
+        <div class="btn-row">
+          <a class="btn" href="#">Class Schedule</a>
+          <a class="btn" href="#">Join</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="after">
+    <div class="after-inner">
+      <div>
+        <h2>THE MESH IS FELT,<br>NOT SHOWN</h2>
+        <p>
+          The goal here is not to draw a system of nodes and lines. The goal is to create the
+          sensation that something beneath the surface is organizing tension — gathering inward,
+          compressing slightly, then easing back out. More fascia than diagram. More body than interface.
+        </p>
+      </div>
+      <div class="note">
+        Cursor movement activates a hidden field in the hero. On touch devices or at rest, the field
+        drifts gently on its own. This is a restrained first pass meant to test feeling before form.
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      const hero = document.getElementById('hero');
+      const canvas = document.getElementById('meshCanvas');
+      const pressure = document.getElementById('meshPressure');
+      const ctx = canvas.getContext('2d');
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      let width = 0;
+      let height = 0;
+      let nodes = [];
+      let rafId = null;
+
+      // Cursor / activation state
+      let mouse = {
+        x: 0.5,
+        y: 0.5,
+        targetX: 0.5,
+        targetY: 0.5,
+        active: false,
+        enteredOnce: false
+      };
+
+      let time = 0;
+
+      const config = {
+        cols: 8,
+        rows: 5,
+        marginX: 0.08,
+        marginY: 0.14,
+        lineAlpha: 0.06,
+        glowAlpha: 0.075,
+        contractionRadius: 0.26,   // normalized radius
+        maxPull: 18,               // px at desktop scale
+        idleDrift: 0.0038,
+        settle: 0.085,
+        spring: 0.075,
+        friction: 0.82
+      };
+
+      function setCanvasSize() {
+        const rect = hero.getBoundingClientRect();
+        width = Math.max(1, Math.floor(rect.width));
+        height = Math.max(1, Math.floor(rect.height));
+
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        buildNodes();
+      }
+
+      function buildNodes() {
+        nodes = [];
+
+        const cols = width < 700 ? 6 : config.cols;
+        const rows = width < 700 ? 5 : config.rows;
+
+        const usableW = width * (1 - config.marginX * 2);
+        const usableH = height * (1 - config.marginY * 2);
+
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const xNorm = cols === 1 ? 0.5 : col / (cols - 1);
+            const yNorm = rows === 1 ? 0.5 : row / (rows - 1);
+
+            const baseX =
+              width * config.marginX +
+              usableW * xNorm +
+              ((row % 2 === 0 ? -1 : 1) * 8);
+
+            const baseY =
+              height * config.marginY +
+              usableH * yNorm +
+              ((col % 2 === 0 ? 1 : -1) * 6);
+
+            nodes.push({
+              baseX,
+              baseY,
+              x: baseX,
+              y: baseY,
+              vx: 0,
+              vy: 0,
+              seed: Math.random() * Math.PI * 2,
+              row,
+              col
+            });
+          }
+        }
+      }
+
+      function setMouseFromEvent(e) {
+        const rect = hero.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+
+        mouse.targetX = clamp(x, 0, 1);
+        mouse.targetY = clamp(y, 0, 1);
+        mouse.active = true;
+        mouse.enteredOnce = true;
+
+        pressure.style.setProperty('--mx', `${mouse.targetX * 100}%`);
+        pressure.style.setProperty('--my', `${mouse.targetY * 100}%`);
+      }
+
+      function relaxMouse() {
+        mouse.active = false;
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function smoothstep(edge0, edge1, x) {
+        const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+      }
+
+      function update() {
+        time += 0.016;
+
+        if (prefersReducedMotion) {
+          mouse.x = 0.5;
+          mouse.y = 0.42;
+        } else if (mouse.active) {
+          mouse.x = lerp(mouse.x, mouse.targetX, 0.16);
+          mouse.y = lerp(mouse.y, mouse.targetY, 0.16);
+        } else {
+          const idleX = 0.5 + Math.cos(time * 0.55) * config.idleDrift * 18;
+          const idleY = 0.42 + Math.sin(time * 0.75) * config.idleDrift * 14;
+          mouse.x = lerp(mouse.x, idleX, 0.035);
+          mouse.y = lerp(mouse.y, idleY, 0.035);
+
+          pressure.style.setProperty('--mx', `${mouse.x * 100}%`);
+          pressure.style.setProperty('--my', `${mouse.y * 100}%`);
+        }
+
+        const mx = mouse.x * width;
+        const my = mouse.y * height;
+        const radiusPx = Math.min(width, height) * config.contractionRadius;
+        const globalActivation = mouse.active ? 1 : (mouse.enteredOnce ? 0.55 : 0.42);
+
+        for (const n of nodes) {
+          const dx = mx - n.baseX;
+          const dy = my - n.baseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // local contraction around the cursor
+          const influence = 1 - smoothstep(0, radiusPx, dist);
+
+          // very subtle whole-field tightening
+          const centerDx = mx - width * 0.52;
+          const centerDy = my - height * 0.5;
+
+          const idleOffsetX = Math.cos(time * 0.65 + n.seed) * 2.4;
+          const idleOffsetY = Math.sin(time * 0.85 + n.seed) * 1.9;
+
+          // pull nodes inward toward active point
+          let tx = n.baseX;
+          let ty = n.baseY;
+
+          if (!prefersReducedMotion) {
+            tx += idleOffsetX * (mouse.active ? 0.22 : 0.85);
+            ty += idleOffsetY * (mouse.active ? 0.22 : 0.85);
+
+            if (influence > 0) {
+              const dirX = dist > 0 ? dx / dist : 0;
+              const dirY = dist > 0 ? dy / dist : 0;
+
+              const pull = config.maxPull * influence * globalActivation;
+              tx += dirX * pull;
+              ty += dirY * pull;
+            }
+
+            // slight global compressive bias
+            tx += centerDx * 0.008 * globalActivation;
+            ty += centerDy * 0.006 * globalActivation;
+          }
+
+          const ax = (tx - n.x) * config.spring;
+          const ay = (ty - n.y) * config.spring;
+
+          n.vx = (n.vx + ax) * config.friction;
+          n.vy = (n.vy + ay) * config.friction;
+
+          n.x += n.vx;
+          n.y += n.vy;
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        const mx = mouse.x * width;
+        const my = mouse.y * height;
+
+        // invisible mesh made perceptible through soft connective energy
+        // draw lines
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const cols = width < 700 ? 6 : config.cols;
+        const rows = width < 700 ? 5 : config.rows;
+
+        function idx(r, c) {
+          return r * cols + c;
+        }
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const a = nodes[idx(r, c)];
+            if (!a) continue;
+
+            const neighbors = [
+              [r, c + 1],
+              [r + 1, c],
+              [r + 1, c + 1]
+            ];
+
+            for (const [nr, nc] of neighbors) {
+              if (nr >= rows || nc >= cols) continue;
+              const b = nodes[idx(nr, nc)];
+              if (!b) continue;
+
+              const midX = (a.x + b.x) * 0.5;
+              const midY = (a.y + b.y) * 0.5;
+              const dmx = mx - midX;
+              const dmy = my - midY;
+              const dd = Math.sqrt(dmx * dmx + dmy * dmy);
+              const local = 1 - smoothstep(0, Math.min(width, height) * 0.34, dd);
+
+              const alpha = config.lineAlpha + local * 0.055;
+              const lineWidth = 1 + local * 1.25;
+
+              const gradient = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+              gradient.addColorStop(0, `rgba(68,79,70,${alpha * 0.65})`);
+              gradient.addColorStop(0.5, `rgba(68,79,70,${alpha})`);
+              gradient.addColorStop(1, `rgba(68,79,70,${alpha * 0.55})`);
+
+              ctx.strokeStyle = gradient;
+              ctx.lineWidth = lineWidth;
+              ctx.beginPath();
+
+              // slight curve makes it feel less engineered
+              const cx = midX + (b.y - a.y) * 0.02;
+              const cy = midY - (b.x - a.x) * 0.02;
+
+              ctx.moveTo(a.x, a.y);
+              ctx.quadraticCurveTo(cx, cy, b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // diffuse nodal pressure, not visible dots
+        for (const n of nodes) {
+          const dx = mx - n.x;
+          const dy = my - n.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const local = 1 - smoothstep(0, Math.min(width, height) * 0.28, dist);
+
+          const r = 12 + local * 30;
+          const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r);
+          g.addColorStop(0, `rgba(68,79,70,${config.glowAlpha + local * 0.055})`);
+          g.addColorStop(0.45, `rgba(68,79,70,${0.022 + local * 0.03})`);
+          g.addColorStop(1, 'rgba(68,79,70,0)');
+
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // large-scale contraction field
+        const fieldRadius = Math.min(width, height) * 0.42;
+        const field = ctx.createRadialGradient(mx, my, 0, mx, my, fieldRadius);
+        field.addColorStop(0, 'rgba(68,79,70,0.08)');
+        field.addColorStop(0.22, 'rgba(68,79,70,0.04)');
+        field.addColorStop(0.5, 'rgba(68,79,70,0.015)');
+        field.addColorStop(1, 'rgba(68,79,70,0)');
+
+        ctx.fillStyle = field;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function frame() {
+        update();
+        draw();
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function onResize() {
+        setCanvasSize();
+      }
+
+      hero.addEventListener('mousemove', setMouseFromEvent);
+      hero.addEventListener('mouseenter', setMouseFromEvent);
+      hero.addEventListener('mouseleave', relaxMouse);
+
+      hero.addEventListener('touchstart', () => {
+        mouse.active = false;
+      }, { passive: true });
+
+      window.addEventListener('resize', onResize);
+
+      setCanvasSize();
+      frame();
+    })();
+  </script>
+</body>
+</html>
