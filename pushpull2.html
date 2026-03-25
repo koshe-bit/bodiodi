@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bodiodi Mesh Lab</title>
+  <title>Bodiodi Mesh Lab v2</title>
 
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,13 +20,21 @@
       --hero-pad-top: clamp(90px, 13vw, 150px);
       --hero-pad-bottom: clamp(80px, 12vw, 130px);
       --hero-max: 1280px;
-      --copy-max: 600px;
+      --copy-max: 620px;
 
-      --mesh-opacity: .62;
-      --mesh-blur: 18px;
-
-      --field-strength: 1;
-      --idle-opacity: .22;
+      /* JS-updated variables */
+      --mx: 50%;
+      --my: 45%;
+      --tx: 0px;
+      --ty: 0px;
+      --copy-shift-x: 0px;
+      --copy-shift-y: 0px;
+      --copy-scale-x: 1;
+      --copy-scale-y: 1;
+      --copy-rotate: 0deg;
+      --copy-opacity: 1;
+      --band-opacity: .8;
+      --pressure-opacity: .3;
     }
 
     * { box-sizing: border-box; }
@@ -40,9 +48,14 @@
 
     body {
       overflow-x: hidden;
+      cursor: default;
     }
 
-    /* ---------- optional simple nav so the page stands alone ---------- */
+    /* hide cursor where the effect happens */
+    .hero,
+    .hero * {
+      cursor: none !important;
+    }
 
     .topbar{
       position: sticky;
@@ -108,11 +121,11 @@
       width: 100%;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(300px, .95fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, .95fr);
       gap: clamp(26px, 4vw, 64px);
       align-items: end;
       position: relative;
-      z-index: 3;
+      z-index: 4;
     }
 
     .logo-outline{
@@ -121,6 +134,12 @@
       display: flex;
       align-items: center;
       pointer-events: none;
+      transform:
+        translate3d(calc(var(--tx) * .22), calc(var(--ty) * .12), 0)
+        scaleX(calc(1 - (1 - var(--copy-scale-x)) * .25))
+        scaleY(calc(1 - (1 - var(--copy-scale-y)) * .08));
+      transition: transform 90ms linear;
+      transform-origin: left center;
     }
 
     .logo-outline h1{
@@ -140,7 +159,16 @@
       max-width: var(--copy-max);
       margin-left: auto;
       position: relative;
-      z-index: 4;
+      z-index: 5;
+      transform:
+        translate3d(var(--copy-shift-x), var(--copy-shift-y), 0)
+        scaleX(var(--copy-scale-x))
+        scaleY(var(--copy-scale-y))
+        rotate(var(--copy-rotate));
+      transform-origin: center left;
+      transition: transform 90ms linear, opacity 180ms ease;
+      opacity: var(--copy-opacity);
+      will-change: transform;
     }
 
     .hero-copy .eyebrow{
@@ -191,16 +219,33 @@
       font-size: 14px;
       font-weight: 600;
       backdrop-filter: blur(10px);
-      transition: transform .24s ease, background-color .24s ease, border-color .24s ease;
+      transition:
+        transform 90ms linear,
+        background-color .24s ease,
+        border-color .24s ease;
+      will-change: transform;
+    }
+
+    .btn-row .btn:nth-child(1){
+      transform:
+        translate3d(calc(var(--copy-shift-x) * .25), calc(var(--copy-shift-y) * .25), 0)
+        scaleX(calc(1 - (1 - var(--copy-scale-x)) * .22))
+        scaleY(calc(1 - (1 - var(--copy-scale-y)) * .08));
+    }
+
+    .btn-row .btn:nth-child(2){
+      transform:
+        translate3d(calc(var(--copy-shift-x) * .18), calc(var(--copy-shift-y) * .18), 0)
+        scaleX(calc(1 - (1 - var(--copy-scale-x)) * .16))
+        scaleY(calc(1 - (1 - var(--copy-scale-y)) * .05));
     }
 
     .btn:hover{
-      transform: translateY(-1px);
       background: rgba(255,255,255,.74);
       border-color: rgba(68,79,70,.2);
     }
 
-    /* ---------- invisible mesh rendering layers ---------- */
+    /* ---------- hidden mesh / visible pressure surface ---------- */
 
     .mesh-wrap{
       position: absolute;
@@ -216,71 +261,69 @@
       width: 100%;
       height: 100%;
       display: block;
-      opacity: var(--mesh-opacity);
-      filter: blur(var(--mesh-blur));
-      transform: scale(1.02);
+      opacity: 1;
     }
 
-    /* soft base atmosphere */
+    /* big soft pressure field */
+    .mesh-pressure{
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: var(--pressure-opacity);
+      background:
+        radial-gradient(
+          ellipse 260px 180px at var(--mx) var(--my),
+          rgba(68,79,70,.10) 0%,
+          rgba(68,79,70,.055) 22%,
+          rgba(68,79,70,.022) 40%,
+          transparent 68%
+        ),
+        radial-gradient(
+          ellipse 520px 340px at var(--mx) var(--my),
+          rgba(237,236,135,.11) 0%,
+          rgba(237,236,135,.05) 24%,
+          transparent 62%
+        );
+      transition: opacity 180ms ease;
+      mix-blend-mode: multiply;
+    }
+
+    /* subtle directional sheen so compression has something to act on */
+    .mesh-skin{
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: .36;
+      background:
+        linear-gradient(
+          112deg,
+          transparent 0%,
+          transparent 10%,
+          rgba(255,255,255,.18) 16%,
+          transparent 22%,
+          transparent 34%,
+          rgba(255,255,255,.12) 39%,
+          transparent 47%,
+          transparent 100%
+        );
+      mix-blend-mode: screen;
+    }
+
     .mesh-atmosphere{
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(circle at 18% 72%, rgba(68,79,70,.05), transparent 32%),
-        radial-gradient(circle at 76% 26%, rgba(237,236,135,.13), transparent 24%),
-        radial-gradient(circle at 60% 62%, rgba(68,79,70,.035), transparent 36%);
+        radial-gradient(circle at 18% 72%, rgba(68,79,70,.045), transparent 32%),
+        radial-gradient(circle at 76% 26%, rgba(237,236,135,.12), transparent 24%),
+        radial-gradient(circle at 60% 62%, rgba(68,79,70,.03), transparent 36%);
       mix-blend-mode: multiply;
-      opacity: .9;
+      opacity: .92;
     }
 
-    .mesh-pressure{
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      opacity: .9;
-      background:
-        radial-gradient(
-          circle 220px at var(--mx, 50%) var(--my, 50%),
-          rgba(68,79,70,.11),
-          rgba(68,79,70,.05) 24%,
-          rgba(68,79,70,.02) 38%,
-          transparent 66%
-        ),
-        radial-gradient(
-          circle 420px at var(--mx, 50%) var(--my, 50%),
-          rgba(237,236,135,.12),
-          rgba(237,236,135,.05) 28%,
-          transparent 62%
-        );
-      transition: opacity .35s ease;
-    }
-
-    /* subtle tissue sheen */
-    .mesh-sheen{
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      opacity: .35;
-      background:
-        linear-gradient(
-          116deg,
-          transparent 0%,
-          transparent 10%,
-          rgba(255,255,255,.22) 14%,
-          transparent 20%,
-          transparent 34%,
-          rgba(255,255,255,.16) 38%,
-          transparent 44%,
-          transparent 100%
-        );
-      mix-blend-mode: screen;
-    }
-
-    /* light grounding line */
     .hero::after{
       content: "";
       position: absolute;
@@ -291,8 +334,6 @@
       background: linear-gradient(90deg, transparent, rgba(68,79,70,.14), transparent);
       z-index: 3;
     }
-
-    /* ---------- lower content block so page feels real ---------- */
 
     .after{
       padding: 72px var(--hero-pad-x) 110px;
@@ -368,8 +409,15 @@
     }
 
     @media (prefers-reduced-motion: reduce){
+      .hero,
+      .hero *{
+        cursor: auto !important;
+      }
+
       .mesh-canvas,
       .mesh-pressure,
+      .hero-copy,
+      .logo-outline,
       .btn{
         transition: none !important;
         animation: none !important;
@@ -397,7 +445,7 @@
       <canvas class="mesh-canvas" id="meshCanvas"></canvas>
       <div class="mesh-atmosphere"></div>
       <div class="mesh-pressure" id="meshPressure"></div>
-      <div class="mesh-sheen"></div>
+      <div class="mesh-skin"></div>
     </div>
 
     <div class="hero-inner">
@@ -405,12 +453,12 @@
         <h1>BODIODI</h1>
       </div>
 
-      <div class="hero-copy">
-        <span class="eyebrow">Mesh Lab / Invisible Tension Field</span>
+      <div class="hero-copy" id="heroCopy">
+        <span class="eyebrow">Invisible contraction field / v2</span>
         <h2 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h2>
         <p class="sub">
-          This version explores a hidden muscular field beneath the surface — not seen directly,
-          but felt through subtle contraction, pressure, and release.
+          The cursor is hidden. What remains should feel more like pressure moving through a surface:
+          the field tightens, the text yields slightly, and then everything releases.
         </p>
         <div class="btn-row">
           <a class="btn" href="#">Class Schedule</a>
@@ -423,16 +471,16 @@
   <section class="after">
     <div class="after-inner">
       <div>
-        <h2>THE MESH IS FELT,<br>NOT SHOWN</h2>
+        <h2>PRESSURE, NOT POINTER</h2>
         <p>
-          The goal here is not to draw a system of nodes and lines. The goal is to create the
-          sensation that something beneath the surface is organizing tension — gathering inward,
-          compressing slightly, then easing back out. More fascia than diagram. More body than interface.
+          This version removes the visible cursor entirely inside the hero and tries to let the page
+          surface communicate the interaction. Instead of seeing a tool move around, you should feel
+          compression, inward pull, and a slight yielding of the content under that force.
         </p>
       </div>
       <div class="note">
-        Cursor movement activates a hidden field in the hero. On touch devices or at rest, the field
-        drifts gently on its own. This is a restrained first pass meant to test feeling before form.
+        If this still reads too much like a decorative effect and not enough like contraction, the next move
+        would be to increase band compression and reduce the radial pressure layer even further.
       </div>
     </div>
   </section>
@@ -441,46 +489,63 @@
     (() => {
       const hero = document.getElementById('hero');
       const canvas = document.getElementById('meshCanvas');
-      const pressure = document.getElementById('meshPressure');
       const ctx = canvas.getContext('2d');
-
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       let dpr = Math.min(window.devicePixelRatio || 1, 2);
-
       let width = 0;
       let height = 0;
-      let nodes = [];
       let rafId = null;
-
-      // Cursor / activation state
-      let mouse = {
-        x: 0.5,
-        y: 0.5,
-        targetX: 0.5,
-        targetY: 0.5,
-        active: false,
-        enteredOnce: false
-      };
-
       let time = 0;
 
-      const config = {
-        cols: 8,
-        rows: 5,
-        marginX: 0.08,
-        marginY: 0.14,
-        lineAlpha: 0.06,
-        glowAlpha: 0.075,
-        contractionRadius: 0.26,   // normalized radius
-        maxPull: 24,               // px at desktop scale
-        idleDrift: 0.0038,
-        settle: 0.085,
-        spring: 0.075,
-        friction: 0.82
+      // Hidden structural nodes, but now used to bend "tension bands"
+      let nodes = [];
+
+      const mouse = {
+        x: 0.52,
+        y: 0.45,
+        tx: 0.52,
+        ty: 0.45,
+        active: false,
+        entered: false,
+        strength: 0,
+        targetStrength: 0
       };
 
-      function setCanvasSize() {
+      const config = {
+        cols: 10,
+        rows: 6,
+        maxPull: 58,           // much stronger than before
+        radius: 0.28,          // normalized radius of influence
+        settle: 0.12,
+        spring: 0.11,
+        friction: 0.78,
+
+        bandCount: 13,
+        bandSegments: 40,
+        bandAlpha: 0.06,
+        bandAlphaActive: 0.13,
+        bandThickness: 1.0,
+        bandThicknessActive: 2.8,
+
+        idleDriftX: 0.025,
+        idleDriftY: 0.02
+      };
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function smoothstep(edge0, edge1, x) {
+        const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+      }
+
+      function resize() {
         const rect = hero.getBoundingClientRect();
         width = Math.max(1, Math.floor(rect.width));
         height = Math.max(1, Math.floor(rect.height));
@@ -497,27 +562,21 @@
 
       function buildNodes() {
         nodes = [];
-
-        const cols = width < 700 ? 6 : config.cols;
+        const cols = width < 700 ? 8 : config.cols;
         const rows = width < 700 ? 5 : config.rows;
 
-        const usableW = width * (1 - config.marginX * 2);
-        const usableH = height * (1 - config.marginY * 2);
+        const marginX = width * 0.06;
+        const marginY = height * 0.12;
+        const usableW = width - marginX * 2;
+        const usableH = height - marginY * 2;
 
-        for (let row = 0; row < rows; row++) {
-          for (let col = 0; col < cols; col++) {
-            const xNorm = cols === 1 ? 0.5 : col / (cols - 1);
-            const yNorm = rows === 1 ? 0.5 : row / (rows - 1);
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const xn = cols === 1 ? 0.5 : c / (cols - 1);
+            const yn = rows === 1 ? 0.5 : r / (rows - 1);
 
-            const baseX =
-              width * config.marginX +
-              usableW * xNorm +
-              ((row % 2 === 0 ? -1 : 1) * 8);
-
-            const baseY =
-              height * config.marginY +
-              usableH * yNorm +
-              ((col % 2 === 0 ? 1 : -1) * 6);
+            const baseX = marginX + usableW * xn + Math.sin((r + 1) * 1.3 + c * .7) * 8;
+            const baseY = marginY + usableH * yn + Math.cos((c + 1) * 1.1 + r * .6) * 7;
 
             nodes.push({
               baseX,
@@ -526,104 +585,120 @@
               y: baseY,
               vx: 0,
               vy: 0,
-              seed: Math.random() * Math.PI * 2,
-              row,
-              col
+              seed: Math.random() * Math.PI * 2
             });
           }
         }
       }
 
-      function setMouseFromEvent(e) {
+      function setPointer(e) {
         const rect = hero.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top) / rect.height;
-
-        mouse.targetX = clamp(x, 0, 1);
-        mouse.targetY = clamp(y, 0, 1);
+        mouse.tx = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        mouse.ty = clamp((e.clientY - rect.top) / rect.height, 0, 1);
         mouse.active = true;
-        mouse.enteredOnce = true;
-
-        pressure.style.setProperty('--mx', `${mouse.targetX * 100}%`);
-        pressure.style.setProperty('--my', `${mouse.targetY * 100}%`);
+        mouse.entered = true;
+        mouse.targetStrength = 1;
       }
 
-      function relaxMouse() {
+      function leavePointer() {
         mouse.active = false;
+        mouse.targetStrength = 0;
       }
 
-      function clamp(v, min, max) {
-        return Math.max(min, Math.min(max, v));
+      function updateCSSVars() {
+        const root = document.documentElement;
+        root.style.setProperty('--mx', `${mouse.x * 100}%`);
+        root.style.setProperty('--my', `${mouse.y * 100}%`);
+
+        const px = mouse.x * width;
+        const py = mouse.y * height;
+
+        // Pressure on text is based on how close cursor is to the copy region
+        const heroInner = hero.querySelector('.hero-inner');
+        const copy = document.getElementById('heroCopy');
+        const copyRect = copy.getBoundingClientRect();
+        const heroRect = hero.getBoundingClientRect();
+
+        const copyCx = (copyRect.left - heroRect.left) + copyRect.width * 0.5;
+        const copyCy = (copyRect.top - heroRect.top) + copyRect.height * 0.45;
+
+        const dx = px - copyCx;
+        const dy = py - copyCy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = Math.min(width, height) * 0.55;
+
+        const influence = 1 - smoothstep(0, maxDist, dist);
+        const activation = influence * mouse.strength;
+
+        // Text yields slightly toward the invisible pressure
+        const shiftX = dx * 0.016 * activation;
+        const shiftY = dy * 0.012 * activation;
+
+        // Horizontal compression reads more like contraction
+        const scaleX = 1 - activation * 0.035;
+        const scaleY = 1 + activation * 0.01;
+        const rotate = dx * 0.0022 * activation;
+
+        root.style.setProperty('--copy-shift-x', `${shiftX.toFixed(2)}px`);
+        root.style.setProperty('--copy-shift-y', `${shiftY.toFixed(2)}px`);
+        root.style.setProperty('--copy-scale-x', scaleX.toFixed(4));
+        root.style.setProperty('--copy-scale-y', scaleY.toFixed(4));
+        root.style.setProperty('--copy-rotate', `${rotate.toFixed(3)}deg`);
+        root.style.setProperty('--copy-opacity', `${(1 - activation * 0.04).toFixed(3)}`);
+
+        // logo responds too, more subtly
+        root.style.setProperty('--tx', `${(dx * 0.008 * activation).toFixed(2)}px`);
+        root.style.setProperty('--ty', `${(dy * 0.006 * activation).toFixed(2)}px`);
+
+        // pressure layer stays quieter than before
+        root.style.setProperty('--pressure-opacity', `${(0.12 + mouse.strength * 0.18).toFixed(3)}`);
       }
 
-      function lerp(a, b, t) {
-        return a + (b - a) * t;
-      }
-
-      function smoothstep(edge0, edge1, x) {
-        const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
-        return t * t * (3 - 2 * t);
-      }
-
-      function update() {
+      function updateNodes() {
         time += 0.016;
 
         if (prefersReducedMotion) {
-          mouse.x = 0.5;
-          mouse.y = 0.42;
-        } else if (mouse.active) {
-          mouse.x = lerp(mouse.x, mouse.targetX, 0.16);
-          mouse.y = lerp(mouse.y, mouse.targetY, 0.16);
+          mouse.x = 0.52;
+          mouse.y = 0.45;
+          mouse.strength = 0;
         } else {
-          const idleX = 0.5 + Math.cos(time * 0.55) * config.idleDrift * 18;
-          const idleY = 0.42 + Math.sin(time * 0.75) * config.idleDrift * 14;
-          mouse.x = lerp(mouse.x, idleX, 0.035);
-          mouse.y = lerp(mouse.y, idleY, 0.035);
+          if (mouse.active) {
+            mouse.x = lerp(mouse.x, mouse.tx, 0.18);
+            mouse.y = lerp(mouse.y, mouse.ty, 0.18);
+          } else {
+            const idleX = 0.52 + Math.cos(time * 0.55) * config.idleDriftX;
+            const idleY = 0.44 + Math.sin(time * 0.74) * config.idleDriftY;
+            mouse.x = lerp(mouse.x, idleX, 0.03);
+            mouse.y = lerp(mouse.y, idleY, 0.03);
+          }
 
-          pressure.style.setProperty('--mx', `${mouse.x * 100}%`);
-          pressure.style.setProperty('--my', `${mouse.y * 100}%`);
+          mouse.strength = lerp(mouse.strength, mouse.targetStrength, mouse.active ? 0.18 : 0.055);
         }
 
         const mx = mouse.x * width;
         const my = mouse.y * height;
-        const radiusPx = Math.min(width, height) * config.contractionRadius;
-        const globalActivation = mouse.active ? 1 : (mouse.enteredOnce ? 0.55 : 0.42);
+        const radiusPx = Math.min(width, height) * config.radius;
 
         for (const n of nodes) {
           const dx = mx - n.baseX;
           const dy = my - n.baseY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
 
-          // local contraction around the cursor
           const influence = 1 - smoothstep(0, radiusPx, dist);
 
-          // very subtle whole-field tightening
-          const centerDx = mx - width * 0.52;
-          const centerDy = my - height * 0.5;
+          // stronger inward pull
+          const dirX = dx / dist;
+          const dirY = dy / dist;
 
-          const idleOffsetX = Math.cos(time * 0.65 + n.seed) * 2.4;
-          const idleOffsetY = Math.sin(time * 0.85 + n.seed) * 1.9;
+          // base target = original + tiny idle drift
+          let tx = n.baseX + Math.cos(time * 0.8 + n.seed) * 1.4 * (1 - mouse.strength);
+          let ty = n.baseY + Math.sin(time * 0.7 + n.seed) * 1.2 * (1 - mouse.strength);
 
-          // pull nodes inward toward active point
-          let tx = n.baseX;
-          let ty = n.baseY;
-
-          if (!prefersReducedMotion) {
-            tx += idleOffsetX * (mouse.active ? 0.22 : 0.85);
-            ty += idleOffsetY * (mouse.active ? 0.22 : 0.85);
-
-            if (influence > 0) {
-              const dirX = dist > 0 ? dx / dist : 0;
-              const dirY = dist > 0 ? dy / dist : 0;
-
-              const pull = config.maxPull * influence * globalActivation;
-              tx += dirX * pull;
-              ty += dirY * pull;
-            }
-
-            // slight global compressive bias
-            tx += centerDx * 0.008 * globalActivation;
-            ty += centerDy * 0.006 * globalActivation;
+          // contraction
+          if (influence > 0) {
+            const pull = config.maxPull * influence * mouse.strength;
+            tx += dirX * pull;
+            ty += dirY * pull;
           }
 
           const ax = (tx - n.x) * config.spring;
@@ -635,124 +710,134 @@
           n.x += n.vx;
           n.y += n.vy;
         }
+
+        updateCSSVars();
       }
 
-      function draw() {
+      function sampleNodeInfluence(px, py, mx, my) {
+        const dx = mx - px;
+        const dy = my - py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const r = Math.min(width, height) * 0.30;
+        return 1 - smoothstep(0, r, dist);
+      }
+
+      function drawBands() {
         ctx.clearRect(0, 0, width, height);
 
         const mx = mouse.x * width;
         const my = mouse.y * height;
 
-        // invisible mesh made perceptible through soft connective energy
-        // draw lines
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+        // base: invisible mesh influences these bands
+        const bandCount = width < 700 ? 10 : config.bandCount;
+        const segments = width < 700 ? 28 : config.bandSegments;
 
-        const cols = width < 700 ? 6 : config.cols;
-        const rows = width < 700 ? 5 : config.rows;
+        for (let i = 0; i < bandCount; i++) {
+          const t = bandCount === 1 ? 0.5 : i / (bandCount - 1);
+          const baseY = height * 0.16 + t * height * 0.66;
 
-        function idx(r, c) {
-          return r * cols + c;
-        }
-
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const a = nodes[idx(r, c)];
-            if (!a) continue;
-
-            const neighbors = [
-              [r, c + 1],
-              [r + 1, c],
-              [r + 1, c + 1]
-            ];
-
-            for (const [nr, nc] of neighbors) {
-              if (nr >= rows || nc >= cols) continue;
-              const b = nodes[idx(nr, nc)];
-              if (!b) continue;
-
-              const midX = (a.x + b.x) * 0.5;
-              const midY = (a.y + b.y) * 0.5;
-              const dmx = mx - midX;
-              const dmy = my - midY;
-              const dd = Math.sqrt(dmx * dmx + dmy * dmy);
-              const local = 1 - smoothstep(0, Math.min(width, height) * 0.34, dd);
-
-              const alpha = config.lineAlpha + local * 0.055;
-              const lineWidth = 1 + local * 1.25;
-
-              const gradient = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-              gradient.addColorStop(0, `rgba(68,79,70,${alpha * 0.65})`);
-              gradient.addColorStop(0.5, `rgba(68,79,70,${alpha})`);
-              gradient.addColorStop(1, `rgba(68,79,70,${alpha * 0.55})`);
-
-              ctx.strokeStyle = gradient;
-              ctx.lineWidth = lineWidth;
-              ctx.beginPath();
-
-              // slight curve makes it feel less engineered
-              const cx = midX + (b.y - a.y) * 0.02;
-              const cy = midY - (b.x - a.x) * 0.02;
-
-              ctx.moveTo(a.x, a.y);
-              ctx.quadraticCurveTo(cx, cy, b.x, b.y);
-              ctx.stroke();
-            }
-          }
-        }
-
-        // diffuse nodal pressure, not visible dots
-        for (const n of nodes) {
-          const dx = mx - n.x;
-          const dy = my - n.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const local = 1 - smoothstep(0, Math.min(width, height) * 0.28, dist);
-
-          const r = 12 + local * 30;
-          const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r);
-          g.addColorStop(0, `rgba(68,79,70,${config.glowAlpha + local * 0.055})`);
-          g.addColorStop(0.45, `rgba(68,79,70,${0.022 + local * 0.03})`);
-          g.addColorStop(1, 'rgba(68,79,70,0)');
-
-          ctx.fillStyle = g;
           ctx.beginPath();
-          ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-          ctx.fill();
+
+          for (let s = 0; s <= segments; s++) {
+            const u = s / segments;
+            const x = u * width;
+
+            // each band gets pulled toward the pressure point
+            const dx = mx - x;
+            const dy = my - baseY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            const local = 1 - smoothstep(0, Math.min(width, height) * 0.34, dist);
+
+            // pinch bands inward around cursor
+            const yPull = dy * 0.16 * local * mouse.strength;
+            const xPull = dx * 0.06 * local * mouse.strength;
+
+            // subtle organic waviness so the surface feels alive
+            const waveA = Math.sin((u * 7.8) + (i * 0.7) + time * 0.55) * 2.4;
+            const waveB = Math.cos((u * 12.6) + (i * 0.45) + time * 0.4) * 1.25;
+
+            // local compression toward active point
+            const px = x + xPull;
+            const py = baseY + yPull + waveA + waveB;
+
+            if (s === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+
+          const bandInfluence = sampleNodeInfluence(width * 0.5, baseY, mx, my) * mouse.strength;
+          const alpha = lerp(config.bandAlpha, config.bandAlphaActive, bandInfluence);
+          const lineWidth = lerp(config.bandThickness, config.bandThicknessActive, bandInfluence);
+
+          const grad = ctx.createLinearGradient(0, baseY, width, baseY);
+          grad.addColorStop(0, `rgba(68,79,70,${alpha * 0.15})`);
+          grad.addColorStop(0.12, `rgba(68,79,70,${alpha * 0.45})`);
+          grad.addColorStop(0.5, `rgba(68,79,70,${alpha})`);
+          grad.addColorStop(0.88, `rgba(68,79,70,${alpha * 0.45})`);
+          grad.addColorStop(1, `rgba(68,79,70,${alpha * 0.12})`);
+
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = lineWidth;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.stroke();
         }
 
-        // large-scale contraction field
-        const fieldRadius = Math.min(width, height) * 0.42;
-        const field = ctx.createRadialGradient(mx, my, 0, mx, my, fieldRadius);
-        field.addColorStop(0, 'rgba(68,79,70,0.08)');
-        field.addColorStop(0.22, 'rgba(68,79,70,0.04)');
-        field.addColorStop(0.5, 'rgba(68,79,70,0.015)');
-        field.addColorStop(1, 'rgba(68,79,70,0)');
+        // secondary diagonal tissue lines, very faint
+        for (let i = 0; i < 6; i++) {
+          const x0 = width * (0.08 + i * 0.15);
+          const y0 = height * 0.12;
+          const x1 = x0 + width * 0.12;
+          const y1 = height * 0.86;
 
-        ctx.fillStyle = field;
+          const midX = (x0 + x1) * 0.5;
+          const midY = (y0 + y1) * 0.5;
+
+          const dx = mx - midX;
+          const dy = my - midY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const local = 1 - smoothstep(0, Math.min(width, height) * 0.46, dist);
+
+          const bow = 18 * local * mouse.strength;
+          const cx = midX + dx * 0.035;
+          const cy = midY + dy * 0.06 + bow;
+
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          ctx.quadraticCurveTo(cx, cy, x1, y1);
+          ctx.strokeStyle = `rgba(68,79,70,${0.018 + local * 0.03})`;
+          ctx.lineWidth = 1 + local * 0.8;
+          ctx.stroke();
+        }
+
+        // soft pinch shadow, elliptical not cursor-like
+        const shadow = ctx.createRadialGradient(mx, my, 0, mx, my, Math.min(width, height) * 0.26);
+        shadow.addColorStop(0, `rgba(68,79,70,${0.06 * mouse.strength})`);
+        shadow.addColorStop(0.22, `rgba(68,79,70,${0.03 * mouse.strength})`);
+        shadow.addColorStop(0.55, `rgba(68,79,70,${0.012 * mouse.strength})`);
+        shadow.addColorStop(1, 'rgba(68,79,70,0)');
+
+        ctx.fillStyle = shadow;
         ctx.fillRect(0, 0, width, height);
       }
 
       function frame() {
-        update();
-        draw();
+        updateNodes();
+        drawBands();
         rafId = requestAnimationFrame(frame);
       }
 
-      function onResize() {
-        setCanvasSize();
-      }
-
-      hero.addEventListener('mousemove', setMouseFromEvent);
-      hero.addEventListener('mouseenter', setMouseFromEvent);
-      hero.addEventListener('mouseleave', relaxMouse);
+      hero.addEventListener('mousemove', setPointer);
+      hero.addEventListener('mouseenter', setPointer);
+      hero.addEventListener('mouseleave', leavePointer);
+      window.addEventListener('resize', resize);
 
       hero.addEventListener('touchstart', () => {
         mouse.active = false;
+        mouse.targetStrength = 0;
       }, { passive: true });
 
-      window.addEventListener('resize', onResize);
-
-      setCanvasSize();
+      resize();
       frame();
     })();
   </script>
