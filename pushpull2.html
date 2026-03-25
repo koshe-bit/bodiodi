@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bodiodi Mesh Lab v2</title>
+  <title>Bodiodi — Mesh Hero v3</title>
 
   <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,52 +17,44 @@
       --accent: #EDEC87;
 
       --hero-pad-x: clamp(24px, 6vw, 84px);
-      --hero-pad-top: clamp(90px, 13vw, 150px);
-      --hero-pad-bottom: clamp(80px, 12vw, 130px);
+      --hero-pad-top: clamp(110px, 14vw, 170px);
+      --hero-pad-bottom: clamp(130px, 15vw, 220px);
+      --section-pad-y: clamp(70px, 9vw, 120px);
       --hero-max: 1280px;
-      --copy-max: 620px;
+      --copy-max: 640px;
 
-      /* JS-updated variables */
-      --mx: 50%;
-      --my: 45%;
-      --tx: 0px;
-      --ty: 0px;
-      --copy-shift-x: 0px;
-      --copy-shift-y: 0px;
-      --copy-scale-x: 1;
-      --copy-scale-y: 1;
-      --copy-rotate: 0deg;
-      --copy-opacity: 1;
-      --band-opacity: .8;
-      --pressure-opacity: .3;
+      --meshGlowX: 50%;
+      --meshGlowY: 50%;
+      --meshPressure: 0;
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing: border-box; }
 
-    html, body {
+    html, body{
       margin: 0;
       padding: 0;
       background: var(--bg);
       color: var(--dk);
     }
 
-    body {
+    body{
       overflow-x: hidden;
-      cursor: default;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(237,236,135,.06), transparent 22%),
+        radial-gradient(circle at 82% 18%, rgba(68,79,70,.04), transparent 28%),
+        var(--bg);
     }
 
-    /* hide cursor where the effect happens */
-    .hero,
-    .hero * {
-      cursor: none !important;
+    a{
+      color: inherit;
     }
 
     .topbar{
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 80;
       backdrop-filter: blur(10px);
-      background: color-mix(in srgb, var(--bg) 82%, white 18%);
+      background: color-mix(in srgb, var(--bg) 84%, white 16%);
       border-bottom: 1px solid rgba(68,79,70,.07);
     }
 
@@ -100,159 +92,185 @@
       color: var(--dk);
     }
 
-    /* ---------- hero ---------- */
+    /* ---------------- HERO ---------------- */
 
     .hero{
       position: relative;
       isolation: isolate;
+      min-height: min(100svh, 980px);
+      display: flex;
+      align-items: stretch;
       overflow: clip;
-      min-height: min(88vh, 880px);
-      display: grid;
-      align-items: end;
-      padding:
-        var(--hero-pad-top)
-        var(--hero-pad-x)
-        var(--hero-pad-bottom)
-        var(--hero-pad-x);
+      background: var(--bg);
+    }
+
+    .hero-media{
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(
+          180deg,
+          rgba(255,250,248,.10) 0%,
+          rgba(255,250,248,.06) 20%,
+          rgba(255,250,248,.10) 44%,
+          rgba(255,250,248,.18) 62%,
+          rgba(255,250,248,.46) 76%,
+          rgba(255,250,248,.78) 88%,
+          rgba(255,250,248,.96) 100%
+        ),
+        radial-gradient(circle at 22% 28%, rgba(237,236,135,.12), transparent 26%),
+        radial-gradient(circle at 78% 26%, rgba(68,79,70,.08), transparent 28%),
+        radial-gradient(circle at 48% 62%, rgba(68,79,70,.06), transparent 32%),
+        url("assets/bodiodispace.jpg");
+      background-size: cover;
+      background-position: center center;
+      filter: saturate(.92) contrast(.96) brightness(1.01);
+      transform: scale(1.015);
+    }
+
+    .hero-atmosphere{
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg,
+          rgba(255,250,248,.02) 0%,
+          rgba(255,250,248,.02) 35%,
+          rgba(255,250,248,.10) 55%,
+          rgba(255,250,248,.24) 70%,
+          rgba(255,250,248,.52) 82%,
+          rgba(255,250,248,.84) 100%
+        ),
+        radial-gradient(circle at 24% 18%, rgba(237,236,135,.08), transparent 22%),
+        radial-gradient(circle at 70% 24%, rgba(68,79,70,.045), transparent 26%);
+      mix-blend-mode: normal;
+    }
+
+    .hero-fade{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: clamp(180px, 28vw, 360px);
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg,
+          rgba(255,250,248,0) 0%,
+          rgba(255,250,248,.06) 14%,
+          rgba(247,244,237,.18) 28%,
+          rgba(241,239,220,.30) 45%,
+          rgba(255,250,248,.64) 72%,
+          rgba(255,250,248,.94) 100%
+        ),
+        radial-gradient(circle at 18% 40%, rgba(237,236,135,.10), transparent 34%),
+        radial-gradient(circle at 80% 28%, rgba(68,79,70,.05), transparent 32%);
     }
 
     .hero-inner{
-      max-width: var(--hero-max);
+      position: relative;
+      z-index: 3;
       width: 100%;
+      max-width: var(--hero-max);
       margin: 0 auto;
+      padding:
+        var(--hero-pad-top)
+        var(--hero-pad-x)
+        var(--hero-pad-bottom);
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(300px, .95fr);
-      gap: clamp(26px, 4vw, 64px);
+      grid-template-columns: minmax(0, 1fr);
       align-items: end;
-      position: relative;
-      z-index: 4;
-    }
-
-    .logo-outline{
-      position: relative;
-      min-height: 320px;
-      display: flex;
-      align-items: center;
-      pointer-events: none;
-      transform:
-        translate3d(calc(var(--tx) * .22), calc(var(--ty) * .12), 0)
-        scaleX(calc(1 - (1 - var(--copy-scale-x)) * .25))
-        scaleY(calc(1 - (1 - var(--copy-scale-y)) * .08));
-      transition: transform 90ms linear;
-      transform-origin: left center;
-    }
-
-    .logo-outline h1{
-      margin: 0;
-      font-family: "fit-tamil-variable", Inter, sans-serif;
-      font-size: clamp(4.8rem, 15vw, 13rem);
-      line-height: .88;
-      letter-spacing: .012em;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(68,79,70,.14);
-      text-stroke: 1px rgba(68,79,70,.14);
-      transform: translateX(clamp(-6px, -1vw, -18px));
-      opacity: .95;
     }
 
     .hero-copy{
       max-width: var(--copy-max);
-      margin-left: auto;
-      position: relative;
-      z-index: 5;
-      transform:
-        translate3d(var(--copy-shift-x), var(--copy-shift-y), 0)
-        scaleX(var(--copy-scale-x))
-        scaleY(var(--copy-scale-y))
-        rotate(var(--copy-rotate));
-      transform-origin: center left;
-      transition: transform 90ms linear, opacity 180ms ease;
-      opacity: var(--copy-opacity);
-      will-change: transform;
     }
 
-    .hero-copy .eyebrow{
+    .eyebrow{
       display: inline-block;
-      margin: 0 0 18px;
+      margin-bottom: 18px;
       font-family: Inter, sans-serif;
       font-size: 12px;
-      letter-spacing: .18em;
+      font-weight: 700;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: rgba(68,79,70,.52);
+      color: rgba(68,79,70,.62);
     }
 
-    .hero-copy .h1{
-      margin: 0 0 16px;
+    .h1{
+      margin: 0;
       font-family: Inter, sans-serif;
       font-weight: 800;
-      font-size: clamp(2.4rem, 6.2vw, 5.8rem);
-      line-height: .94;
-      letter-spacing: -.04em;
-      max-width: 11ch;
+      font-size: clamp(3rem, 7vw, 6.2rem);
+      line-height: .92;
+      letter-spacing: -.055em;
+      color: rgba(68,79,70,.98);
       text-wrap: balance;
+      max-width: 9ch;
     }
 
-    .hero-copy .sub{
-      margin: 0 0 26px;
+    .sub{
+      margin: 22px 0 0;
+      max-width: 54ch;
       font-family: Krub, sans-serif;
-      font-size: clamp(1rem, 1.35vw, 1.12rem);
-      line-height: 1.7;
-      color: rgba(68,79,70,.8);
-      max-width: 30ch;
+      font-size: clamp(1rem, 1.4vw, 1.1rem);
+      line-height: 1.8;
+      color: rgba(68,79,70,.82);
     }
 
     .btn-row{
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
+      margin-top: 28px;
     }
 
     .btn{
       appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
       border: 1px solid rgba(68,79,70,.12);
-      background: rgba(255,255,255,.56);
+      background: rgba(255,250,248,.86);
+      backdrop-filter: blur(8px);
       color: var(--dk);
       text-decoration: none;
-      padding: 13px 18px;
-      border-radius: 999px;
       font-family: Inter, sans-serif;
       font-size: 14px;
-      font-weight: 600;
-      backdrop-filter: blur(10px);
-      transition:
-        transform 90ms linear,
-        background-color .24s ease,
-        border-color .24s ease;
-      will-change: transform;
-    }
-
-    .btn-row .btn:nth-child(1){
-      transform:
-        translate3d(calc(var(--copy-shift-x) * .25), calc(var(--copy-shift-y) * .25), 0)
-        scaleX(calc(1 - (1 - var(--copy-scale-x)) * .22))
-        scaleY(calc(1 - (1 - var(--copy-scale-y)) * .08));
-    }
-
-    .btn-row .btn:nth-child(2){
-      transform:
-        translate3d(calc(var(--copy-shift-x) * .18), calc(var(--copy-shift-y) * .18), 0)
-        scaleX(calc(1 - (1 - var(--copy-scale-x)) * .16))
-        scaleY(calc(1 - (1 - var(--copy-scale-y)) * .05));
+      font-weight: 700;
+      letter-spacing: .01em;
+      box-shadow: 0 6px 26px rgba(68,79,70,.06);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
     }
 
     .btn:hover{
-      background: rgba(255,255,255,.74);
-      border-color: rgba(68,79,70,.2);
+      transform: translateY(-1px);
+      border-color: rgba(68,79,70,.20);
+      background: rgba(255,250,248,.96);
     }
 
-    /* ---------- hidden mesh / visible pressure surface ---------- */
+    /* ---------------- MESH TRANSITION / SECTION ---------------- */
 
-    .mesh-wrap{
+    .mesh-section{
+      position: relative;
+      margin-top: clamp(-140px, -12vw, -90px);
+      z-index: 4;
+      background:
+        radial-gradient(circle at 16% 8%, rgba(237,236,135,.10), transparent 20%),
+        radial-gradient(circle at 84% 18%, rgba(68,79,70,.045), transparent 26%),
+        linear-gradient(180deg, rgba(255,250,248,.74) 0%, rgba(255,250,248,1) 16%, rgba(255,250,248,1) 100%);
+    }
+
+    .mesh-stage{
       position: absolute;
       inset: 0;
       z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
+      pointer-events: auto;
     }
 
     .mesh-canvas{
@@ -261,132 +279,104 @@
       width: 100%;
       height: 100%;
       display: block;
-      opacity: 1;
-    }
-
-    /* big soft pressure field */
-    .mesh-pressure{
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: var(--pressure-opacity);
-      background:
-        radial-gradient(
-          ellipse 260px 180px at var(--mx) var(--my),
-          rgba(68,79,70,.10) 0%,
-          rgba(68,79,70,.055) 22%,
-          rgba(68,79,70,.022) 40%,
-          transparent 68%
-        ),
-        radial-gradient(
-          ellipse 520px 340px at var(--mx) var(--my),
-          rgba(237,236,135,.11) 0%,
-          rgba(237,236,135,.05) 24%,
-          transparent 62%
-        );
-      transition: opacity 180ms ease;
-      mix-blend-mode: multiply;
-    }
-
-    /* subtle directional sheen so compression has something to act on */
-    .mesh-skin{
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      opacity: .36;
-      background:
-        linear-gradient(
-          112deg,
-          transparent 0%,
-          transparent 10%,
-          rgba(255,255,255,.18) 16%,
-          transparent 22%,
-          transparent 34%,
-          rgba(255,255,255,.12) 39%,
-          transparent 47%,
-          transparent 100%
-        );
-      mix-blend-mode: screen;
     }
 
     .mesh-atmosphere{
       position: absolute;
       inset: 0;
-      z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(circle at 18% 72%, rgba(68,79,70,.045), transparent 32%),
-        radial-gradient(circle at 76% 26%, rgba(237,236,135,.12), transparent 24%),
-        radial-gradient(circle at 60% 62%, rgba(68,79,70,.03), transparent 36%);
-      mix-blend-mode: multiply;
-      opacity: .92;
+        radial-gradient(circle at var(--meshGlowX) var(--meshGlowY), rgba(237,236,135,.09), transparent 12%),
+        radial-gradient(circle at calc(var(--meshGlowX) + 8%) calc(var(--meshGlowY) + 4%), rgba(68,79,70,.05), transparent 18%),
+        radial-gradient(circle at 20% 24%, rgba(237,236,135,.08), transparent 22%),
+        radial-gradient(circle at 82% 14%, rgba(68,79,70,.03), transparent 24%);
+      opacity: calc(.72 + (var(--meshPressure) * .16));
+      transition: opacity .18s ease;
     }
 
-    .hero::after{
-      content: "";
+    .mesh-pressure{
       position: absolute;
-      left: clamp(20px, 4vw, 44px);
-      right: clamp(20px, 4vw, 44px);
-      bottom: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(68,79,70,.14), transparent);
-      z-index: 3;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          230px circle at var(--meshGlowX) var(--meshGlowY),
+          rgba(255,255,255,.16) 0%,
+          rgba(237,236,135,.10) 16%,
+          rgba(68,79,70,.05) 28%,
+          rgba(68,79,70,0) 62%
+        );
+      mix-blend-mode: screen;
+      opacity: calc(.02 + (var(--meshPressure) * .22));
+      transition: opacity .16s ease;
     }
 
-    .after{
-      padding: 72px var(--hero-pad-x) 110px;
-    }
-
-    .after-inner{
+    .mesh-inner{
+      position: relative;
+      z-index: 1;
       max-width: var(--hero-max);
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
-      gap: clamp(28px, 5vw, 80px);
-      align-items: start;
+      padding:
+        clamp(160px, 18vw, 240px)
+        var(--hero-pad-x)
+        var(--section-pad-y);
     }
 
-    .after h2{
-      margin: 0 0 16px;
+    .mesh-content{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, .82fr);
+      gap: clamp(32px, 6vw, 88px);
+      align-items: start;
+      min-height: 620px;
+    }
+
+    .mesh-copy{
+      max-width: 58ch;
+      padding-top: clamp(40px, 8vw, 90px);
+    }
+
+    .mesh-copy h2{
+      margin: 0 0 18px;
       font-family: Inter, sans-serif;
       font-weight: 800;
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      line-height: .95;
-      letter-spacing: -.04em;
-      max-width: 12ch;
+      font-size: clamp(2.2rem, 4vw, 4.5rem);
+      line-height: .94;
+      letter-spacing: -.045em;
+      max-width: 10ch;
     }
 
-    .after p{
+    .mesh-copy p{
       margin: 0;
       font-family: Krub, sans-serif;
-      line-height: 1.75;
-      color: rgba(68,79,70,.82);
-      max-width: 60ch;
+      line-height: 1.8;
+      color: rgba(68,79,70,.80);
+      max-width: 58ch;
     }
 
-    .note{
-      padding-top: 8px;
+    .mesh-note{
+      align-self: end;
+      padding-bottom: clamp(20px, 4vw, 48px);
       font-family: Inter, sans-serif;
       font-size: 13px;
-      line-height: 1.7;
-      letter-spacing: .01em;
-      color: rgba(68,79,70,.55);
+      line-height: 1.8;
+      color: rgba(68,79,70,.52);
+      max-width: 34ch;
+    }
+
+    /* hide cursor only where the field takes over */
+    .mesh-section.is-interactive,
+    .mesh-section.is-interactive *{
+      cursor: none !important;
     }
 
     @media (max-width: 920px){
-      .hero-inner,
-      .after-inner{
+      .mesh-content{
         grid-template-columns: 1fr;
+        min-height: 560px;
       }
 
-      .logo-outline{
-        min-height: auto;
-      }
-
-      .hero-copy{
-        margin-left: 0;
+      .mesh-note{
+        max-width: 52ch;
       }
     }
 
@@ -400,27 +390,25 @@
       }
 
       .hero{
-        min-height: 76vh;
+        min-height: 88svh;
       }
 
-      .logo-outline h1{
-        font-size: clamp(4rem, 20vw, 6.8rem);
+      .mesh-section{
+        margin-top: clamp(-90px, -10vw, -60px);
+      }
+
+      .mesh-inner{
+        padding-top: clamp(130px, 22vw, 180px);
+      }
+
+      .btn{
+        width: auto;
       }
     }
 
     @media (prefers-reduced-motion: reduce){
-      .hero,
-      .hero *{
-        cursor: auto !important;
-      }
-
-      .mesh-canvas,
-      .mesh-pressure,
-      .hero-copy,
-      .logo-outline,
       .btn{
         transition: none !important;
-        animation: none !important;
       }
     }
   </style>
@@ -440,22 +428,15 @@
     </div>
   </div>
 
-  <header class="hero" id="hero">
-    <div class="mesh-wrap" aria-hidden="true">
-      <canvas class="mesh-canvas" id="meshCanvas"></canvas>
-      <div class="mesh-atmosphere"></div>
-      <div class="mesh-pressure" id="meshPressure"></div>
-      <div class="mesh-skin"></div>
-    </div>
+  <header class="hero">
+    <div class="hero-media" aria-hidden="true"></div>
+    <div class="hero-atmosphere" aria-hidden="true"></div>
+    <div class="hero-fade" aria-hidden="true"></div>
 
     <div class="hero-inner">
-      <div class="logo-outline" aria-hidden="true">
-        <h1>BODIODI</h1>
-      </div>
-
-      <div class="hero-copy" id="heroCopy">
-        <span class="eyebrow">Invisible contraction field / v2</span>
-        <h2 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h2>
+      <div class="hero-copy">
+        <span class="eyebrow">Invisible contraction field / v3</span>
+        <h1 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h1>
         <p class="sub">
           The cursor is hidden. What remains should feel more like pressure moving through a surface:
           the field tightens, the text yields slightly, and then everything releases.
@@ -468,28 +449,39 @@
     </div>
   </header>
 
-  <section class="after">
-    <div class="after-inner">
-      <div>
-        <h2>PRESSURE, NOT POINTER</h2>
-        <p>
-          This version removes the visible cursor entirely inside the hero and tries to let the page
-          surface communicate the interaction. Instead of seeing a tool move around, you should feel
-          compression, inward pull, and a slight yielding of the content under that force.
-        </p>
-      </div>
-      <div class="note">
-        If this still reads too much like a decorative effect and not enough like contraction, the next move
-        would be to increase band compression and reduce the radial pressure layer even further.
+  <section class="mesh-section" id="meshSection">
+    <div class="mesh-stage" aria-hidden="true">
+      <canvas class="mesh-canvas" id="meshCanvas"></canvas>
+      <div class="mesh-atmosphere"></div>
+      <div class="mesh-pressure"></div>
+    </div>
+
+    <div class="mesh-inner">
+      <div class="mesh-content">
+        <div class="mesh-copy">
+          <h2>PRESSURE, NOT POINTER</h2>
+          <p>
+            This version lets the image carry the first impression, then slowly hands the page over
+            to a more living field beneath it. The mesh stays barely perceptible at rest, then gathers
+            tension as pressure moves through it.
+          </p>
+        </div>
+
+        <div class="mesh-note">
+          The next refinement would be tuning the angle, spacing, and glimmer rhythm of the fascia grid
+          until it feels less like a graphic overlay and more like structure appearing only when light
+          and pressure reveal it.
+        </div>
       </div>
     </div>
   </section>
 
   <script>
     (() => {
-      const hero = document.getElementById('hero');
+      const section = document.getElementById('meshSection');
       const canvas = document.getElementById('meshCanvas');
       const ctx = canvas.getContext('2d');
+      const root = document.documentElement;
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       let dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -498,55 +490,58 @@
       let rafId = null;
       let time = 0;
 
-      // Hidden structural nodes, but now used to bend "tension bands"
-      let nodes = [];
-
       const mouse = {
-        x: 0.52,
-        y: 0.45,
-        tx: 0.52,
-        ty: 0.45,
+        x: 0.5,
+        y: 0.38,
+        tx: 0.5,
+        ty: 0.38,
         active: false,
-        entered: false,
+        inside: false,
         strength: 0,
         targetStrength: 0
       };
 
       const config = {
-        cols: 10,
-        rows: 6,
-        maxPull: 58,           // much stronger than before
-        radius: 0.28,          // normalized radius of influence
-        settle: 0.12,
-        spring: 0.11,
-        friction: 0.78,
+        cols: 16,
+        rows: 10,
+        maxPull: 28,
+        radius: 0.20,
+        spring: 0.10,
+        friction: 0.80,
 
-        bandCount: 13,
-        bandSegments: 40,
-        bandAlpha: 0.06,
-        bandAlphaActive: 0.13,
-        bandThickness: 1.0,
-        bandThicknessActive: 2.8,
+        lineAlpha: 0.028,
+        lineAlphaActive: 0.12,
+        lineWidth: 0.45,
+        lineWidthActive: 1.1,
 
-        idleDriftX: 0.025,
-        idleDriftY: 0.02
+        nodeAlpha: 0.018,
+        nodeAlphaActive: 0.22,
+        nodeSize: 0.9,
+        nodeSizeActive: 2.0,
+
+        idleDriftX: 0.018,
+        idleDriftY: 0.014,
+
+        isoAngle: 30 * (Math.PI / 180)
       };
 
-      function clamp(v, min, max) {
+      let nodes = [];
+
+      function clamp(v, min, max){
         return Math.max(min, Math.min(max, v));
       }
 
-      function lerp(a, b, t) {
+      function lerp(a, b, t){
         return a + (b - a) * t;
       }
 
-      function smoothstep(edge0, edge1, x) {
+      function smoothstep(edge0, edge1, x){
         const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
         return t * t * (3 - 2 * t);
       }
 
-      function resize() {
-        const rect = hero.getBoundingClientRect();
+      function resize(){
+        const rect = section.getBoundingClientRect();
         width = Math.max(1, Math.floor(rect.width));
         height = Math.max(1, Math.floor(rect.height));
 
@@ -560,142 +555,94 @@
         buildNodes();
       }
 
-      function buildNodes() {
+      function buildNodes(){
         nodes = [];
-        const cols = width < 700 ? 8 : config.cols;
-        const rows = width < 700 ? 5 : config.rows;
 
-        const marginX = width * 0.06;
-        const marginY = height * 0.12;
+        const isMobile = width < 700;
+        const cols = isMobile ? 12 : config.cols;
+        const rows = isMobile ? 8 : config.rows;
+
+        const marginX = width * 0.08;
+        const marginTop = height * 0.08;
+        const marginBottom = height * 0.10;
+
         const usableW = width - marginX * 2;
-        const usableH = height - marginY * 2;
+        const usableH = height - marginTop - marginBottom;
 
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const xn = cols === 1 ? 0.5 : c / (cols - 1);
-            const yn = rows === 1 ? 0.5 : r / (rows - 1);
+        const cellW = usableW / (cols - 1);
+        const cellH = usableH / (rows - 1);
 
-            const baseX = marginX + usableW * xn + Math.sin((r + 1) * 1.3 + c * .7) * 8;
-            const baseY = marginY + usableH * yn + Math.cos((c + 1) * 1.1 + r * .6) * 7;
+        const offsetX = cellW * 0.5;
+        const skewY = Math.tan(config.isoAngle) * cellW * 0.36;
+
+        for(let r = 0; r < rows; r++){
+          for(let c = 0; c < cols; c++){
+            const baseX = marginX + c * cellW + ((r % 2) * offsetX * 0.42);
+            const baseY = marginTop + r * cellH - c * skewY * 0.06;
 
             nodes.push({
+              r,
+              c,
               baseX,
               baseY,
               x: baseX,
               y: baseY,
               vx: 0,
               vy: 0,
-              seed: Math.random() * Math.PI * 2
+              seed: Math.random() * 1000
             });
           }
         }
       }
 
-      function setPointer(e) {
-        const rect = hero.getBoundingClientRect();
-        mouse.tx = clamp((e.clientX - rect.left) / rect.width, 0, 1);
-        mouse.ty = clamp((e.clientY - rect.top) / rect.height, 0, 1);
-        mouse.active = true;
-        mouse.entered = true;
-        mouse.targetStrength = 1;
+      function nodeAt(r, c){
+        return nodes.find(n => n.r === r && n.c === c);
       }
 
-      function leavePointer() {
-        mouse.active = false;
-        mouse.targetStrength = 0;
+      function updateCSSVars(){
+        root.style.setProperty('--meshGlowX', `${(mouse.x * 100).toFixed(2)}%`);
+        root.style.setProperty('--meshGlowY', `${(mouse.y * 100).toFixed(2)}%`);
+        root.style.setProperty('--meshPressure', mouse.strength.toFixed(3));
       }
 
-      function updateCSSVars() {
-        const root = document.documentElement;
-        root.style.setProperty('--mx', `${mouse.x * 100}%`);
-        root.style.setProperty('--my', `${mouse.y * 100}%`);
-
-        const px = mouse.x * width;
-        const py = mouse.y * height;
-
-        // Pressure on text is based on how close cursor is to the copy region
-        const heroInner = hero.querySelector('.hero-inner');
-        const copy = document.getElementById('heroCopy');
-        const copyRect = copy.getBoundingClientRect();
-        const heroRect = hero.getBoundingClientRect();
-
-        const copyCx = (copyRect.left - heroRect.left) + copyRect.width * 0.5;
-        const copyCy = (copyRect.top - heroRect.top) + copyRect.height * 0.45;
-
-        const dx = px - copyCx;
-        const dy = py - copyCy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = Math.min(width, height) * 0.55;
-
-        const influence = 1 - smoothstep(0, maxDist, dist);
-        const activation = influence * mouse.strength;
-
-        // Text yields slightly toward the invisible pressure
-        const shiftX = dx * 0.016 * activation;
-        const shiftY = dy * 0.012 * activation;
-
-        // Horizontal compression reads more like contraction
-        const scaleX = 1 - activation * 0.035;
-        const scaleY = 1 + activation * 0.01;
-        const rotate = dx * 0.0022 * activation;
-
-        root.style.setProperty('--copy-shift-x', `${shiftX.toFixed(2)}px`);
-        root.style.setProperty('--copy-shift-y', `${shiftY.toFixed(2)}px`);
-        root.style.setProperty('--copy-scale-x', scaleX.toFixed(4));
-        root.style.setProperty('--copy-scale-y', scaleY.toFixed(4));
-        root.style.setProperty('--copy-rotate', `${rotate.toFixed(3)}deg`);
-        root.style.setProperty('--copy-opacity', `${(1 - activation * 0.04).toFixed(3)}`);
-
-        // logo responds too, more subtly
-        root.style.setProperty('--tx', `${(dx * 0.008 * activation).toFixed(2)}px`);
-        root.style.setProperty('--ty', `${(dy * 0.006 * activation).toFixed(2)}px`);
-
-        // pressure layer stays quieter than before
-        root.style.setProperty('--pressure-opacity', `${(0.12 + mouse.strength * 0.18).toFixed(3)}`);
-      }
-
-      function updateNodes() {
+      function updateNodes(){
         time += 0.016;
 
-        if (prefersReducedMotion) {
-          mouse.x = 0.52;
-          mouse.y = 0.45;
+        if (prefersReducedMotion){
+          mouse.x = 0.5;
+          mouse.y = 0.38;
           mouse.strength = 0;
         } else {
-          if (mouse.active) {
+          if (mouse.active){
             mouse.x = lerp(mouse.x, mouse.tx, 0.18);
             mouse.y = lerp(mouse.y, mouse.ty, 0.18);
           } else {
-            const idleX = 0.52 + Math.cos(time * 0.55) * config.idleDriftX;
-            const idleY = 0.44 + Math.sin(time * 0.74) * config.idleDriftY;
-            mouse.x = lerp(mouse.x, idleX, 0.03);
-            mouse.y = lerp(mouse.y, idleY, 0.03);
+            const idleX = 0.50 + Math.cos(time * 0.44) * config.idleDriftX;
+            const idleY = 0.34 + Math.sin(time * 0.56) * config.idleDriftY;
+            mouse.x = lerp(mouse.x, idleX, 0.025);
+            mouse.y = lerp(mouse.y, idleY, 0.025);
           }
 
-          mouse.strength = lerp(mouse.strength, mouse.targetStrength, mouse.active ? 0.18 : 0.055);
+          mouse.strength = lerp(mouse.strength, mouse.targetStrength, mouse.active ? 0.18 : 0.05);
         }
 
         const mx = mouse.x * width;
         const my = mouse.y * height;
         const radiusPx = Math.min(width, height) * config.radius;
 
-        for (const n of nodes) {
+        for (const n of nodes){
           const dx = mx - n.baseX;
           const dy = my - n.baseY;
           const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
 
           const influence = 1 - smoothstep(0, radiusPx, dist);
-
-          // stronger inward pull
           const dirX = dx / dist;
           const dirY = dy / dist;
 
-          // base target = original + tiny idle drift
-          let tx = n.baseX + Math.cos(time * 0.8 + n.seed) * 1.4 * (1 - mouse.strength);
-          let ty = n.baseY + Math.sin(time * 0.7 + n.seed) * 1.2 * (1 - mouse.strength);
+          let tx = n.baseX + Math.cos(time * 0.48 + n.seed) * 0.45 * (1 - mouse.strength);
+          let ty = n.baseY + Math.sin(time * 0.54 + n.seed) * 0.45 * (1 - mouse.strength);
 
-          // contraction
-          if (influence > 0) {
+          if (influence > 0){
             const pull = config.maxPull * influence * mouse.strength;
             tx += dirX * pull;
             ty += dirY * pull;
@@ -714,131 +661,129 @@
         updateCSSVars();
       }
 
-      function sampleNodeInfluence(px, py, mx, my) {
+      function getInfluence(px, py){
+        const mx = mouse.x * width;
+        const my = mouse.y * height;
         const dx = mx - px;
         const dy = my - py;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const r = Math.min(width, height) * 0.30;
+        const r = Math.min(width, height) * 0.22;
         return 1 - smoothstep(0, r, dist);
       }
 
-      function drawBands() {
+      function drawConnection(a, b, emphasis = 1){
+        const midX = (a.x + b.x) * 0.5;
+        const midY = (a.y + b.y) * 0.5;
+        const influence = Math.max(getInfluence(midX, midY), getInfluence(a.x, a.y), getInfluence(b.x, b.y));
+
+        const alpha = lerp(config.lineAlpha, config.lineAlphaActive, influence * mouse.strength) * emphasis;
+        const widthPx = lerp(config.lineWidth, config.lineWidthActive, influence * mouse.strength);
+
+        ctx.lineWidth = widthPx;
+        ctx.strokeStyle = `rgba(68,79,70,${alpha})`;
+        ctx.beginPath();
+
+        const cx = midX + Math.sin(time * 0.8 + a.seed) * 0.9 * influence;
+        const cy = midY + Math.cos(time * 0.7 + b.seed) * 0.9 * influence;
+
+        ctx.moveTo(a.x, a.y);
+        ctx.quadraticCurveTo(cx, cy, b.x, b.y);
+        ctx.stroke();
+      }
+
+      function drawNode(n){
+        const influence = getInfluence(n.x, n.y);
+        const alpha = lerp(config.nodeAlpha, config.nodeAlphaActive, influence * mouse.strength);
+        const radius = lerp(config.nodeSize, config.nodeSizeActive, influence * mouse.strength);
+
+        const shimmer = (Math.sin(time * 1.8 + n.seed) + 1) * 0.5;
+        const finalAlpha = alpha * lerp(0.55, 1.0, shimmer);
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(68,79,70,${finalAlpha})`;
+        ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (influence * mouse.strength > 0.22){
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(237,236,135,${0.05 + influence * mouse.strength * 0.08})`;
+          ctx.arc(n.x, n.y, radius * 2.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawMesh(){
         ctx.clearRect(0, 0, width, height);
 
-        const mx = mouse.x * width;
-        const my = mouse.y * height;
+        const rowCount = Math.max(...nodes.map(n => n.r)) + 1;
+        const colCount = Math.max(...nodes.map(n => n.c)) + 1;
 
-        // base: invisible mesh influences these bands
-        const bandCount = width < 700 ? 10 : config.bandCount;
-        const segments = width < 700 ? 28 : config.bandSegments;
+        for(let r = 0; r < rowCount; r++){
+          for(let c = 0; c < colCount; c++){
+            const n = nodeAt(r, c);
+            if (!n) continue;
 
-        for (let i = 0; i < bandCount; i++) {
-          const t = bandCount === 1 ? 0.5 : i / (bandCount - 1);
-          const baseY = height * 0.16 + t * height * 0.66;
+            const right = nodeAt(r, c + 1);
+            const down = nodeAt(r + 1, c);
+            const diag = nodeAt(r + 1, c + 1);
 
-          ctx.beginPath();
-
-          for (let s = 0; s <= segments; s++) {
-            const u = s / segments;
-            const x = u * width;
-
-            // each band gets pulled toward the pressure point
-            const dx = mx - x;
-            const dy = my - baseY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            const local = 1 - smoothstep(0, Math.min(width, height) * 0.34, dist);
-
-            // pinch bands inward around cursor
-            const yPull = dy * 0.16 * local * mouse.strength;
-            const xPull = dx * 0.06 * local * mouse.strength;
-
-            // subtle organic waviness so the surface feels alive
-            const waveA = Math.sin((u * 7.8) + (i * 0.7) + time * 0.55) * 2.4;
-            const waveB = Math.cos((u * 12.6) + (i * 0.45) + time * 0.4) * 1.25;
-
-            // local compression toward active point
-            const px = x + xPull;
-            const py = baseY + yPull + waveA + waveB;
-
-            if (s === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
+            if (right) drawConnection(n, right, 0.92);
+            if (down) drawConnection(n, down, 0.78);
+            if (diag) drawConnection(n, diag, 0.62);
           }
-
-          const bandInfluence = sampleNodeInfluence(width * 0.5, baseY, mx, my) * mouse.strength;
-          const alpha = lerp(config.bandAlpha, config.bandAlphaActive, bandInfluence);
-          const lineWidth = lerp(config.bandThickness, config.bandThicknessActive, bandInfluence);
-
-          const grad = ctx.createLinearGradient(0, baseY, width, baseY);
-          grad.addColorStop(0, `rgba(68,79,70,${alpha * 0.15})`);
-          grad.addColorStop(0.12, `rgba(68,79,70,${alpha * 0.45})`);
-          grad.addColorStop(0.5, `rgba(68,79,70,${alpha})`);
-          grad.addColorStop(0.88, `rgba(68,79,70,${alpha * 0.45})`);
-          grad.addColorStop(1, `rgba(68,79,70,${alpha * 0.12})`);
-
-          ctx.strokeStyle = grad;
-          ctx.lineWidth = lineWidth;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-          ctx.stroke();
         }
 
-        // secondary diagonal tissue lines, very faint
-        for (let i = 0; i < 6; i++) {
-          const x0 = width * (0.08 + i * 0.15);
-          const y0 = height * 0.12;
-          const x1 = x0 + width * 0.12;
-          const y1 = height * 0.86;
-
-          const midX = (x0 + x1) * 0.5;
-          const midY = (y0 + y1) * 0.5;
-
-          const dx = mx - midX;
-          const dy = my - midY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const local = 1 - smoothstep(0, Math.min(width, height) * 0.46, dist);
-
-          const bow = 18 * local * mouse.strength;
-          const cx = midX + dx * 0.035;
-          const cy = midY + dy * 0.06 + bow;
-
-          ctx.beginPath();
-          ctx.moveTo(x0, y0);
-          ctx.quadraticCurveTo(cx, cy, x1, y1);
-          ctx.strokeStyle = `rgba(68,79,70,${0.018 + local * 0.03})`;
-          ctx.lineWidth = 1 + local * 0.8;
-          ctx.stroke();
+        for (const n of nodes){
+          drawNode(n);
         }
-
-        // soft pinch shadow, elliptical not cursor-like
-        const shadow = ctx.createRadialGradient(mx, my, 0, mx, my, Math.min(width, height) * 0.26);
-        shadow.addColorStop(0, `rgba(68,79,70,${0.06 * mouse.strength})`);
-        shadow.addColorStop(0.22, `rgba(68,79,70,${0.03 * mouse.strength})`);
-        shadow.addColorStop(0.55, `rgba(68,79,70,${0.012 * mouse.strength})`);
-        shadow.addColorStop(1, 'rgba(68,79,70,0)');
-
-        ctx.fillStyle = shadow;
-        ctx.fillRect(0, 0, width, height);
       }
 
-      function frame() {
+      function loop(){
         updateNodes();
-        drawBands();
-        rafId = requestAnimationFrame(frame);
+        drawMesh();
+        rafId = requestAnimationFrame(loop);
       }
 
-      hero.addEventListener('mousemove', setPointer);
-      hero.addEventListener('mouseenter', setPointer);
-      hero.addEventListener('mouseleave', leavePointer);
-      window.addEventListener('resize', resize);
+      function onPointerMove(e){
+        const rect = section.getBoundingClientRect();
+        const x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        const y = clamp((e.clientY - rect.top) / rect.height, 0, 1);
 
-      hero.addEventListener('touchstart', () => {
+        mouse.tx = x;
+        mouse.ty = y;
+        mouse.targetStrength = 1;
+      }
+
+      function onPointerEnter(){
+        mouse.active = true;
+        mouse.inside = true;
+        mouse.targetStrength = 1;
+        section.classList.add('is-interactive');
+      }
+
+      function onPointerLeave(){
         mouse.active = false;
+        mouse.inside = false;
         mouse.targetStrength = 0;
-      }, { passive: true });
+        section.classList.remove('is-interactive');
+      }
 
-      resize();
-      frame();
+      function init(){
+        resize();
+        section.addEventListener('pointerenter', onPointerEnter);
+        section.addEventListener('pointermove', onPointerMove);
+        section.addEventListener('pointerleave', onPointerLeave);
+        window.addEventListener('resize', resize);
+
+        if (prefersReducedMotion){
+          drawMesh();
+          return;
+        }
+
+        loop();
+      }
+
+      init();
     })();
   </script>
 </body>
