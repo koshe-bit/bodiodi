@@ -37,33 +37,108 @@
     html, body {
       overflow-x: hidden;
       background: var(--page-bg);
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* =====================
+       PAGE WRAPPER
+       One continuous background column — BGFlipped on top half,
+       BG on bottom half, dark green in the middle.
+       Everything else layers on top of this.
+    ===================== */
+    .page-atmosphere {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* BGFlipped covers the top ~60% of the viewport atmosphere */
+    .page-atmosphere::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        url("BGFlipped.png") center top / cover no-repeat;
+      opacity: 0.72;
+    }
+
+    /* BG covers the bottom ~60% */
+    .page-atmosphere::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        url("BG.png") center bottom / cover no-repeat;
+      opacity: 0.72;
+      /* fade out the top so it doesn't fight BGFlipped */
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 30%,
+        black 65%,
+        black 100%
+      );
+      mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 30%,
+        black 65%,
+        black 100%
+      );
+    }
+
+    /* Everything sits above the atmosphere layer */
+    .topbar,
+    .hero.hero-image,
+    .mesh-section,
+    #about.section,
+    .strip {
+      position: relative;
+      z-index: 1;
     }
 
     /* =====================
        HERO
     ===================== */
     .hero.hero-image {
-      position: relative;
       isolation: isolate;
       min-height: 100svh;
       overflow: hidden;
-      background: var(--page-bg);
-      /* extend downward so mesh can crawl underneath */
-      margin-bottom: 0;
     }
 
+    /* The actual studio photo */
     .hero-bg-photo {
       position: absolute;
       inset: 0;
       z-index: 0;
       background: url("assets/bodiodispace.jpg") center 18% / cover no-repeat;
       transform: scale(1.03);
-      filter: saturate(.92) contrast(.96) brightness(.97);
+      filter: saturate(.92) contrast(.96) brightness(.96);
       pointer-events: none;
+      /* fade the bottom of the photo so atmosphere bleeds through */
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        black 42%,
+        rgba(0,0,0,.85) 58%,
+        rgba(0,0,0,.52) 72%,
+        rgba(0,0,0,.18) 86%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        black 42%,
+        rgba(0,0,0,.85) 58%,
+        rgba(0,0,0,.52) 72%,
+        rgba(0,0,0,.18) 86%,
+        transparent 100%
+      );
     }
 
-    /* subtle dark tone for legibility */
+    /* subtle dark vignette for text legibility only */
     .hero.hero-image::before {
       content: "";
       position: absolute;
@@ -71,41 +146,17 @@
       z-index: 1;
       pointer-events: none;
       background: linear-gradient(
-        170deg,
-        rgba(0,0,0,.06) 0%,
-        rgba(0,0,0,.03) 30%,
-        rgba(0,0,0,.18) 68%,
-        rgba(0,0,0,.32) 100%
-      );
-    }
-
-    /* THE KEY TRANSITION: a very tall masked blend at the bottom of the hero
-       that dissolves the photo into the dark green world below */
-    .hero.hero-image::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      /* tall enough to create a long, invisible handoff */
-      height: clamp(400px, 55vw, 700px);
-      z-index: 2;
-      pointer-events: none;
-      /* dark green fills from bottom, photo shows through at top */
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(55,65,57,.12) 22%,
-        rgba(60,70,62,.42) 44%,
-        rgba(65,75,67,.72) 64%,
-        rgba(68,79,70,.90) 80%,
-        rgba(68,79,70,1) 100%
+        180deg,
+        rgba(0,0,0,.04) 0%,
+        rgba(0,0,0,.02) 40%,
+        rgba(0,0,0,.14) 72%,
+        rgba(0,0,0,.28) 100%
       );
     }
 
     .hero.hero-image .hero-inner {
       position: relative;
-      z-index: 3;
+      z-index: 2;
       min-height: 100svh;
       display: flex;
       align-items: flex-end;
@@ -127,7 +178,7 @@
       line-height: .93;
       letter-spacing: -0.03em;
       margin: 0 0 14px 0;
-      text-shadow: 0 2px 24px rgba(0,0,0,.22);
+      text-shadow: 0 2px 28px rgba(0,0,0,.22);
     }
 
     .hero.hero-image .sub {
@@ -138,7 +189,7 @@
       line-height: 1.4;
       margin: 0 0 26px 0;
       opacity: .88;
-      text-shadow: 0 1px 12px rgba(0,0,0,.28);
+      text-shadow: 0 1px 14px rgba(0,0,0,.28);
     }
 
     .hero.hero-image .btn {
@@ -153,65 +204,45 @@
       }
       .hero.hero-image .h1 { font-size: clamp(44px, 12vw, 68px); }
       .hero.hero-image .sub { font-size: clamp(15px, 4.2vw, 19px); }
-      .hero.hero-image::after {
-        height: clamp(260px, 40vw, 420px);
-      }
     }
 
     /* =====================
        MESH SECTION
-       Pulls WAY up under the hero so the dark green
-       world is already present before the photo ends
+       No hard background — it's transparent so the page
+       atmosphere (BGFlipped → dark green → BG) shows through.
+       We just overlay a dark green layer that fades in and out
+       to deepen the mid section where the mesh lives.
     ===================== */
     .mesh-section {
       position: relative;
       isolation: isolate;
-      /* pull up deep under the hero */
-      margin-top: clamp(-380px, -48vw, -240px);
-      /* pad top so content doesn't hide under hero */
-      padding-top: clamp(420px, 56vw, 680px);
-      /* extend far down so about section can dissolve up into it */
-      padding-bottom: clamp(200px, 24vw, 380px);
+      /* overlap the bottom of the hero */
+      margin-top: clamp(-120px, -14vw, -60px);
+      padding-top: clamp(140px, 18vw, 260px);
+      padding-bottom: clamp(140px, 18vw, 260px);
       overflow: hidden;
       cursor: default;
-      z-index: 2;
-      /* the actual dark green — solid in the middle */
-      background: var(--dk);
+      background: transparent;
     }
 
-    /* top fade: dark green dissolves upward into nothing
-       (the hero's ::after is already painting dark green down,
-        so they meet invisibly in the middle) */
+    /* dark green deepening layer — fades in from top, out at bottom */
     .mesh-section::before {
       content: "";
       position: absolute;
-      left: 0; right: 0;
-      top: 0;
-      height: 38%;
+      inset: 0;
       z-index: 0;
       pointer-events: none;
       background: linear-gradient(
-        to bottom,
-        rgba(68,79,70,0) 0%,
-        rgba(68,79,70,.55) 35%,
-        rgba(68,79,70,1) 100%
-      );
-    }
-
-    /* bottom fade: dark green dissolves downward into nothing */
-    .mesh-section::after {
-      content: "";
-      position: absolute;
-      left: 0; right: 0;
-      bottom: 0;
-      height: 42%;
-      z-index: 0;
-      pointer-events: none;
-      background: linear-gradient(
-        to top,
-        rgba(68,79,70,0) 0%,
-        rgba(68,79,70,.55) 38%,
-        rgba(68,79,70,1) 100%
+        180deg,
+        rgba(55,65,57,0) 0%,
+        rgba(58,68,60,.55) 18%,
+        rgba(62,72,64,.88) 32%,
+        rgba(65,75,67,.96) 44%,
+        rgba(68,79,70,1) 50%,
+        rgba(65,75,67,.96) 56%,
+        rgba(62,72,64,.88) 68%,
+        rgba(58,68,60,.55) 82%,
+        rgba(55,65,57,0) 100%
       );
     }
 
@@ -234,11 +265,11 @@
       pointer-events: none;
       background: radial-gradient(
         360px circle at var(--meshX) var(--meshY),
-        rgba(236,235,134,.14) 0%,
-        rgba(236,235,134,.05) 32%,
-        transparent 65%
+        rgba(236,235,134,.13) 0%,
+        rgba(236,235,134,.05) 30%,
+        transparent 62%
       );
-      opacity: calc(.08 + (var(--meshPressure) * .52));
+      opacity: calc(.08 + (var(--meshPressure) * .50));
       mix-blend-mode: screen;
       transition: opacity .2s ease;
     }
@@ -297,9 +328,9 @@
 
     @media (max-width: 820px) {
       .mesh-section {
-        margin-top: clamp(-240px, -36vw, -160px);
-        padding-top: clamp(280px, 42vw, 440px);
-        padding-bottom: clamp(140px, 18vw, 240px);
+        margin-top: clamp(-80px, -10vw, -40px);
+        padding-top: clamp(100px, 14vw, 180px);
+        padding-bottom: clamp(100px, 14vw, 180px);
       }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
@@ -307,46 +338,22 @@
 
     /* =====================
        ABOUT SECTION
-       Pulls up into the bottom dissolve of mesh section
+       Also transparent — BG.png from the page atmosphere
+       shows through naturally. Just needs padding and text.
     ===================== */
     .rule { display: none !important; }
 
     #about.section {
       position: relative;
-      z-index: 3;
-      /* pulls up into the mesh's bottom fade zone */
-      margin-top: clamp(-220px, -22vw, -120px);
-      padding-top: clamp(240px, 26vw, 360px);
+      z-index: 1;
+      margin-top: clamp(-60px, -6vw, -30px);
+      padding-top: clamp(80px, 10vw, 140px);
       padding-bottom: clamp(60px, 8vw, 120px);
-      /* BG.png sits here, but fades in very gradually */
-      background:
-        url("BG.png") center top / cover no-repeat;
+      background: transparent;
       width: 100%;
-      /* the warm page color bleeds through at top */
-      isolation: isolate;
-    }
-
-    /* mask the about section's top so it dissolves up into the dark green */
-    #about.section::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: linear-gradient(
-        to bottom,
-        var(--page-bg) 0%,
-        rgba(255,250,248,.92) 8%,
-        rgba(255,250,248,.72) 18%,
-        rgba(255,250,248,.38) 32%,
-        rgba(255,250,248,.10) 50%,
-        rgba(255,250,248,0) 68%
-      );
     }
 
     #about .content-col {
-      position: relative;
-      z-index: 1;
       width: min(760px, 92vw);
       margin: 0 auto;
       padding: 0 12px;
@@ -370,11 +377,15 @@
       color: var(--dk);
     }
 
-    @media (max-width: 820px) {
-      #about.section {
-        margin-top: clamp(-140px, -16vw, -80px);
-        padding-top: clamp(160px, 20vw, 240px);
-      }
+    /* strip at bottom */
+    .strip {
+      height: 44vh;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(68,79,70,.15) 40%,
+        rgba(68,79,70,.35) 100%
+      );
     }
 
     .only-mobile { display: none; }
@@ -391,6 +402,9 @@
 </head>
 
 <body>
+
+  <!-- FIXED ATMOSPHERE LAYER — sits behind everything -->
+  <div class="page-atmosphere" aria-hidden="true"></div>
 
   <div class="topbar">
     <div class="topbar-inner">
@@ -420,7 +434,6 @@
     <a href="https://bodiodi.com/faqs.html">FAQs</a>
   </nav>
 
-  <!-- HERO: studio photo -->
   <header class="hero hero-image">
     <div class="hero-bg-photo" aria-hidden="true"></div>
     <div class="hero-inner">
@@ -436,13 +449,11 @@
     </div>
   </header>
 
-  <!-- MESH: Find Your Formula -->
   <section class="mesh-section" id="meshSection">
     <div class="mesh-canvas-wrap" aria-hidden="true">
       <canvas class="mesh-canvas" id="meshCanvas"></canvas>
       <div class="mesh-pressure"></div>
     </div>
-
     <div class="mesh-inner">
       <div class="mesh-copy" id="meshCopy">
         <h2 class="h1">FIND YOUR<br>FORMULA</h2>
@@ -461,7 +472,6 @@
 
   <div class="rule" aria-hidden="true"></div>
 
-  <!-- ABOUT -->
   <section id="about" class="section">
     <div class="content-col">
       <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
