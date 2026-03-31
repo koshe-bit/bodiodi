@@ -74,34 +74,35 @@
       );
     }
 
-    /* BGFlipped transition — bottom only, masked */
     .hero.hero-image::after {
       content: "";
       position: absolute;
       left: 0;
       right: 0;
       bottom: -1px;
-      height: clamp(280px, 36vw, 520px);
+      height: clamp(320px, 42vw, 580px);
       z-index: 2;
       pointer-events: none;
       background: url("BGFlipped.png") center top / cover no-repeat;
       -webkit-mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0,0,0,.18) 20%,
-        rgba(0,0,0,.55) 45%,
-        rgba(0,0,0,.88) 72%,
+        rgba(0,0,0,.08) 15%,
+        rgba(0,0,0,.35) 38%,
+        rgba(0,0,0,.72) 62%,
+        rgba(0,0,0,.92) 80%,
         black 100%
       );
       mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0,0,0,.18) 20%,
-        rgba(0,0,0,.55) 45%,
-        rgba(0,0,0,.88) 72%,
+        rgba(0,0,0,.08) 15%,
+        rgba(0,0,0,.35) 38%,
+        rgba(0,0,0,.72) 62%,
+        rgba(0,0,0,.92) 80%,
         black 100%
       );
-      opacity: .92;
+      opacity: .88;
     }
 
     .hero.hero-image .hero-inner {
@@ -155,7 +156,7 @@
       .hero.hero-image .h1 { font-size: clamp(44px, 12vw, 68px); }
       .hero.hero-image .sub { font-size: clamp(15px, 4.2vw, 19px); }
       .hero.hero-image::after {
-        height: clamp(180px, 28vw, 300px);
+        height: clamp(200px, 32vw, 340px);
       }
     }
 
@@ -165,9 +166,9 @@
     .mesh-section {
       position: relative;
       isolation: isolate;
-      margin-top: clamp(-180px, -22vw, -100px);
-      padding-top: clamp(200px, 26vw, 360px);
-      padding-bottom: clamp(80px, 10vw, 160px);
+      margin-top: clamp(-200px, -26vw, -120px);
+      padding-top: clamp(220px, 30vw, 400px);
+      padding-bottom: clamp(120px, 16vw, 240px);
       overflow: hidden;
       cursor: default;
       z-index: 2;
@@ -182,11 +183,12 @@
       background: linear-gradient(
         180deg,
         rgba(68,79,70,0) 0%,
-        rgba(68,79,70,.72) 22%,
-        rgba(68,79,70,.96) 42%,
-        rgba(68,79,70,1) 54%,
-        rgba(68,79,70,.96) 68%,
-        rgba(68,79,70,.72) 82%,
+        rgba(68,79,70,.45) 12%,
+        rgba(68,79,70,.88) 28%,
+        rgba(68,79,70,1) 42%,
+        rgba(68,79,70,1) 58%,
+        rgba(68,79,70,.88) 74%,
+        rgba(68,79,70,.45) 88%,
         rgba(68,79,70,0) 100%
       );
     }
@@ -273,8 +275,9 @@
 
     @media (max-width: 820px) {
       .mesh-section {
-        margin-top: clamp(-120px, -18vw, -70px);
-        padding-top: clamp(140px, 20vw, 240px);
+        margin-top: clamp(-140px, -20vw, -80px);
+        padding-top: clamp(160px, 24vw, 280px);
+        padding-bottom: clamp(80px, 12vw, 160px);
       }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
@@ -288,16 +291,17 @@
     #about.section {
       position: relative;
       z-index: 3;
-      margin-top: clamp(-80px, -8vw, -40px);
-      padding-top: clamp(100px, 12vw, 180px);
+      margin-top: clamp(-160px, -18vw, -80px);
+      padding-top: clamp(160px, 18vw, 260px);
       padding-bottom: clamp(60px, 8vw, 120px);
       background:
         url("BG.png") center 20px / cover no-repeat,
         linear-gradient(
           180deg,
           rgba(255,250,248,0) 0%,
-          rgba(255,250,248,.55) 18%,
-          rgba(255,250,248,.92) 38%,
+          rgba(255,250,248,.30) 12%,
+          rgba(255,250,248,.70) 28%,
+          rgba(255,250,248,.92) 44%,
           rgba(255,250,248,1) 60%
         );
       width: 100%;
@@ -329,8 +333,8 @@
 
     @media (max-width: 820px) {
       #about.section {
-        margin-top: clamp(-50px, -6vw, -24px);
-        padding-top: clamp(70px, 10vw, 120px);
+        margin-top: clamp(-100px, -12vw, -50px);
+        padding-top: clamp(120px, 16vw, 180px);
       }
     }
 
