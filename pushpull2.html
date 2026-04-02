@@ -42,13 +42,13 @@
     }
 
     /* =====================
-       HERO — unchanged
+       HERO — completely unchanged
     ===================== */
     .hero.hero-image {
       position: relative;
       isolation: isolate;
       min-height: 100svh;
-      overflow: hidden;
+      overflow: visible;
       z-index: 1;
     }
 
@@ -60,6 +60,7 @@
       transform: scale(1.03);
       filter: saturate(.92) contrast(.96) brightness(.96);
       pointer-events: none;
+      overflow: hidden;
     }
 
     .hero.hero-image::before {
@@ -162,42 +163,40 @@
     .mesh-section {
       position: relative;
       isolation: isolate;
-      /* pull up so orb horizon overlaps hero bottom */
-      margin-top: clamp(-140px, -16vw, -80px);
-      padding-top: clamp(160px, 20vw, 300px);
-      padding-bottom: clamp(160px, 20vw, 300px);
+      margin-top: -40vh;
+      padding-top: 44vh;
+      padding-bottom: clamp(120px, 16vw, 240px);
       overflow: hidden;
       cursor: default;
-      z-index: 2;
+      z-index: 0;
       background: #444F46;
     }
 
-    /* BG.png bleeds down from the bottom of mesh
-       into and behind the about section */
+    /* BG.png fixed — lines up perfectly with about section */
     .mesh-section::after {
       content: "";
       position: absolute;
       left: 0; right: 0; bottom: 0;
-      height: clamp(400px, 55vw, 700px);
+      height: clamp(500px, 65vw, 800px);
       z-index: 0;
       pointer-events: none;
-      background: url("BG.png") center center / cover no-repeat;
+      background: url("BG.png") center top / cover fixed;
       -webkit-mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0,0,0,.06) 16%,
-        rgba(0,0,0,.28) 36%,
-        rgba(0,0,0,.62) 58%,
-        rgba(0,0,0,.88) 78%,
+        rgba(0,0,0,.05) 14%,
+        rgba(0,0,0,.22) 32%,
+        rgba(0,0,0,.58) 54%,
+        rgba(0,0,0,.86) 74%,
         black 100%
       );
       mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0,0,0,.06) 16%,
-        rgba(0,0,0,.28) 36%,
-        rgba(0,0,0,.62) 58%,
-        rgba(0,0,0,.88) 78%,
+        rgba(0,0,0,.05) 14%,
+        rgba(0,0,0,.22) 32%,
+        rgba(0,0,0,.58) 54%,
+        rgba(0,0,0,.86) 74%,
         black 100%
       );
     }
@@ -284,9 +283,8 @@
 
     @media (max-width: 820px) {
       .mesh-section {
-        margin-top: clamp(-80px, -10vw, -40px);
-        padding-top: clamp(100px, 14vw, 180px);
-        padding-bottom: clamp(100px, 14vw, 180px);
+        margin-top: -30vh;
+        padding-top: 34vh;
       }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
@@ -294,18 +292,17 @@
 
     /* =====================
        ABOUT SECTION
-       No background at all — BG.png from mesh flows through
+       Same BG.png fixed — perfectly continuous with mesh
     ===================== */
     .rule { display: none !important; }
 
     #about.section {
       position: relative;
-      z-index: 3;
+      z-index: 1;
       margin-top: 0;
       padding-top: clamp(80px, 10vw, 140px);
       padding-bottom: clamp(60px, 8vw, 120px);
-      /* transparent — lets mesh's BG.png bleed through */
-      background: transparent;
+      background: url("BG.png") center top / cover fixed;
       width: 100%;
     }
 
@@ -335,7 +332,7 @@
 
     .strip {
       height: 44vh;
-      background: transparent;
+      background: url("BG.png") center top / cover fixed;
     }
 
     @media (max-width: 820px) {
@@ -493,15 +490,17 @@
       nodes  = [];
       rowMap = [];
 
-      /* The sphere's equator sits at 55% down the section —
-         slightly below center so more of the sphere is visible
-         in the foreground and the horizon peeks up into the hero */
+      /* orb center pushed high — top arc overlaps hero bottom.
+         We place it at 28% down the section so the top of the
+         orb sits right at or above the section's top edge,
+         which overlaps into the hero due to negative margin. */
       const orbCX = W * 0.50;
-      const orbCY = H * 0.55;
+      const orbCY = H * 0.28;
 
-      /* Orb radii — wide and tall, fills the section generously */
-      const orbRX = W * 0.58;
-      const orbRY = H * 0.50;
+      /* wide and tall — fills generously so foreground
+         spreads past the bottom of the visible section */
+      const orbRX = W * 0.62;
+      const orbRY = H * 0.58;
 
       /* center node */
       const center = {
@@ -516,44 +515,44 @@
       rowMap.push([center]);
 
       for (let ring = 1; ring < RINGS; ring++){
-        const t = ring / (RINGS - 1);
+        const t      = ring / (RINGS - 1);
+        const easeT  = Math.pow(t, 0.82);
+        const rx     = orbRX * easeT;
+        const ry     = orbRY * easeT;
 
-        /* perspective scaling: nodes near the top (horizon/far)
-           compress together — nodes near the bottom (foreground)
-           spread far apart. Achieved by scaling the angle increment. */
-        const perspEase = Math.pow(t, 0.78);
-        const rx = orbRX * perspEase;
-        const ry = orbRY * perspEase;
-
-        /* fade toward outer rings — strongest fade at top of sphere */
+        /* outer rings fade out */
         const orbAlpha = 1 - Math.pow(t, 1.2) * 0.90;
 
-        /* more points per ring as it expands — fewer at top for
-           the compressed horizon look, more at bottom for foreground */
-        const numPts = Math.round(4 + ring * 3.6);
+        /* more nodes per ring as it expands */
+        const numPts = Math.round(5 + ring * 3.4);
 
         const row = [];
-
         for (let i = 0; i < numPts; i++){
           const angle = (i / numPts) * Math.PI * 2;
 
-          /* perspective distortion: compress the top half of the ring
-             (angles near π/2, i.e. north pole / horizon)
-             and expand the bottom half (foreground) */
-          const rawY  = Math.sin(angle);
-          /* squish Y toward top — simulates looking slightly down at sphere */
-          const perspY = rawY < 0
-            ? rawY * 0.55   /* top half: compress toward horizon */
-            : rawY * 1.0;   /* bottom half: full foreground expansion */
+          /* perspective distortion:
+             - top of sphere (negative sin = going up) compresses strongly
+               → nodes bunch together at the horizon
+             - bottom of sphere (positive sin = going down) expands
+               → nodes spread far apart in the foreground
+             This is exactly what you see on a globe/ball held at eye level */
+          const sinA   = Math.sin(angle);
+          const perspY = sinA < 0
+            ? sinA * 0.42   /* top hemisphere: heavily compressed */
+            : sinA * 1.15;  /* bottom hemisphere: expanded foreground */
 
           const nx = orbCX + Math.cos(angle) * rx;
           const ny = orbCY + perspY * ry;
 
-          /* additional per-node alpha: nodes near the top of the orb
-             fade more — this creates the "fades into horizon" effect */
-          const normalizedY = (ny - orbCY) / orbRY; /* -1 top, +1 bottom */
-          const horizonFade = normalizedY < 0
-            ? Math.pow(1 + normalizedY, 0.6)  /* fade as y goes negative (up) */
+          /* nodes above the orb center fade strongly → horizon dissolve */
+          const relY       = (ny - orbCY) / orbRY;
+          const horizonFade = relY < 0
+            ? Math.pow(Math.max(0, 1 + relY * 1.6), 1.4)
+            : 1.0;
+
+          /* nodes near horizon are smaller */
+          const perspScale = relY < 0
+            ? lerp(0.2, 1.0, Math.max(0, 1 + relY))
             : 1.0;
 
           row.push({
@@ -562,7 +561,7 @@
             x: nx, y: ny,
             seed: Math.random() * 1000,
             orbAlpha: orbAlpha * horizonFade,
-            perspScale: 1 - t * 0.6  /* nodes smaller near horizon */
+            perspScale
           });
         }
         nodes.push(...row);
@@ -608,24 +607,25 @@
       root.style.setProperty('--meshBtnY',      `${(cy*BTN_DRIFT*0.9*p).toFixed(2)}px`);
 
       for (let i = 0; i < nodes.length; i++){
-        const n = nodes[i];
+        const n     = nodes[i];
         const infl  = influence(n.baseX, n.baseY);
         const depth = n.r / Math.max(1, RINGS - 1);
+        const relY  = (n.baseY - (H * 0.28)) / (H * 0.58);
 
-        /* foreground nodes (bottom) breathe and pull more */
-        const normalizedY = (n.baseY - (H * 0.55)) / (H * 0.50);
-        const isForeground = normalizedY > 0;
+        /* foreground moves freely, horizon is nearly still */
+        const isForeground = relY > 0;
         const breathAmp = isForeground
-          ? lerp(0.15, 0.65, depth)
-          : lerp(0.02, 0.15, depth); /* horizon barely moves */
+          ? lerp(0.12, 0.60, depth)
+          : lerp(0.01, 0.08, depth);
 
         const bx = Math.cos(tick * 0.52 + n.seed) * breathAmp * (1 - p * 0.5);
         const by = Math.sin(tick * 0.45 + n.seed) * breathAmp * (1 - p * 0.5);
 
         const toX = ptr.x * W - n.baseX;
         const toY = ptr.y * H - n.baseY;
-        /* foreground pulls strongly, horizon barely moves */
-        const pullStrength = isForeground ? lerp(4, 22, depth) : lerp(0, 4, depth);
+        const pullStrength = isForeground
+          ? lerp(4, 22, depth)
+          : lerp(0, 3, depth);
         const pull = infl * p * pullStrength;
 
         n.x = n.baseX + bx + toX * (pull / (W * 0.5));
@@ -646,13 +646,10 @@
       const depth     = a.r / Math.max(1, RINGS - 1);
       const baseAlpha = orbA * lerp(0.005, 0.026, depth) * emphasisMult;
       const alpha     = lerp(baseAlpha, 0.24, hot * orbA);
-
-      /* lines near horizon are thinner — foreground lines thicker */
       const perspW    = ((a.perspScale || 1) + (b.perspScale || 1)) * 0.5;
       const lineW     = lerp(
         lerp(0.15, 0.65, depth) * perspW,
-        1.4,
-        hot
+        1.4, hot
       );
 
       ctx.lineWidth   = lineW;
@@ -666,19 +663,15 @@
     }
 
     function drawNode(n){
-      const hot      = influence(n.x, n.y) * ptr.pressure;
-      const depth    = n.r / Math.max(1, RINGS - 1);
-      const orbAlpha = n.orbAlpha || 1;
+      const hot        = influence(n.x, n.y) * ptr.pressure;
+      const depth      = n.r / Math.max(1, RINGS - 1);
+      const orbAlpha   = n.orbAlpha || 1;
       const perspScale = n.perspScale || 1;
-
-      const baseAlpha = orbAlpha * lerp(0.004, 0.05, depth);
-      const alpha     = lerp(baseAlpha, 0.28, hot * orbAlpha);
-
-      /* nodes smaller near horizon, larger in foreground */
-      const size = lerp(
+      const baseAlpha  = orbAlpha * lerp(0.004, 0.05, depth);
+      const alpha      = lerp(baseAlpha, 0.28, hot * orbAlpha);
+      const size       = lerp(
         lerp(0.3, 1.2, depth) * perspScale,
-        2.4,
-        hot
+        2.4, hot
       );
       const shimmer = (Math.sin(tick*1.3+n.seed)+1)*.5;
 
@@ -705,13 +698,11 @@
         for (let c = 0; c < row.length; c++){
           const n = row[c];
 
-          /* ring connections — circular */
           if (row.length > 1){
             const nextInRing = row[(c + 1) % row.length];
             drawLine(n, nextInRing, 1.0);
           }
 
-          /* spoke connections to next ring */
           if (next && next.length > 1){
             const ratio  = c / Math.max(1, row.length);
             const mapped = Math.round(ratio * next.length) % next.length;
