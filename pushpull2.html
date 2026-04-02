@@ -42,14 +42,14 @@
     }
 
     /* =====================
-       HERO — completely unchanged
+       HERO — z-index 0, mesh sits on top
     ===================== */
     .hero.hero-image {
       position: relative;
       isolation: isolate;
       min-height: 100svh;
-      overflow: visible;
-      z-index: 1;
+      overflow: hidden;
+      z-index: 0;
     }
 
     .hero-bg-photo {
@@ -60,7 +60,6 @@
       transform: scale(1.03);
       filter: saturate(.92) contrast(.96) brightness(.96);
       pointer-events: none;
-      overflow: hidden;
     }
 
     .hero.hero-image::before {
@@ -159,20 +158,22 @@
 
     /* =====================
        MESH SECTION
+       z-index: 1 — sits ON TOP of hero
+       negative margin pulls it up over hero bottom
     ===================== */
     .mesh-section {
       position: relative;
       isolation: isolate;
       margin-top: -40vh;
-      padding-top: 44vh;
+      padding-top: 58vh;
       padding-bottom: clamp(120px, 16vw, 240px);
       overflow: hidden;
       cursor: default;
-      z-index: 0;
+      z-index: 1;
       background: #444F46;
     }
 
-    /* BG.png fixed — lines up perfectly with about section */
+    /* BG.png fixed — bleeds into about section seamlessly */
     .mesh-section::after {
       content: "";
       position: absolute;
@@ -284,7 +285,7 @@
     @media (max-width: 820px) {
       .mesh-section {
         margin-top: -30vh;
-        padding-top: 34vh;
+        padding-top: 38vh;
       }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
@@ -490,19 +491,11 @@
       nodes  = [];
       rowMap = [];
 
-      /* orb center pushed high — top arc overlaps hero bottom.
-         We place it at 28% down the section so the top of the
-         orb sits right at or above the section's top edge,
-         which overlaps into the hero due to negative margin. */
       const orbCX = W * 0.50;
       const orbCY = H * 0.28;
-
-      /* wide and tall — fills generously so foreground
-         spreads past the bottom of the visible section */
       const orbRX = W * 0.62;
       const orbRY = H * 0.58;
 
-      /* center node */
       const center = {
         r: 0, c: 0, rowCols: 1,
         baseX: orbCX, baseY: orbCY,
@@ -519,39 +512,25 @@
         const easeT  = Math.pow(t, 0.82);
         const rx     = orbRX * easeT;
         const ry     = orbRY * easeT;
-
-        /* outer rings fade out */
         const orbAlpha = 1 - Math.pow(t, 1.2) * 0.90;
-
-        /* more nodes per ring as it expands */
         const numPts = Math.round(5 + ring * 3.4);
+        const row    = [];
 
-        const row = [];
         for (let i = 0; i < numPts; i++){
-          const angle = (i / numPts) * Math.PI * 2;
-
-          /* perspective distortion:
-             - top of sphere (negative sin = going up) compresses strongly
-               → nodes bunch together at the horizon
-             - bottom of sphere (positive sin = going down) expands
-               → nodes spread far apart in the foreground
-             This is exactly what you see on a globe/ball held at eye level */
+          const angle  = (i / numPts) * Math.PI * 2;
           const sinA   = Math.sin(angle);
           const perspY = sinA < 0
-            ? sinA * 0.42   /* top hemisphere: heavily compressed */
-            : sinA * 1.15;  /* bottom hemisphere: expanded foreground */
+            ? sinA * 0.42
+            : sinA * 1.15;
 
           const nx = orbCX + Math.cos(angle) * rx;
           const ny = orbCY + perspY * ry;
 
-          /* nodes above the orb center fade strongly → horizon dissolve */
-          const relY       = (ny - orbCY) / orbRY;
+          const relY        = (ny - orbCY) / orbRY;
           const horizonFade = relY < 0
             ? Math.pow(Math.max(0, 1 + relY * 1.6), 1.4)
             : 1.0;
-
-          /* nodes near horizon are smaller */
-          const perspScale = relY < 0
+          const perspScale  = relY < 0
             ? lerp(0.2, 1.0, Math.max(0, 1 + relY))
             : 1.0;
 
@@ -611,8 +590,6 @@
         const infl  = influence(n.baseX, n.baseY);
         const depth = n.r / Math.max(1, RINGS - 1);
         const relY  = (n.baseY - (H * 0.28)) / (H * 0.58);
-
-        /* foreground moves freely, horizon is nearly still */
         const isForeground = relY > 0;
         const breathAmp = isForeground
           ? lerp(0.12, 0.60, depth)
@@ -620,7 +597,6 @@
 
         const bx = Math.cos(tick * 0.52 + n.seed) * breathAmp * (1 - p * 0.5);
         const by = Math.sin(tick * 0.45 + n.seed) * breathAmp * (1 - p * 0.5);
-
         const toX = ptr.x * W - n.baseX;
         const toY = ptr.y * H - n.baseY;
         const pullStrength = isForeground
