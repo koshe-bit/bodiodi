@@ -162,16 +162,24 @@
        negative margin pulls it up over hero bottom
     ===================== */
     .mesh-section {
-      position: relative;
-      isolation: isolate;
-      margin-top: -40vh;
-      padding-top: 58vh;
-      padding-bottom: clamp(120px, 16vw, 240px);
-      overflow: hidden;
-      cursor: default;
-      z-index: 1;
-      background: #444F46;
-    }
+  position: relative;
+  isolation: isolate;
+  margin-top: -40vh;
+  padding-top: 58vh;
+  padding-bottom: clamp(120px, 16vw, 240px);
+  overflow: hidden;
+  cursor: default;
+  z-index: 1;
+  /* transparent at top so hero shows through,
+     solid dark green in the middle and bottom */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 28%,
+    #444F46 42%,
+    #444F46 100%
+  );
+}
 
     /* BG.png fixed — bleeds into about section seamlessly */
     .mesh-section::after {
