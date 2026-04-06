@@ -376,6 +376,20 @@
     @media (prefers-reduced-motion: reduce) {
       .mesh-canvas { display: none; }
     }
+    @media (max-width: 820px) {
+  .mesh-section::after {
+    background-attachment: scroll !important;
+    background-position: center top !important;
+  }
+  #about.section {
+    background-attachment: scroll !important;
+    background-position: center top !important;
+  }
+  .strip {
+    background-attachment: scroll !important;
+    background-position: center bottom !important;
+  }
+}
   </style>
 </head>
 
