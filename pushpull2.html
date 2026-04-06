@@ -170,26 +170,17 @@
        pointer-events: none so hero buttons stay clickable
     ===================== */
     .mesh-section {
-      position: relative;
-      isolation: isolate;
-      margin-top: -12vh;
-      padding-top: 16vh;
-      padding-bottom: clamp(120px, 16vw, 240px);
-      overflow: hidden;
-      cursor: default;
-      z-index: 1;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(68,79,70,.15) 12%,
-        rgba(68,79,70,.52) 24%,
-        rgba(68,79,70,.84) 36%,
-        #444F46 46%,
-        #444F46 100%
-      );
-      /* transparent top lets clicks pass to hero buttons */
-      pointer-events: none;
-    }
+  position: relative;
+  isolation: isolate;
+  margin-top: 0;
+  padding-top: 16vh;
+  padding-bottom: clamp(120px, 16vw, 240px);
+  overflow: hidden;
+  cursor: default;
+  z-index: 1;
+  background: #444F46;
+  pointer-events: none;
+}
 
     /* BG.png fixed — bleeds into about section seamlessly */
     .mesh-section::after {
