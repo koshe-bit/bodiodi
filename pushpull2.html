@@ -41,6 +41,10 @@
       background: #fffaf8;
     }
 
+    /* =====================
+       HERO
+       z-index: 0 — mesh sits on top
+    ===================== */
     .hero.hero-image {
       position: relative;
       isolation: isolate;
@@ -74,7 +78,6 @@
       );
     }
 
-    /* CHANGE 1: taller, slower fade, ends in dark green */
     .hero.hero-image::after {
       content: "";
       position: absolute;
@@ -114,10 +117,14 @@
 
     .hero.hero-image .logo-outline { display: none; }
 
+    /* hero copy sits above everything including mesh overlap */
     .hero.hero-image .hero-copy {
       margin-left: clamp(32px, 8vw, 120px);
       margin-bottom: clamp(72px, 10vw, 130px);
       max-width: 820px;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
     }
 
     .hero.hero-image .h1 {
@@ -156,12 +163,17 @@
       .hero.hero-image::after { height: clamp(200px, 30vw, 340px); }
     }
 
-    /* CHANGE 2: mesh background eases in gradually — no hard line */
+    /* =====================
+       MESH SECTION
+       z-index: 1 — sits on top of hero
+       small overlap only — just the orb horizon
+       pointer-events: none so hero buttons stay clickable
+    ===================== */
     .mesh-section {
       position: relative;
       isolation: isolate;
-      margin-top: -40vh;
-      padding-top: 58vh;
+      margin-top: -12vh;
+      padding-top: 16vh;
       padding-bottom: clamp(120px, 16vw, 240px);
       overflow: hidden;
       cursor: default;
@@ -169,14 +181,17 @@
       background: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(68,79,70,.15) 18%,
-        rgba(68,79,70,.52) 32%,
-        rgba(68,79,70,.84) 42%,
-        #444F46 52%,
+        rgba(68,79,70,.15) 12%,
+        rgba(68,79,70,.52) 24%,
+        rgba(68,79,70,.84) 36%,
+        #444F46 46%,
         #444F46 100%
       );
+      /* transparent top lets clicks pass to hero buttons */
+      pointer-events: none;
     }
 
+    /* BG.png fixed — bleeds into about section seamlessly */
     .mesh-section::after {
       content: "";
       position: absolute;
@@ -203,6 +218,19 @@
         rgba(0,0,0,.86) 74%,
         black 100%
       );
+    }
+
+    /* mobile fallback — fixed attachment doesn't work on iOS */
+    @supports not (background-attachment: fixed) {
+      .mesh-section::after {
+        background: url("BG.png") center top / cover no-repeat;
+      }
+      #about.section {
+        background: url("BG.png") center top / cover no-repeat;
+      }
+      .strip {
+        background: url("BG.png") center bottom / cover no-repeat;
+      }
     }
 
     .mesh-canvas-wrap {
@@ -233,6 +261,7 @@
       transition: opacity .2s ease;
     }
 
+    /* mesh inner restores pointer events for text + buttons */
     .mesh-section .mesh-inner {
       position: relative;
       z-index: 2;
@@ -242,6 +271,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      pointer-events: auto;
     }
 
     .mesh-section .mesh-copy {
@@ -278,6 +308,7 @@
     .mesh-section .btn {
       border-color: rgba(236,235,134,.55);
       color: var(--hero-gold);
+      pointer-events: auto;
     }
     .mesh-section .btn:hover {
       background: rgba(236,235,134,.12);
@@ -287,13 +318,18 @@
 
     @media (max-width: 820px) {
       .mesh-section {
-        margin-top: -30vh;
-        padding-top: 38vh;
+        margin-top: -8vh;
+        padding-top: 12vh;
+        padding-bottom: clamp(80px, 12vw, 160px);
       }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
     }
 
+    /* =====================
+       ABOUT SECTION
+       BG.png fixed — continuous with mesh
+    ===================== */
     .rule { display: none !important; }
 
     #about.section {
@@ -304,16 +340,6 @@
       padding-bottom: clamp(60px, 8vw, 120px);
       background: url("BG.png") center top / cover fixed;
       width: 100%;
-    }
-
-    /* mobile fallback — fixed attachment doesn't work on iOS */
-    @supports not (background-attachment: fixed) {
-      #about.section {
-        background: url("BG.png") center top / cover no-repeat;
-      }
-      .strip {
-        background: url("BG.png") center bottom / cover no-repeat;
-      }
     }
 
     #about .content-col {
