@@ -212,17 +212,17 @@
     }
 
     /* mobile fallback — fixed attachment doesn't work on iOS */
-    @supports not (background-attachment: fixed) {
-      .mesh-section::after {
-        background: url("BG.png") center top / cover no-repeat;
-      }
-      #about.section {
-        background: url("BG.png") center top / cover no-repeat;
-      }
-      .strip {
-        background: url("BG.png") center bottom / cover no-repeat;
-      }
-    }
+   @media (max-width: 820px) {
+  .mesh-section::after {
+    background: url("BG.png") center top / cover no-repeat;
+  }
+  #about.section {
+    background: url("BG.png") center top / cover no-repeat;
+  }
+  .strip {
+    background: url("BG.png") center bottom / cover no-repeat;
+  }
+}
 
     .mesh-canvas-wrap {
       position: absolute;
