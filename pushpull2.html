@@ -41,9 +41,6 @@
       background: #fffaf8;
     }
 
-    /* =====================
-       HERO — z-index 0, mesh sits on top
-    ===================== */
     .hero.hero-image {
       position: relative;
       isolation: isolate;
@@ -77,28 +74,31 @@
       );
     }
 
+    /* CHANGE 1: taller, slower fade, ends in dark green */
     .hero.hero-image::after {
       content: "";
       position: absolute;
       left: 0; right: 0; bottom: 0;
-      height: clamp(300px, 40vw, 560px);
+      height: clamp(400px, 52vw, 680px);
       z-index: 2;
       pointer-events: none;
       background: url("BGFlipped.png") center bottom / cover no-repeat;
       -webkit-mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0,0,0,.12) 18%,
-        rgba(0,0,0,.48) 42%,
-        rgba(0,0,0,.82) 68%,
+        rgba(0,0,0,.06) 12%,
+        rgba(0,0,0,.28) 32%,
+        rgba(0,0,0,.62) 58%,
+        rgba(0,0,0,.88) 78%,
         black 100%
       );
       mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0,0,0,.12) 18%,
-        rgba(0,0,0,.48) 42%,
-        rgba(0,0,0,.82) 68%,
+        rgba(0,0,0,.06) 12%,
+        rgba(0,0,0,.28) 32%,
+        rgba(0,0,0,.62) 58%,
+        rgba(0,0,0,.88) 78%,
         black 100%
       );
     }
@@ -156,32 +156,27 @@
       .hero.hero-image::after { height: clamp(200px, 30vw, 340px); }
     }
 
-    /* =====================
-       MESH SECTION
-       z-index: 1 — sits ON TOP of hero
-       negative margin pulls it up over hero bottom
-    ===================== */
+    /* CHANGE 2: mesh background eases in gradually — no hard line */
     .mesh-section {
-  position: relative;
-  isolation: isolate;
-  margin-top: -40vh;
-  padding-top: 58vh;
-  padding-bottom: clamp(120px, 16vw, 240px);
-  overflow: hidden;
-  cursor: default;
-  z-index: 1;
-  /* transparent at top so hero shows through,
-     solid dark green in the middle and bottom */
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    transparent 28%,
-    #444F46 42%,
-    #444F46 100%
-  );
-}
+      position: relative;
+      isolation: isolate;
+      margin-top: -40vh;
+      padding-top: 58vh;
+      padding-bottom: clamp(120px, 16vw, 240px);
+      overflow: hidden;
+      cursor: default;
+      z-index: 1;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(68,79,70,.15) 18%,
+        rgba(68,79,70,.52) 32%,
+        rgba(68,79,70,.84) 42%,
+        #444F46 52%,
+        #444F46 100%
+      );
+    }
 
-    /* BG.png fixed — bleeds into about section seamlessly */
     .mesh-section::after {
       content: "";
       position: absolute;
@@ -299,10 +294,6 @@
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
     }
 
-    /* =====================
-       ABOUT SECTION
-       Same BG.png fixed — perfectly continuous with mesh
-    ===================== */
     .rule { display: none !important; }
 
     #about.section {
@@ -313,6 +304,16 @@
       padding-bottom: clamp(60px, 8vw, 120px);
       background: url("BG.png") center top / cover fixed;
       width: 100%;
+    }
+
+    /* mobile fallback — fixed attachment doesn't work on iOS */
+    @supports not (background-attachment: fixed) {
+      #about.section {
+        background: url("BG.png") center top / cover no-repeat;
+      }
+      .strip {
+        background: url("BG.png") center bottom / cover no-repeat;
+      }
     }
 
     #about .content-col {
