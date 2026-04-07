@@ -299,11 +299,11 @@
       <div class="page-head-copy">
         <p class="kicker">Members</p>
         <h1 class="page-title">Reserve your spot</h1>
-        <p class="meta">Tap a class, confirm the reminder, and you’re in.</p>
+        <p class="meta">Tap a class, confirm the reminder, and you're in.</p>
         <p class="meta">* MORNING CLASSES * Please be sure to reserve your spot at least 24 hrs before class start.</p>
       </div>
 
-      <div class="badge" id="memberBadge">Loading member…</div>
+      <div class="badge" id="memberBadge">Loading…</div>
     </div>
 
     <div class="rule" aria-hidden="true"></div>
@@ -348,7 +348,16 @@
     const memberId = params.get('id');
 
     const memberBadge = document.getElementById('memberBadge');
-    memberBadge.textContent = memberId ? 'Checking member…' : 'Missing member link';
+    memberBadge.textContent = memberId ? 'Loading…' : 'Missing member link';
+
+    // Show a loading skeleton immediately so members know something is happening
+    const grid = document.getElementById('classGrid');
+    grid.innerHTML = `
+      <article class="card" style="opacity:.5;">
+        <h3>Loading schedule…</h3>
+        <p class="when">Just a moment.</p>
+      </article>
+    `;
 
     async function loadMember(){
       if (!memberId) return null;
@@ -572,8 +581,6 @@
       return out;
     }
 
-    const grid = document.getElementById('classGrid');
-
     function renderCards(list){
       grid.innerHTML = '';
 
@@ -700,12 +707,16 @@
       openConfirmModal(payload);
     }
 
+    // PARALLEL LOAD: member lookup and schedule fetch fire at the same time
     (async () => {
-      const m = await loadMember();
+      const [m, rows] = await Promise.all([
+        loadMember(),
+        fetchScheduleRows()
+      ]);
+
       if (!m && memberId) memberBadge.textContent = 'Member link not found';
       if (!memberId) memberBadge.textContent = 'Missing member link';
 
-      const rows = await fetchScheduleRows();
       const cards = buildCardsFromScheduleRows(rows);
       renderCards(cards);
     })();
