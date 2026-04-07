@@ -1,1 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bodiodi — Find Your Path</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Krub:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #fffaf8;
+      --ink: #1d1d1d;
+      --sage: #839b85;
+      --sage-mid: #9eb6a0;
+      --sage-dark: #6c8570;
+      --sage-deep: #444F46;
+      --peach: #f6e3da;
+      --border: #ddd7d2;
+      --muted: #888;
+      --light-muted: #aaa;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Krub', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-peach {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(246,227,218,0.55) 0%, transparent 70%);
+      top: -150px; right: -150px;
+    }
+    .glow-sage {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(131,155,133,0.18) 0%, transparent 70%);
+      bottom: -100px; left: -100px;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .screen.active { display: flex; }
+
+    .content {
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 2rem;
+    }
+
+    .hero-title {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title em { font-style: italic; color: var(--sage); }
+
+    .hero-sub {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: #555;
+      margin-bottom: 3rem;
+      max-width: 400px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+      padding: 14px 38px;
+      cursor: pointer;
+      background: transparent;
+      text-decoration: none;
+      transition: background 0.25s, color 0.25s;
+    }
+    .btn-primary:hover { background: var(--ink); color: var(--bg); }
+
+    .btn-continue {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--sage);
+      border: none;
+      padding: 14px 36px;
+      cursor: pointer;
+      opacity: 0.35;
+      pointer-events: none;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .btn-continue.ready { opacity: 1; pointer-events: all; }
+    .btn-continue:hover { background: var(--sage-dark); }
+
+    .btn-back {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.2s;
+    }
+    .btn-back:hover { color: #555; }
+
+    .btn-ghost {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 13px 26px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--sage); color: var(--sage); }
+
+    .btn-flag {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--sage-dark);
+      border: none;
+      padding: 14px 38px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-flag:hover { background: var(--sage-deep); }
+
+    .progress-wrap {
+      width: 100%;
+      max-width: 560px;
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 10px;
+    }
+    .progress-track {
+      height: 1px;
+      background: #e0d8d2;
+      position: relative;
+    }
+    .progress-fill {
+      height: 1px;
+      background: var(--sage);
+      position: absolute;
+      top: 0; left: 0;
+      transition: width 0.6s ease;
+    }
+
+    .q-number {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--sage-mid);
+      margin-bottom: 1rem;
+    }
+    .q-text {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1.3rem, 3.5vw, 1.75rem);
+      font-weight: 300;
+      line-height: 1.25;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      margin-bottom: 0.5rem;
+    }
+    .q-sub {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 2.5rem;
+    }
+    .cards.two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .card:hover { border-color: var(--sage); transform: translateY(-1px); }
+    .card.selected { border-color: var(--sage); background: rgba(131,155,133,0.08); }
+    .card.flag.selected { border-color: #c97b63; background: rgba(246,227,218,0.35); }
+    .card-letter {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: var(--light-muted);
+      min-width: 14px;
+      padding-top: 1px;
+      flex-shrink: 0;
+    }
+    .card.selected .card-letter { color: var(--sage); }
+    .card-text {
+      font-size: 0.875rem;
+      font-weight: 300;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .continue-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .flag-title {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+    }
+    .flag-body {
+      font-size: 0.95rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: #555;
+      margin-bottom: 2.5rem;
+      max-width: 460px;
+    }
+    .flag-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .result-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 1rem;
+    }
+    .result-track {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(2.8rem, 9vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--sage);
+      margin-bottom: 2rem;
+    }
+
+    .path-wrap {
+      margin-bottom: 2.5rem;
+      overflow-x: auto;
+      padding: 16px 4px 4px 4px;
+    }
+    .path-nodes {
+      display: flex;
+      align-items: flex-start;
+      min-width: max-content;
+    }
+    .path-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .node-dot {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--light-muted);
+      transition: all 0.4s;
+      flex-shrink: 0;
+    }
+    .node-dot.active {
+      border-color: var(--sage);
+      background: var(--sage);
+      color: var(--bg);
+      transform: scale(1.18);
+      box-shadow: 0 0 0 5px var(--bg);
+    }
+    .node-dot.passed {
+      border-color: var(--sage-mid);
+      color: var(--sage-mid);
+    }
+    .node-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ccc;
+      text-align: center;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+    .node-name.active { color: var(--sage); font-weight: 500; }
+    .node-name.passed { color: var(--sage-mid); }
+    .path-line {
+      width: 36px;
+      height: 1px;
+      background: var(--border);
+      flex-shrink: 0;
+      margin-top: 23px;
+    }
+    .path-line.passed { background: var(--sage-mid); }
+
+    .result-desc {
+      font-size: 0.95rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: #444;
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+    }
+    .classes-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--sage-mid);
+      margin-bottom: 0.75rem;
+    }
+    .class-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .class-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--sage-dark);
+      border: 1px solid #c4d4c5;
+      padding: 7px 16px;
+    }
+    .result-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .fade-up { animation: fadeUp 0.5s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up:nth-child(1) { animation-delay: 0s; }
+    .fade-up:nth-child(2) { animation-delay: 0.07s; }
+    .fade-up:nth-child(3) { animation-delay: 0.14s; }
+    .fade-up:nth-child(4) { animation-delay: 0.21s; }
+    .fade-up:nth-child(5) { animation-delay: 0.28s; }
+    .fade-up:nth-child(6) { animation-delay: 0.35s; }
+    .fade-up:nth-child(7) { animation-delay: 0.42s; }
+
+    @media (max-width: 480px) {
+      .cards.two-col { grid-template-columns: 1fr; }
+      .hero-title { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow glow-peach"></div>
+  <div class="glow glow-sage"></div>
+
+  <div class="screen active" id="screen-hero">
+    <div class="content">
+      <p class="eyebrow fade-up">Questionnaire</p>
+      <h1 class="hero-title fade-up">Begin your<br><em>body odyssey.</em></h1>
+      <p class="hero-sub fade-up">Eight questions. No pressure. We'll assess where you are, where you're heading, and find the best track for you.</p>
+      <button class="btn-primary fade-up" onclick="startQuiz()">Find your path</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-question">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="prog-label">Question 1 of 8</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="content" id="q-content"></div>
+  </div>
+
+  <div class="screen" id="screen-flag">
+    <div class="content">
+      <p class="eyebrow fade-up">Before we go further</p>
+      <h2 class="flag-title fade-up" id="flag-title"></h2>
+      <p class="flag-body fade-up" id="flag-body"></p>
+      <div class="flag-actions fade-up">
+        <a class="btn-flag" href="https://www.bodiodi.com/classes" id="flag-cta">Schedule with Sarah</a>
+        <button class="btn-back" onclick="goBack()">← Go back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-result">
+    <div class="content">
+      <p class="result-eyebrow fade-up">Your path</p>
+      <div class="result-track fade-up" id="result-track"></div>
+      <div class="path-wrap fade-up">
+        <div class="path-nodes" id="path-nodes"></div>
+      </div>
+      <p class="result-desc fade-up" id="result-desc"></p>
+      <p class="classes-label fade-up">Your classes</p>
+      <div class="class-tags fade-up" id="class-tags"></div>
+      <div class="result-actions fade-up">
+        <a class="btn-primary" href="https://www.bodiodi.com/classes" target="_blank">Explore classes</a>
+        <button class="btn-ghost" onclick="resetQuiz()">Start over</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      { id: 'activity', text: 'How active are you right now?', sub: null, multi: false, options: [
+        { label: 'Mostly sedentary — not much movement day to day', value: 0 },
+        { label: 'Light and casual — walks, occasional movement', value: 1 },
+        { label: '1–2 structured workouts a week', value: 2 },
+        { label: '3+ structured workouts a week', value: 3 }
+      ]},
+      { id: 'history', text: 'How long have you been exercising consistently?', sub: null, multi: false, options: [
+        { label: 'Never, or just starting out', value: 0 },
+        { label: 'Less than 6 months', value: 1 },
+        { label: '6 months to 2 years', value: 2 },
+        { label: '2+ years', value: 3 }
+      ]},
+      { id: 'pain', text: 'Any current pain, injury, or upcoming surgery affecting how you move?', sub: null, multi: false, flag: true, options: [
+        { label: 'No — I feel good', value: 0 },
+        { label: 'Minor — manageable and not limiting', value: 1 },
+        { label: 'Yes — actively being treated', value: 2, softFlag: true },
+        { label: 'Yes — surgery pending or recent', value: 3, hardFlag: true }
+      ]},
+      { id: 'health', text: 'Any cardiovascular, neurological, or metabolic conditions we should know about?', sub: 'Heart disease, diabetes, uncontrolled hypertension, pregnancy, neurological conditions.', multi: false, flag: true, options: [
+        { label: 'None', value: 0 },
+        { label: 'Yes — well-managed with medical support', value: 1, softFlag: true },
+        { label: 'Yes — recent diagnosis or uncontrolled', value: 2, hardFlag: true }
+      ]},
+      { id: 'awareness', text: 'How would you describe your body awareness and movement confidence?', sub: 'Knowing where your body is in space, how to brace, control your breath under effort.', multi: false, options: [
+        { label: 'Still figuring it out — I\'m a learner', value: 0 },
+        { label: 'I have some sense of it', value: 1 },
+        { label: 'Pretty natural to me', value: 2 }
+      ]},
+      { id: 'energy', text: 'What kind of energy do you bring to a workout?', sub: null, multi: false, options: [
+        { label: 'Calm and controlled — precision over pace', value: 0 },
+        { label: 'Steady and focused — I want to build', value: 1 },
+        { label: 'High energy — push me hard', value: 2 },
+        { label: 'I\'m an athlete or runner — I want to build power, force, and speed', value: 3 }
+      ]},
+      { id: 'movement', text: 'What draws you to movement?', sub: 'Select all that apply.', multi: true, twoCol: true, options: [
+        { label: 'Lifting & strength', value: 'strength' },
+        { label: 'Mobility & flexibility', value: 'mobility' },
+        { label: 'Dance & rhythm', value: 'rhythm' },
+        { label: 'High-intensity & cardio', value: 'hiit' },
+        { label: 'Mind-body connection', value: 'mind' },
+        { label: 'Still exploring', value: 'exploring' }
+      ]},
+      { id: 'why', text: 'What does showing up at Bodiodi mean to you?', sub: 'Select all that apply.', multi: true, options: [
+        { label: 'Building a lasting habit', value: 'habit' },
+        { label: 'Getting stronger or more capable', value: 'stronger' },
+        { label: 'Recovering or healing', value: 'healing' },
+        { label: 'Changing how I feel in my body', value: 'feel' },
+        { label: 'Finding my people', value: 'community' },
+        { label: 'Proving something to myself', value: 'prove' }
+      ]}
+    ];
+
+    const TRACKS = {
+      foundation: { name: 'Foundation', desc: 'You\'re in the right place to start well. Foundation is about building the real thing — body awareness, breath, control, and movement patterns that will serve you for life. Classes here are intentional and immersive, never rushed.', classes: ['Kinetix', 'Flexion'], nodeIndex: 0 },
+      build: { name: 'Build', desc: 'You\'re ready to load it up. Build is where you develop real strength and endurance capacity — progressive, purposeful, and coach-led. Expect to work hard and leave knowing you did something.', classes: ['Tonnix', 'Rhythmix'], nodeIndex: 2 },
+      ignite: { name: 'Ignite', desc: 'You\'re here to perform. Ignite is for people who want to move with power, speed, and intention — athletic output in a focused small-group environment. This is where you push.', classes: ['Anabolix'], nodeIndex: 4 }
+    };
+
+    const NODES = ['Kinetix', 'Flexion', 'Tonnix', 'Rhythmix', 'Anabolix'];
+    const LETTERS = 'ABCDEF';
+    let current = 0, answers = {}, selected = [], history = [];
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0 });
+    }
+
+    function startQuiz() { current = 0; answers = {}; history = []; renderQuestion(0); }
+
+    function renderQuestion(index) {
+      showScreen('screen-question');
+      const q = QUESTIONS[index];
+      selected = answers[q.id] ? (Array.isArray(answers[q.id]) ? [...answers[q.id]] : [answers[q.id]]) : [];
+      const pct = Math.round((index / QUESTIONS.length) * 100);
+      document.getElementById('prog-label').textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
+      document.getElementById('prog-pct').textContent = pct + '%';
+      document.getElementById('progress-fill').style.width = pct + '%';
+      const cardsHtml = q.options.map((opt, i) => `
+        <div class="card fade-up${opt.hardFlag ? ' flag' : ''}" data-val="${opt.value}" data-hard="${!!opt.hardFlag}" data-soft="${!!opt.softFlag}" onclick="selectCard(this, ${!!q.multi})">
+          <span class="card-letter">${LETTERS[i]}</span>
+          <span class="card-text">${opt.label}</span>
+        </div>`).join('');
+      document.getElementById('q-content').innerHTML = `
+        <p class="q-number fade-up">${String(index + 1).padStart(2, '0')}</p>
+        <h2 class="q-text fade-up">${q.text}</h2>
+        ${q.sub ? `<p class="q-sub fade-up">${q.sub}</p>` : ''}
+        <div class="cards${q.twoCol ? ' two-col' : ''} fade-up">${cardsHtml}</div>
+        <div class="continue-row fade-up">
+          ${index > 0 ? '<button class="btn-back" onclick="goBack()">← Back</button>' : ''}
+          <button class="btn-continue" id="btn-cont" onclick="advance()">Continue</button>
+        </div>`;
+      if (selected.length > 0) {
+        document.querySelectorAll('.card').forEach(card => {
+          const val = isNaN(card.dataset.val) ? card.dataset.val : Number(card.dataset.val);
+          const match = q.multi ? selected.includes(card.dataset.val) : selected[0] === val;
+          if (match) card.classList.add('selected');
+        });
+        document.getElementById('btn-cont').classList.add('ready');
+      }
+    }
+
+    function selectCard(el, multi) {
+      if (!multi) {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selected = [isNaN(el.dataset.val) ? el.dataset.val : Number(el.dataset.val)];
+      } else {
+        el.classList.toggle('selected');
+        const val = el.dataset.val;
+        selected = el.classList.contains('selected') ? [...selected, val] : selected.filter(v => v !== val);
+      }
+      document.getElementById('btn-cont').classList.toggle('ready', selected.length > 0);
+    }
+
+    function advance() {
+      const q = QUESTIONS[current];
+      answers[q.id] = q.multi ? [...selected] : selected[0];
+      history.push(current);
+      if (q.flag) {
+        const sel = document.querySelector('.card.selected');
+        if (sel && sel.dataset.hard === 'true') { showFlag(true); return; }
+        if (sel && sel.dataset.soft === 'true') { showFlag(false); return; }
+      }
+      current++;
+      if (current >= QUESTIONS.length) { showResult(); } else { renderQuestion(current); }
+    }
+
+    function goBack() {
+      if (history.length > 0) { current = history.pop(); renderQuestion(current); } else { resetQuiz(); }
+    }
+
+    function showFlag(hard) {
+      document.getElementById('flag-title').textContent = hard ? 'We\'d love to meet you first.' : 'Let\'s start with a conversation.';
+      document.getElementById('flag-body').textContent = hard
+        ? 'Based on what you shared, we\'d like to set you up with a personal assessment with Sarah before placing you in a track. This isn\'t a barrier — it\'s the beginning of getting it right. Sarah is a CPT who will make sure your first classes feel safe, intentional, and built for where you actually are.'
+        : 'You\'re ready to move — we just want to make sure we\'re smart about it with you. A quick assessment with Sarah will help us build a path that respects where your body is right now. You\'ll be in class before you know it.';
+      showScreen('screen-flag');
+    }
+
+    function calcTrack() {
+      const score = (Number(answers.activity)||0) + (Number(answers.history)||0) + (Number(answers.awareness)||0) + (Number(answers.energy)||0);
+      if (score <= 3) return 'foundation';
+      if (score <= 7) return 'build';
+      return 'ignite';
+    }
+
+    function showResult() {
+      const track = TRACKS[calcTrack()];
+      document.getElementById('result-track').textContent = track.name;
+      document.getElementById('result-desc').textContent = track.desc;
+      document.getElementById('class-tags').innerHTML = track.classes.map(c => `<span class="class-tag">${c}</span>`).join('');
+      document.getElementById('path-nodes').innerHTML = NODES.map((n, i) => {
+        const active = track.classes.includes(n);
+        const passed = i < track.nodeIndex;
+        const line = i < NODES.length - 1 ? `<div class="path-line${passed ? ' passed' : ''}"></div>` : '';
+        return `<div class="path-node">
+          <div class="node-dot${active ? ' active' : passed ? ' passed' : ''}">${n.substring(0,3)}</div>
+          <span class="node-name${active ? ' active' : passed ? ' passed' : ''}">${n}</span>
+        </div>${line}`;
+      }).join('');
+      showScreen('screen-result');
+    }
+
+    function resetQuiz() { current = 0; answers = {}; selected = []; history = []; showScreen('screen-hero'); }
+  </script>
+</body>
+</html>
