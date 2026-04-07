@@ -446,11 +446,10 @@
     async function render(){
   const grid = document.getElementById('dayGrid');
 
-  // show a loading state instead of "no classes"
   grid.innerHTML = `
     <article class="card">
       <h3>Loading…</h3>
-      <p class="when">Fetching this week’s schedule.</p>
+      <p class="when">Fetching this week's schedule.</p>
     </article>
   `;
 
@@ -462,7 +461,6 @@
     tpl = Array.from({length:7},(_,i)=>({ weekday:i+1, classes:[] }));
   }
 
-  // now render the real week
   grid.innerHTML = '';
   const week = buildWeek();
 
@@ -472,6 +470,22 @@
   }));
 
   merged.forEach(day=>{
+    // Sort classes within each day by start time ascending
+    day.classes.sort((a, b) => {
+      const parse = str => {
+        const m = String(str || '').toLowerCase().replace(/\s/g,'').match(/^(\d{1,2})(?::(\d{2}))?([ap])$/);
+        if (!m) return 0;
+        let hh = parseInt(m[1], 10);
+        const mm = m[2] ? parseInt(m[2], 10) : 0;
+        if (m[3] === 'p' && hh !== 12) hh += 12;
+        if (m[3] === 'a' && hh === 12) hh = 0;
+        return hh * 60 + mm;
+      };
+      const startA = String(a.time || '').split('–')[0];
+      const startB = String(b.time || '').split('–')[0];
+      return parse(startA) - parse(startB);
+    });
+
     const card=document.createElement('article');
     card.className='card';
     const has=day.classes.length>0;
