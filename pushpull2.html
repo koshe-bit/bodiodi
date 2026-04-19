@@ -51,7 +51,6 @@
       overflow: hidden;
       z-index: 0;
     }
-
     .hero-bg-photo {
       position: absolute;
       inset: 0;
@@ -61,22 +60,14 @@
       filter: saturate(.92) contrast(.96) brightness(.96);
       pointer-events: none;
     }
-
     .hero.hero-image::before {
       content: "";
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: linear-gradient(
-        170deg,
-        rgba(0,0,0,.06) 0%,
-        rgba(0,0,0,.02) 35%,
-        rgba(0,0,0,.18) 68%,
-        rgba(0,0,0,.30) 100%
-      );
+      background: linear-gradient(170deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.02) 35%,rgba(0,0,0,.18) 68%,rgba(0,0,0,.30) 100%);
     }
-
     .hero.hero-image::after {
       content: "";
       position: absolute;
@@ -85,26 +76,9 @@
       z-index: 2;
       pointer-events: none;
       background: url("BGFlipped.png") center bottom / cover no-repeat;
-      -webkit-mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.06) 12%,
-        rgba(0,0,0,.28) 32%,
-        rgba(0,0,0,.62) 58%,
-        rgba(0,0,0,.88) 78%,
-        black 100%
-      );
-      mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.06) 12%,
-        rgba(0,0,0,.28) 32%,
-        rgba(0,0,0,.62) 58%,
-        rgba(0,0,0,.88) 78%,
-        black 100%
-      );
+      -webkit-mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.06) 12%,rgba(0,0,0,.28) 32%,rgba(0,0,0,.62) 58%,rgba(0,0,0,.88) 78%,black 100%);
+      mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.06) 12%,rgba(0,0,0,.28) 32%,rgba(0,0,0,.62) 58%,rgba(0,0,0,.88) 78%,black 100%);
     }
-
     .hero.hero-image .hero-inner {
       position: relative;
       z-index: 3;
@@ -113,9 +87,7 @@
       align-items: flex-end;
       width: 100%;
     }
-
     .hero.hero-image .logo-outline { display: none; }
-
     .hero.hero-image .hero-copy {
       margin-left: clamp(32px, 8vw, 120px);
       margin-bottom: clamp(72px, 10vw, 130px);
@@ -124,7 +96,6 @@
       z-index: 10;
       pointer-events: auto;
     }
-
     .hero.hero-image .h1 {
       color: var(--hero-gold);
       max-width: 10ch;
@@ -134,7 +105,6 @@
       margin: 0 0 14px 0;
       text-shadow: 0 2px 24px rgba(0,0,0,.22);
     }
-
     .hero.hero-image .sub {
       color: var(--hero-gold);
       font-weight: 400;
@@ -145,17 +115,12 @@
       opacity: .88;
       text-shadow: 0 1px 12px rgba(0,0,0,.28);
     }
-
     .hero.hero-image .btn {
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-
     @media (max-width: 820px) {
-      .hero.hero-image .hero-copy {
-        margin-left: clamp(22px, 6vw, 40px);
-        margin-bottom: clamp(54px, 10vw, 88px);
-      }
+      .hero.hero-image .hero-copy { margin-left: clamp(22px, 6vw, 40px); margin-bottom: clamp(54px, 10vw, 88px); }
       .hero.hero-image .h1 { font-size: clamp(44px, 12vw, 68px); }
       .hero.hero-image .sub { font-size: clamp(15px, 4.2vw, 19px); }
       .hero.hero-image::after { height: clamp(200px, 30vw, 340px); }
@@ -176,7 +141,6 @@
       background: #444F46;
       pointer-events: none;
     }
-
     .mesh-section::after {
       content: "";
       position: absolute;
@@ -185,69 +149,25 @@
       z-index: 0;
       pointer-events: none;
       background: url("BG.png") center top / cover fixed;
-      -webkit-mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.05) 14%,
-        rgba(0,0,0,.22) 32%,
-        rgba(0,0,0,.58) 54%,
-        rgba(0,0,0,.86) 74%,
-        black 100%
-      );
-      mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.05) 14%,
-        rgba(0,0,0,.22) 32%,
-        rgba(0,0,0,.58) 54%,
-        rgba(0,0,0,.86) 74%,
-        black 100%
-      );
+      -webkit-mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.05) 14%,rgba(0,0,0,.22) 32%,rgba(0,0,0,.58) 54%,rgba(0,0,0,.86) 74%,black 100%);
+      mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.05) 14%,rgba(0,0,0,.22) 32%,rgba(0,0,0,.58) 54%,rgba(0,0,0,.86) 74%,black 100%);
     }
-
     @media (max-width: 820px) {
-      .mesh-section::after {
-        background: url("BGFlipped.png") center top / cover no-repeat;
-        background-attachment: scroll !important;
-      }
-      #about.section {
-        background: url("BGFlipped.png") center top / cover no-repeat;
-        background-attachment: scroll !important;
-      }
-      .strip {
-        background: url("BG.png") center bottom / cover no-repeat;
-        background-attachment: scroll !important;
-      }
+      .mesh-section::after { background: url("BGFlipped.png") center top / cover no-repeat; background-attachment: scroll !important; }
+      #about.section { background: url("BGFlipped.png") center top / cover no-repeat !important; background-attachment: scroll !important; }
+      .strip { background: url("BG.png") center bottom / cover no-repeat; background-attachment: scroll !important; }
     }
-
-    .mesh-canvas-wrap {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .mesh-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
+    .mesh-canvas-wrap { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+    .mesh-canvas { width: 100%; height: 100%; display: block; }
     .mesh-pressure {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(
-        360px circle at var(--meshX) var(--meshY),
-        rgba(236,235,134,.13) 0%,
-        rgba(236,235,134,.04) 32%,
-        transparent 62%
-      );
+      background: radial-gradient(360px circle at var(--meshX) var(--meshY),rgba(236,235,134,.13) 0%,rgba(236,235,134,.04) 32%,transparent 62%);
       opacity: calc(.06 + (var(--meshPressure) * .48));
       mix-blend-mode: screen;
       transition: opacity .2s ease;
     }
-
     .mesh-section .mesh-inner {
       position: relative;
       z-index: 2;
@@ -259,12 +179,7 @@
       align-items: center;
       pointer-events: auto;
     }
-
-    .mesh-section .mesh-copy {
-      text-align: center;
-      max-width: 680px;
-    }
-
+    .mesh-section .mesh-copy { text-align: center; max-width: 680px; }
     .mesh-section .h1 {
       color: var(--hero-gold);
       font-size: clamp(38px, 5vw, 72px);
@@ -274,7 +189,6 @@
       transform: translate(var(--meshHeadlineX), var(--meshHeadlineY));
       will-change: transform;
     }
-
     .mesh-section .sub {
       color: rgba(236,235,134,.80);
       font-size: clamp(15px, 1.5vw, 19px);
@@ -284,30 +198,11 @@
       transform: translate(var(--meshSubX), var(--meshSubY));
       will-change: transform;
     }
-
-    .mesh-section .btn-row {
-      justify-content: center;
-      transform: translate(var(--meshBtnX), var(--meshBtnY));
-      will-change: transform;
-    }
-
-    .mesh-section .btn {
-      border-color: rgba(236,235,134,.55);
-      color: var(--hero-gold);
-      pointer-events: auto;
-    }
-    .mesh-section .btn:hover {
-      background: rgba(236,235,134,.12);
-      color: var(--hero-gold);
-      border-color: var(--hero-gold);
-    }
-
+    .mesh-section .btn-row { justify-content: center; transform: translate(var(--meshBtnX), var(--meshBtnY)); will-change: transform; }
+    .mesh-section .btn { border-color: rgba(236,235,134,.55); color: var(--hero-gold); pointer-events: auto; }
+    .mesh-section .btn:hover { background: rgba(236,235,134,.12); color: var(--hero-gold); border-color: var(--hero-gold); }
     @media (max-width: 820px) {
-      .mesh-section {
-        margin-top: -8vh;
-        padding-top: 12vh;
-        padding-bottom: clamp(200px, 28vw, 320px);
-      }
+      .mesh-section { margin-top: -8vh; padding-top: 12vh; padding-bottom: clamp(200px, 28vw, 320px); }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
     }
@@ -326,13 +221,11 @@
       background: url("BG.png") center top / cover fixed;
       width: 100%;
     }
-
     #about .content-col {
       width: min(760px, 92vw);
       margin: 0 auto;
       padding: 0 12px;
     }
-
     #about h2 {
       margin: 0 0 14px 0;
       font-family: "Inter";
@@ -342,7 +235,6 @@
       line-height: 1.02;
       color: var(--dk);
     }
-
     #about p {
       margin: 0;
       font-size: 16px;
@@ -350,288 +242,89 @@
       max-width: 58ch;
       color: var(--dk);
     }
-
     .strip {
       height: 44vh;
       background: url("BG.png") center top / cover fixed;
     }
-
-    @media (max-width: 820px) {
-      #about.section { padding-top: 0; }
-    }
-
     .only-mobile { display: none; }
     @media (max-width: 740px) {
       .only-mobile { display: inline; }
       .menu-btn { display: inline-flex; }
       .navlinks { display: none; }
     }
-
     @media (prefers-reduced-motion: reduce) {
       .mesh-canvas { display: none; }
     }
 
     /* =====================
-       STUDIO GALLERY ANIMATION STAGE
-       Lives inside #about, above the text
+       SCROLL TUNNEL + GALLERY CANVAS
     ===================== */
 
-    .studio-stage {
+    /* Tall spacer — scroll through this to drive the animation */
+    .gallery-tunnel {
       position: relative;
-      width: min(1060px, 94vw);
-      margin: 0 auto clamp(48px, 6vw, 80px);
-      /* tall enough to be the scroll trigger zone */
-      min-height: 520px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: clamp(60px, 8vw, 100px);
+      height: 280vh;
     }
 
-    /* The three-image row — hidden until JS triggers it */
-    .studio-row {
-      display: flex;
-      gap: clamp(12px, 2vw, 24px);
-      align-items: flex-end;
-      width: 100%;
-      position: relative;
-      z-index: 2;
-    }
-
-    .studio-frame {
-      flex: 1;
-      aspect-ratio: 3 / 4;
-      border-radius: 6px;
+    /* Sticky frame — stays in viewport, canvas fills it */
+    .gallery-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
       overflow: hidden;
-      position: relative;
-      background: #2e3830;
     }
 
-    .studio-frame img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-    }
-
-    /* ── FRAME 1: Studio1 — drops from above with elastic bounce ── */
-    .frame-1 {
-      transform: translateY(-140%) rotate(-3deg);
-      opacity: 0;
-      transition:
-        transform 0.85s cubic-bezier(0.22, 1.6, 0.36, 1),
-        opacity 0.35s ease;
-      /* slight size variation for visual rhythm */
-      flex: 1.05;
-    }
-
-    /* ── FRAME 2: Studio2 — the "kick" frame, starts centered/floating ── */
-    .frame-2 {
-      position: relative;
-      flex: 1.15;
-      /* starts centered in the stage before kick */
-    }
-
-    .frame-2-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 6px;
-      overflow: hidden;
-      background: #2e3830;
-      /* floating bob animation, plays immediately on entering viewport */
-      animation: none;
-    }
-
-    .frame-2-inner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* ── FRAME 3: Studio3 — breathes in from scale ── */
-    .frame-3 {
-      transform: scale(0.7);
-      opacity: 0;
-      transition:
-        transform 1.1s cubic-bezier(0.34, 1.3, 0.64, 1),
-        opacity 0.6s ease;
-      transform-origin: center bottom;
-      flex: 0.95;
-    }
-
-    /* ── SHOE ── */
-    .shoe-wrap {
+    #galleryCanvas {
       position: absolute;
-      /* sits just to the left of frame-2, overlapping its left edge */
-      z-index: 10;
-      pointer-events: none;
-      width: clamp(90px, 12vw, 150px);
-      /* vertically centered on the image */
-      top: 50%;
-      transform: translateY(-50%);
-      /* start position: left edge of frame-2 area — set by JS */
-      left: 0;
-    }
-
-    .shoe-wrap img {
+      inset: 0;
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
-      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.28));
     }
 
-    /* Bob keyframe — applied when stage enters view, before kick */
-    @keyframes shoeBob {
-      0%, 100% { transform: translateY(-50%) rotate(-6deg); }
-      50%       { transform: translateY(calc(-50% - 10px)) rotate(-2deg); }
-    }
-
-    @keyframes studioBob {
-      0%, 100% { transform: translateY(0px) rotate(0.4deg); }
-      50%       { transform: translateY(-8px) rotate(-0.4deg); }
-    }
-
-    /* Kick sequence — shoe swings right then shoots off */
-    @keyframes shoeKick {
-      0%   { transform: translateY(-50%) rotate(-6deg); }
-      18%  { transform: translateY(-50%) rotate(-28deg) translateX(-14px); }  /* wind-up */
-      42%  { transform: translateY(-38%) rotate(32deg) translateX(80px); }     /* impact */
-      65%  { transform: translateY(-20%) rotate(90deg) translateX(200px) scale(0.8); }
-      100% { transform: translateY(10%) rotate(200deg) translateX(520px) scale(0.3); opacity: 0; }
-    }
-
-    /* Studio2 gets knocked rightward into final position */
-    @keyframes studio2Settle {
-      0%   { transform: translateX(0) rotate(0deg); }
-      20%  { transform: translateX(18px) rotate(1.5deg); }   /* impact nudge */
-      45%  { transform: translateX(-6px) rotate(-0.8deg); }  /* rebound */
-      68%  { transform: translateX(5px) rotate(0.4deg); }    /* settle */
-      100% { transform: translateX(0) rotate(0deg); }
-    }
-
-    /* Pre-kick: Studio2 centered float (large, prominent) */
-    .studio-stage.pre-kick .frame-2 {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: clamp(200px, 38vw, 380px);
-      height: auto;
-      aspect-ratio: 3 / 4;
-      flex: unset;
-      z-index: 5;
-    }
-
-    /* After kick: frame-2 snaps into the row */
-    .studio-stage.kicked .frame-2 {
-      position: relative;
-      left: unset;
-      top: unset;
-      transform: none;
-      width: auto;
-      height: auto;
-      flex: 1.15;
-      transition: all 0.55s cubic-bezier(0.22, 1.4, 0.36, 1);
-    }
-
-    /* ── ACTIVE STATES ── */
-
-    /* Frame 1 flies in */
-    .studio-stage.kicked .frame-1 {
-      transform: translateY(0) rotate(0deg);
-      opacity: 1;
-      transition-delay: 0.12s;
-    }
-
-    /* Frame 3 breathes in */
-    .studio-stage.kicked .frame-3 {
-      transform: scale(1);
-      opacity: 1;
-      transition-delay: 0.28s;
-    }
-
-    /* Studio2 settle bounce after kick */
-    .frame-2-inner.settling {
-      animation: studio2Settle 0.7s cubic-bezier(0.22, 1.4, 0.36, 1) forwards;
-    }
-
-    /* Bob states */
-    .shoe-wrap.bobbing {
-      animation: shoeBob 2.2s ease-in-out infinite;
-    }
-    .frame-2-inner.bobbing {
-      animation: studioBob 2.8s ease-in-out infinite;
-      animation-delay: -0.6s;
-    }
-
-    /* Kick state */
-    .shoe-wrap.kicking {
-      animation: shoeKick 0.9s cubic-bezier(0.22, 1.2, 0.36, 1) forwards !important;
-    }
-
-    /* About text: fades up after images settle */
+    /* About text below the tunnel */
     .about-text-wrap {
       opacity: 0;
-      transform: translateY(22px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-      padding-top: clamp(40px, 5vw, 64px);
+      transform: translateY(28px);
+      transition: opacity 0.85s ease, transform 0.85s ease;
+      padding-top: clamp(48px, 6vw, 80px);
     }
     .about-text-wrap.visible {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* ── MOBILE ── */
+    /* Mobile: simple stacked, no canvas */
     @media (max-width: 700px) {
-      .studio-stage {
-        min-height: 380px;
-        padding-top: 48px;
+      .gallery-tunnel { height: auto; }
+      .gallery-sticky {
+        position: relative;
+        height: auto;
+        padding: clamp(48px, 8vw, 72px) 0 24px;
       }
-
-      .studio-row {
+      #galleryCanvas { display: none; }
+      .mobile-gallery {
+        display: flex;
         flex-direction: column;
         gap: 14px;
-        align-items: center;
+        width: 84vw;
+        margin: 0 auto;
       }
-
-      .studio-frame {
-        width: 80%;
-        flex: unset;
+      .mobile-gallery img {
+        width: 100%;
         aspect-ratio: 4 / 3;
-      }
-
-      .frame-1, .frame-3 {
-        /* on mobile, simpler: just fade up */
-        transform: translateY(24px);
+        object-fit: cover;
+        border-radius: 6px;
         opacity: 0;
-        transition: transform 0.6s ease, opacity 0.6s ease;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
       }
-
-      .studio-stage.kicked .frame-1 {
-        transform: translateY(0);
-        opacity: 1;
-        transition-delay: 0.15s;
-      }
-      .studio-stage.kicked .frame-3 {
-        transform: translateY(0);
-        opacity: 1;
-        transition-delay: 0.3s;
-      }
-
-      .studio-stage.pre-kick .frame-2 {
-        width: 80%;
-        position: relative;
-        left: unset;
-        top: unset;
-        transform: none;
-      }
-
-      .shoe-wrap {
-        width: 72px;
-      }
+      .mobile-gallery img.vis { opacity: 1; transform: translateY(0); }
     }
+    @media (min-width: 701px) {
+      .mobile-gallery { display: none; }
+    }
+
   </style>
 </head>
 
@@ -703,46 +396,23 @@
 
   <div class="rule" aria-hidden="true"></div>
 
-  <!-- =====================
-       ABOUT SECTION
-       Studio gallery lives here, above the text
-  ===================== -->
   <section id="about" class="section">
 
-    <!-- STUDIO ANIMATION STAGE -->
-    <div class="studio-stage pre-kick" id="studioStage">
-
-      <!-- Three image frames in their final row positions -->
-      <div class="studio-row" id="studioRow">
-
-        <!-- Frame 1: Studio1 — drops from above -->
-        <div class="studio-frame frame-1" id="frame1">
-          <img src="assets/Studio1.jpg" alt="Bodiodi studio space" loading="lazy">
+    <!-- SCROLL TUNNEL -->
+    <div class="gallery-tunnel" id="galleryTunnel">
+      <div class="gallery-sticky">
+        <!-- Desktop: canvas-driven animation -->
+        <canvas id="galleryCanvas"></canvas>
+        <!-- Mobile: simple stacked images -->
+        <div class="mobile-gallery">
+          <img src="assets/Studio2.jpg" alt="Bodiodi studio" id="mob2">
+          <img src="assets/Studio1.jpg" alt="Bodiodi studio" id="mob1">
+          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail" id="mob3">
         </div>
-
-        <!-- Frame 2: Studio2 — the kick target -->
-        <div class="studio-frame frame-2" id="frame2">
-          <div class="frame-2-inner" id="frame2Inner">
-            <img src="assets/Studio2.jpg" alt="Bodiodi studio interior" loading="lazy">
-          </div>
-        </div>
-
-        <!-- Frame 3: Studio3 — breathes in -->
-        <div class="studio-frame frame-3" id="frame3">
-          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail" loading="lazy">
-        </div>
-
       </div>
-
-      <!-- Shoe: overlaps left edge of frame-2 -->
-      <div class="shoe-wrap" id="shoeWrap">
-        <img src="assets/shoes.jpg" alt="" aria-hidden="true">
-      </div>
-
     </div>
-    <!-- / studio stage -->
 
-    <!-- ABOUT TEXT: fades in after gallery settles -->
+    <!-- ABOUT TEXT -->
     <div class="content-col about-text-wrap" id="aboutText">
       <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
       <p>
@@ -760,114 +430,254 @@
   <div class="strip" id="contact"></div>
 
   <!-- =====================
-       STUDIO GALLERY SCRIPT
+       GALLERY ANIMATION ENGINE
   ===================== -->
   <script>
   (() => {
-    const stage    = document.getElementById('studioStage');
-    const shoe     = document.getElementById('shoeWrap');
-    const frame2   = document.getElementById('frame2');
-    const frame2In = document.getElementById('frame2Inner');
-    const aboutTxt = document.getElementById('aboutText');
-    const isMobile = window.matchMedia('(max-width: 700px)').matches;
-    const reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tunnel    = document.getElementById('galleryTunnel');
+    const canvas    = document.getElementById('galleryCanvas');
+    const aboutText = document.getElementById('aboutText');
+    const isMobile  = window.matchMedia('(max-width: 700px)').matches;
+    const reduced   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (!stage || !shoe) return;
-
-    // ── Position the shoe relative to frame2 ──
-    // We do this once on load and on resize.
-    // The shoe sits so its right ~30% overlaps frame2's left edge.
-    function positionShoe() {
-      const f2rect    = frame2.getBoundingClientRect();
-      const stRect    = stage.getBoundingClientRect();
-      const shoeW     = shoe.offsetWidth;
-      // left edge of frame2 relative to stage, minus 70% of shoe width
-      const leftPos   = (f2rect.left - stRect.left) - shoeW * 0.70;
-      shoe.style.left = Math.max(0, leftPos) + 'px';
-    }
-
-    // ── Reduced motion: just show everything immediately ──
-    if (reduced) {
-      stage.classList.remove('pre-kick');
-      stage.classList.add('kicked');
-      aboutTxt.classList.add('visible');
-      shoe.style.display = 'none';
+    // ── Mobile: fade images in on scroll ──
+    if (isMobile) {
+      const mobImgs = document.querySelectorAll('.mobile-gallery img');
+      const mobObs = new IntersectionObserver(entries => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('vis'), i * 160);
+            mobObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      mobImgs.forEach(img => mobObs.observe(img));
+      new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) aboutText.classList.add('visible');
+      }, { threshold: 0.1 }).observe(aboutText);
       return;
     }
 
-    let hasTriggered = false;
-    let hasBobbed    = false;
+    if (!canvas || !tunnel) return;
 
-    // ── Phase 1: Stage enters view → bobbing begins ──
-    const bobObserver = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && !hasBobbed) {
-        hasBobbed = true;
-        positionShoe();
-        shoe.style.opacity = '1';
+    // ── Reduced motion: skip to final state ──
+    if (reduced) {
+      aboutText.classList.add('visible');
+      return;
+    }
 
-        if (!isMobile) {
-          shoe.classList.add('bobbing');
-          frame2In.classList.add('bobbing');
-        } else {
-          // on mobile skip to kick quickly
-          frame2In.style.opacity = '1';
-        }
+    const ctx = canvas.getContext('2d');
+    let VW = 0, VH = 0, dpr = 1;
 
-        bobObserver.disconnect();
+    function resize() {
+      VW  = window.innerWidth;
+      VH  = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width         = Math.round(VW * dpr);
+      canvas.height        = Math.round(VH * dpr);
+      canvas.style.width   = VW + 'px';
+      canvas.style.height  = VH + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    // ── Preload images — nothing starts until all are ready ──
+    const SRC = {
+      s2:   'assets/Studio2.jpg',
+      s1:   'assets/Studio1.jpg',
+      s3:   'assets/Studio3.jpg',
+      shoe: 'assets/shoes.png'
+    };
+    const IMG = {};
+    let loaded = 0;
+    const total = Object.keys(SRC).length;
+
+    Object.entries(SRC).forEach(([key, src]) => {
+      const img = new Image();
+      img.onload  = () => { loaded++; if (loaded === total) boot(); };
+      img.onerror = () => { loaded++; if (loaded === total) boot(); };
+      img.src = src;
+      IMG[key] = img;
+    });
+
+    // ── Math helpers ──
+    const clamp  = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp   = (a, b, t) => a + (b - a) * t;
+    const mapR   = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v-ia)/(ib-ia), 0, 1));
+    const ease   = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+
+    // Elastic out — springy overshoot for Studio1 drop
+    const elasticOut = t => {
+      if (t <= 0 || t >= 1) return t;
+      return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
+    };
+
+    // ── Scroll progress (0 = tunnel top at viewport top, 1 = tunnel scrolled through) ──
+    function scrollProgress() {
+      const r = tunnel.getBoundingClientRect();
+      return clamp(-r.top / (r.height - VH), 0, 1);
+    }
+
+    // ── Draw one image centered at (cx,cy), width w, rotated, with opacity ──
+    function drawImg(img, cx, cy, w, rot, alpha) {
+      if (alpha < 0.005 || w < 1) return;
+      const ar = img.naturalHeight / img.naturalWidth || 1.333;
+      const h  = w * ar;
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.shadowColor   = 'rgba(0,0,0,0.22)';
+      ctx.shadowBlur    = 24;
+      ctx.shadowOffsetY = 8;
+      ctx.drawImage(img, -w/2, -h/2, w, h);
+      ctx.restore();
+    }
+
+    // ── Main render ──
+    let raf       = null;
+    let tick      = 0;
+    let lastTs    = null;
+    let textShown = false;
+
+    function frame(ts) {
+      raf = requestAnimationFrame(frame);
+      const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
+      lastTs   = ts;
+      tick    += dt;
+
+      const p = scrollProgress();
+
+      ctx.clearRect(0, 0, VW, VH);
+
+      // ── Layout constants ──
+      const cx  = VW * 0.5;
+      const cy  = VH * 0.5;
+
+      // Final row: 3 images side by side
+      const rowW   = VW * 0.27;
+      const gap    = VW * 0.022;
+      const rTotal = rowW * 3 + gap * 2;
+      const rLeft  = (VW - rTotal) / 2;
+      const r1cx   = rLeft + rowW * 0.5;
+      const r2cx   = rLeft + rowW + gap + rowW * 0.5;
+      const r3cx   = rLeft + rowW * 2 + gap * 2 + rowW * 0.5;
+      const rowCY  = VH * 0.50;
+
+      // Hero size for Studio2 before kick
+      const heroW  = VW * 0.36;
+      const shoeW  = VW * 0.115;
+
+      // Idle bob — smooth sine, always running
+      const bobY   = Math.sin(tick * 0.85) * 7;
+      const bobRot = Math.sin(tick * 0.70) * 0.010;
+      // Shoe bobs with offset phase so they feel independent
+      const shoeBobY   = Math.sin(tick * 0.85 + 1.9) * 6;
+      const shoeBobRot = Math.sin(tick * 0.68 + 1.2) * 0.08 - 0.07;
+
+      // ────────────────────────────────────────────────
+      // PHASE BREAKDOWN  (p = 0 → 1 across tunnel scroll)
+      //
+      //  0.00 – 0.18  Studio2 + shoe fade in, floating
+      //  0.18 – 0.38  Bobbing / contemplation phase
+      //  0.38 – 0.60  Shoe kicks, Studio2 slides to row position
+      //  0.50 – 0.70  Studio1 drops in from above
+      //  0.54 – 0.76  Studio3 breathes in from below-right
+      //  0.80 – 1.00  All settled, subtle parallax drift
+      // ────────────────────────────────────────────────
+
+      const fadeIn  = ease(mapR(p, 0.00, 0.18, 0, 1));
+      const bobbing = mapR(p, 0.18, 0.38, 0, 1);
+      const kickP   = mapR(p, 0.38, 0.60, 0, 1);
+      const kickE   = ease(kickP);
+      const s1P     = ease(elasticOut(mapR(p, 0.50, 0.70, 0, 1)));
+      const s3P     = ease(mapR(p, 0.54, 0.76, 0, 1));
+
+      // Bob contribution fades out as kick starts
+      const bobMult = bobbing * (1 - kickE);
+
+      // ── STUDIO 2 ──
+      const s2X = lerp(cx, r2cx, kickE);
+      const s2Y = lerp(cy, rowCY, kickE) + bobY * bobMult;
+      const s2R = lerp(bobRot * bobMult, 0, kickE);
+      const s2W = lerp(heroW, rowW, kickE);
+      const s2A = fadeIn;
+
+      // ── SHOE ──
+      // Rests at left edge of Studio2 hero, overlapping ~30%
+      const shoeRestX = cx - heroW * 0.44;
+      const shoeRestY = cy - VH * 0.04;
+
+      let shoeX, shoeY, shoeR, shoeCurW, shoeA;
+
+      if (kickP < 0.01) {
+        // Pre-kick: bob gently
+        shoeX    = shoeRestX;
+        shoeY    = shoeRestY + shoeBobY * bobbing;
+        shoeR    = shoeBobRot * bobbing;
+        shoeCurW = shoeW;
+        shoeA    = fadeIn * bobbing;
+      } else {
+        // Kick phases
+        const windUp = ease(mapR(kickP, 0.00, 0.20, 0, 1)); // pulls back
+        const impact = ease(mapR(kickP, 0.20, 0.48, 0, 1)); // lunges right
+        const tumble = ease(mapR(kickP, 0.48, 1.00, 0, 1)); // shoots off
+
+        shoeX    = shoeRestX
+                    + lerp(0, -VW * 0.025, windUp)
+                    + lerp(0,  VW * 0.20,  impact)
+                    + lerp(0,  VW * 0.85,  tumble);
+        shoeY    = shoeRestY - lerp(0, VH * 0.10, tumble);
+        shoeR    = lerp(-0.07, Math.PI * 3.2, ease(kickP)); // 3+ spins
+        shoeCurW = shoeW * lerp(1, 0.18, tumble);
+        shoeA    = lerp(1, 0, mapR(kickP, 0.72, 1.0, 0, 1));
       }
-    }, { threshold: 0.35 });
 
-    bobObserver.observe(stage);
+      // ── STUDIO 1 ──
+      // Drops from above with elastic bounce
+      const s1X = r1cx;
+      const s1Y = lerp(rowCY - VH * 0.50, rowCY, s1P);
+      const s1R = lerp(-0.055, -0.010, s1P);
+      const s1W = rowW;
+      const s1A = ease(mapR(mapR(p, 0.50, 0.70, 0, 1), 0, 0.30, 0, 1));
 
-    // ── Phase 2: Scroll further → kick triggers ──
-    // We use a second observer at a higher threshold so the
-    // kick fires after the user has seen the bobbing for a moment.
-    const kickObserver = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && !hasTriggered) {
-        hasTriggered = true;
-        kickObserver.disconnect();
+      // ── STUDIO 3 ──
+      // Breathes in — scales up from small + slight rise
+      const s3X = r3cx;
+      const s3Y = lerp(rowCY + VH * 0.05, rowCY, s3P);
+      const s3W = lerp(rowW * 0.52, rowW, s3P);
+      const s3R = lerp(0.048, 0.008, s3P);
+      const s3A = ease(mapR(mapR(p, 0.54, 0.76, 0, 1), 0, 0.38, 0, 1));
 
-        // Small delay so user enjoys the bob first
-        const delay = isMobile ? 400 : 900;
+      // ── Draw order: back → front ──
+      drawImg(IMG.s1,   s1X, s1Y, s1W, s1R, s1A);
+      drawImg(IMG.s3,   s3X, s3Y, s3W, s3R, s3A);
+      drawImg(IMG.s2,   s2X, s2Y, s2W, s2R, s2A);
+      drawImg(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
 
-        setTimeout(() => {
-          // Stop bobbing, start kick
-          shoe.classList.remove('bobbing');
-          frame2In.classList.remove('bobbing');
+      // Show text once tunnel is mostly scrolled through
+      if (p > 0.86 && !textShown) { textShown = true; aboutText.classList.add('visible'); }
+      if (p < 0.80 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
+    }
 
-          // Trigger shoe kick animation
-          shoe.classList.add('kicking');
+    function boot() {
+      // Seed the first frame so canvas isn't blank before first scroll event
+      raf = requestAnimationFrame(frame);
+    }
 
-          // After impact moment (~380ms), settle frame2 into row
-          setTimeout(() => {
-            frame2In.classList.add('settling');
+    // Pause canvas loop when tunnel is off-screen entirely
+    new IntersectionObserver(entries => {
+      const vis = entries[0].isIntersecting;
+      if (vis && !raf)  { lastTs = null; raf = requestAnimationFrame(frame); }
+      if (!vis && raf)  { cancelAnimationFrame(raf); raf = null; }
+    }, { threshold: 0.01 }).observe(tunnel);
 
-            // Switch stage from pre-kick centered layout to row layout
-            stage.classList.remove('pre-kick');
-            stage.classList.add('kicked');
-
-            positionShoe(); // recalc (will be off-screen by now anyway)
-          }, 380);
-
-          // Text fades in after everything settles
-          setTimeout(() => {
-            aboutTxt.classList.add('visible');
-          }, 1050);
-
-        }, delay);
-      }
-    }, { threshold: isMobile ? 0.55 : 0.65 });
-
-    kickObserver.observe(stage);
-
-    // Reposition shoe on resize
-    window.addEventListener('resize', positionShoe, { passive: true });
-    positionShoe();
   })();
   </script>
 
   <!-- =====================
-       MESH CANVAS SCRIPT (unchanged)
+       MESH CANVAS SCRIPT
   ===================== -->
   <script>
   (() => {
@@ -922,23 +732,13 @@
     function buildGrid(){
       nodes  = [];
       rowMap = [];
-
       const orbCX = W * 0.50;
       const orbCY = H * 0.28;
       const orbRX = W * 0.62;
       const orbRY = H * 0.58;
-
-      const center = {
-        r: 0, c: 0, rowCols: 1,
-        baseX: orbCX, baseY: orbCY,
-        x: orbCX, y: orbCY,
-        seed: Math.random() * 1000,
-        orbAlpha: 1.0,
-        perspScale: 1.0
-      };
+      const center = { r:0,c:0,rowCols:1,baseX:orbCX,baseY:orbCY,x:orbCX,y:orbCY,seed:Math.random()*1000,orbAlpha:1.0,perspScale:1.0 };
       nodes.push(center);
       rowMap.push([center]);
-
       for (let ring = 1; ring < RINGS; ring++){
         const t      = ring / (RINGS - 1);
         const easeT  = Math.pow(t, 0.82);
@@ -947,33 +747,16 @@
         const orbAlpha = 1 - Math.pow(t, 1.2) * 0.90;
         const numPts = Math.round(5 + ring * 3.4);
         const row    = [];
-
         for (let i = 0; i < numPts; i++){
           const angle  = (i / numPts) * Math.PI * 2;
           const sinA   = Math.sin(angle);
-          const perspY = sinA < 0
-            ? sinA * 0.42
-            : sinA * 1.15;
-
+          const perspY = sinA < 0 ? sinA * 0.42 : sinA * 1.15;
           const nx = orbCX + Math.cos(angle) * rx;
           const ny = orbCY + perspY * ry;
-
           const relY        = (ny - orbCY) / orbRY;
-          const horizonFade = relY < 0
-            ? Math.pow(Math.max(0, 1 + relY * 1.6), 1.4)
-            : 1.0;
-          const perspScale  = relY < 0
-            ? lerp(0.2, 1.0, Math.max(0, 1 + relY))
-            : 1.0;
-
-          row.push({
-            r: ring, c: i, rowCols: numPts,
-            baseX: nx, baseY: ny,
-            x: nx, y: ny,
-            seed: Math.random() * 1000,
-            orbAlpha: orbAlpha * horizonFade,
-            perspScale
-          });
+          const horizonFade = relY < 0 ? Math.pow(Math.max(0, 1 + relY * 1.6), 1.4) : 1.0;
+          const perspScale  = relY < 0 ? lerp(0.2, 1.0, Math.max(0, 1 + relY)) : 1.0;
+          row.push({ r:ring,c:i,rowCols:numPts,baseX:nx,baseY:ny,x:nx,y:ny,seed:Math.random()*1000,orbAlpha:orbAlpha*horizonFade,perspScale });
         }
         nodes.push(...row);
         rowMap.push(row);
@@ -983,14 +766,12 @@
     function influence(x, y){
       const dx = ptr.x * W - x;
       const dy = ptr.y * H - y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      return 1 - smoothstep(0, Math.min(W,H) * INF_RADIUS, dist);
+      return 1 - smoothstep(0, Math.min(W,H) * INF_RADIUS, Math.sqrt(dx*dx + dy*dy));
     }
 
     function update(){
       tick += 0.016;
       const active = isInside || (performance.now() - lastInteraction < (coarsePointer ? 1800 : 1400));
-
       if (!reducedMotion){
         if (!active){
           ptr.tx = lerp(ptr.tx, 0.50 + Math.cos(tick * 0.30) * 0.05, 0.025);
@@ -1001,179 +782,106 @@
         ptr.y = lerp(ptr.y, ptr.ty, active ? 0.15 : 0.04);
         ptr.pressure = lerp(ptr.pressure, ptr.targetPressure, active ? 0.18 : 0.06);
       }
-
       root.style.setProperty('--meshX',        `${(ptr.x*100).toFixed(2)}%`);
       root.style.setProperty('--meshY',        `${(ptr.y*100).toFixed(2)}%`);
       root.style.setProperty('--meshPressure', ptr.pressure.toFixed(3));
-
-      const cx = ptr.x - 0.5;
-      const cy = ptr.y - 0.5;
-      const p  = ptr.pressure;
-
+      const cx = ptr.x - 0.5, cy = ptr.y - 0.5, p = ptr.pressure;
       root.style.setProperty('--meshHeadlineX', `${(cx*HEADLINE_DRIFT*p).toFixed(2)}px`);
       root.style.setProperty('--meshHeadlineY', `${(cy*HEADLINE_DRIFT*0.7*p).toFixed(2)}px`);
       root.style.setProperty('--meshSubX',      `${(cx*SUB_DRIFT*p).toFixed(2)}px`);
       root.style.setProperty('--meshSubY',      `${(cy*SUB_DRIFT*0.75*p).toFixed(2)}px`);
       root.style.setProperty('--meshBtnX',      `${(cx*BTN_DRIFT*p).toFixed(2)}px`);
       root.style.setProperty('--meshBtnY',      `${(cy*BTN_DRIFT*0.9*p).toFixed(2)}px`);
-
       for (let i = 0; i < nodes.length; i++){
-        const n     = nodes[i];
-        const infl  = influence(n.baseX, n.baseY);
+        const n = nodes[i];
+        const infl = influence(n.baseX, n.baseY);
         const depth = n.r / Math.max(1, RINGS - 1);
         const relY  = (n.baseY - (H * 0.28)) / (H * 0.58);
-        const isForeground = relY > 0;
-        const breathAmp = isForeground
-          ? lerp(0.12, 0.60, depth)
-          : lerp(0.01, 0.08, depth);
-
-        const bx = Math.cos(tick * 0.52 + n.seed) * breathAmp * (1 - p * 0.5);
-        const by = Math.sin(tick * 0.45 + n.seed) * breathAmp * (1 - p * 0.5);
-        const toX = ptr.x * W - n.baseX;
-        const toY = ptr.y * H - n.baseY;
-        const pullStrength = isForeground
-          ? lerp(4, 22, depth)
-          : lerp(0, 3, depth);
-        const pull = infl * p * pullStrength;
-
-        n.x = n.baseX + bx + toX * (pull / (W * 0.5));
-        n.y = n.baseY + by + toY * (pull / (H * 0.5));
+        const isFG  = relY > 0;
+        const bAmp  = isFG ? lerp(0.12, 0.60, depth) : lerp(0.01, 0.08, depth);
+        const bx = Math.cos(tick * 0.52 + n.seed) * bAmp * (1 - p * 0.5);
+        const by = Math.sin(tick * 0.45 + n.seed) * bAmp * (1 - p * 0.5);
+        const pull = infl * p * (isFG ? lerp(4, 22, depth) : lerp(0, 3, depth));
+        n.x = n.baseX + bx + (ptr.x*W - n.baseX) * (pull / (W*0.5));
+        n.y = n.baseY + by + (ptr.y*H - n.baseY) * (pull / (H*0.5));
       }
     }
 
-    function drawLine(a, b, emphasisMult){
-      const mx  = (a.x + b.x) * .5;
-      const my  = (a.y + b.y) * .5;
-      const hot = Math.max(
-        influence(a.x, a.y),
-        influence(b.x, b.y),
-        influence(mx, my)
-      ) * ptr.pressure;
-
-      const orbA      = ((a.orbAlpha || 1) + (b.orbAlpha || 1)) * 0.5;
-      const depth     = a.r / Math.max(1, RINGS - 1);
-      const baseAlpha = orbA * lerp(0.005, 0.026, depth) * emphasisMult;
-      const alpha     = lerp(baseAlpha, 0.24, hot * orbA);
-      const perspW    = ((a.perspScale || 1) + (b.perspScale || 1)) * 0.5;
-      const lineW     = lerp(
-        lerp(0.15, 0.65, depth) * perspW,
-        1.4, hot
-      );
-
-      ctx.lineWidth   = lineW;
+    function drawLine(a, b, em){
+      const mx = (a.x+b.x)*.5, my = (a.y+b.y)*.5;
+      const hot = Math.max(influence(a.x,a.y),influence(b.x,b.y),influence(mx,my)) * ptr.pressure;
+      const orbA = ((a.orbAlpha||1)+(b.orbAlpha||1))*0.5;
+      const depth = a.r / Math.max(1, RINGS-1);
+      const alpha = lerp(orbA*lerp(0.005,0.026,depth)*em, 0.24, hot*orbA);
+      const perspW = ((a.perspScale||1)+(b.perspScale||1))*0.5;
+      ctx.lineWidth   = lerp(lerp(0.15,0.65,depth)*perspW, 1.4, hot);
       ctx.strokeStyle = `rgba(240,238,210,${alpha})`;
       ctx.beginPath();
-      const cvx = mx + Math.sin(tick*0.75+a.seed)*0.8*hot;
-      const cvy = my + Math.cos(tick*0.65+b.seed)*0.8*hot;
       ctx.moveTo(a.x, a.y);
-      ctx.quadraticCurveTo(cvx, cvy, b.x, b.y);
+      ctx.quadraticCurveTo(mx+Math.sin(tick*.75+a.seed)*.8*hot, my+Math.cos(tick*.65+b.seed)*.8*hot, b.x, b.y);
       ctx.stroke();
     }
 
     function drawNode(n){
-      const hot        = influence(n.x, n.y) * ptr.pressure;
-      const depth      = n.r / Math.max(1, RINGS - 1);
-      const orbAlpha   = n.orbAlpha || 1;
-      const perspScale = n.perspScale || 1;
-      const baseAlpha  = orbAlpha * lerp(0.004, 0.05, depth);
-      const alpha      = lerp(baseAlpha, 0.28, hot * orbAlpha);
-      const size       = lerp(
-        lerp(0.3, 1.2, depth) * perspScale,
-        2.4, hot
-      );
-      const shimmer = (Math.sin(tick*1.3+n.seed)+1)*.5;
-
+      const hot = influence(n.x, n.y) * ptr.pressure;
+      const depth = n.r / Math.max(1, RINGS-1);
+      const orbA = n.orbAlpha||1, pS = n.perspScale||1;
+      const alpha = lerp(orbA*lerp(0.004,0.05,depth), 0.28, hot*orbA);
+      const size  = lerp(lerp(0.3,1.2,depth)*pS, 2.4, hot);
+      const shim  = (Math.sin(tick*1.3+n.seed)+1)*.5;
       ctx.beginPath();
-      ctx.fillStyle = `rgba(240,238,210,${alpha*lerp(0.5,1.0,shimmer)})`;
-      ctx.arc(n.x, n.y, Math.max(0.2, size), 0, Math.PI*2);
+      ctx.fillStyle = `rgba(240,238,210,${alpha*lerp(0.5,1.0,shim)})`;
+      ctx.arc(n.x, n.y, Math.max(0.2,size), 0, Math.PI*2);
       ctx.fill();
-
       if (hot > 0.12){
         ctx.beginPath();
         ctx.fillStyle = `rgba(236,235,134,${0.04+hot*0.12})`;
-        ctx.arc(n.x, n.y, Math.max(0.4, size*2.4), 0, Math.PI*2);
+        ctx.arc(n.x, n.y, Math.max(0.4,size*2.4), 0, Math.PI*2);
         ctx.fill();
       }
     }
 
     function draw(){
       ctx.clearRect(0, 0, W, H);
-
       for (let r = 0; r < rowMap.length; r++){
-        const row  = rowMap[r];
-        const next = rowMap[r + 1] || null;
-
+        const row = rowMap[r], next = rowMap[r+1]||null;
         for (let c = 0; c < row.length; c++){
           const n = row[c];
-
-          if (row.length > 1){
-            const nextInRing = row[(c + 1) % row.length];
-            drawLine(n, nextInRing, 1.0);
-          }
-
+          if (row.length > 1) drawLine(n, row[(c+1)%row.length], 1.0);
           if (next && next.length > 1){
-            const ratio  = c / Math.max(1, row.length);
-            const mapped = Math.round(ratio * next.length) % next.length;
-            const b      = next[mapped];
-            const b2     = next[(mapped + 1) % next.length];
-            if (b)  drawLine(n, b,  0.78);
-            if (b2) drawLine(n, b2, 0.44);
+            const mapped = Math.round((c/Math.max(1,row.length))*next.length) % next.length;
+            if (next[mapped])              drawLine(n, next[mapped], 0.78);
+            if (next[(mapped+1)%next.length]) drawLine(n, next[(mapped+1)%next.length], 0.44);
           }
         }
       }
-
       for (let i = 0; i < nodes.length; i++) drawNode(nodes[i]);
     }
 
-    function loop(){
-      if (!isVisible){ raf = null; return; }
-      update(); draw();
-      raf = requestAnimationFrame(loop);
-    }
-
-    function start(){ if (!raf) raf = requestAnimationFrame(loop); }
+    function loop(){ if (!isVisible){ raf=null; return; } update(); draw(); raf=requestAnimationFrame(loop); }
+    function start(){ if (!raf) raf=requestAnimationFrame(loop); }
 
     function setPtr(clientX, clientY, pressure){
       const r = section.getBoundingClientRect();
-      ptr.tx = clamp((clientX-r.left)/r.width,  0, 1);
-      ptr.ty = clamp((clientY-r.top) /r.height, 0, 1);
+      ptr.tx = clamp((clientX-r.left)/r.width, 0, 1);
+      ptr.ty = clamp((clientY-r.top)/r.height, 0, 1);
       ptr.targetPressure = pressure;
       lastInteraction = performance.now();
     }
 
-    section.addEventListener('pointerenter', () => {
-      isInside = true; ptr.targetPressure = 1;
-      lastInteraction = performance.now(); start();
-    });
-    section.addEventListener('pointermove', e => setPtr(e.clientX, e.clientY, 1));
-    section.addEventListener('pointerleave', () => {
-      isInside = false;
-      ptr.targetPressure = coarsePointer ? 0.28 : 0.06;
-      lastInteraction = performance.now();
-    });
-    section.addEventListener('touchstart', e => {
-      const t = e.touches[0]; if (!t) return;
-      isInside = true; setPtr(t.clientX, t.clientY, 1); start();
-    }, { passive: true });
-    section.addEventListener('touchmove', e => {
-      const t = e.touches[0]; if (!t) return;
-      setPtr(t.clientX, t.clientY, 1);
-    }, { passive: true });
-    section.addEventListener('touchend', () => {
-      isInside = false; ptr.targetPressure = 0.30;
-      lastInteraction = performance.now();
-    }, { passive: true });
+    section.addEventListener('pointerenter', () => { isInside=true; ptr.targetPressure=1; lastInteraction=performance.now(); start(); });
+    section.addEventListener('pointermove',  e => setPtr(e.clientX, e.clientY, 1));
+    section.addEventListener('pointerleave', () => { isInside=false; ptr.targetPressure=coarsePointer?0.28:0.06; lastInteraction=performance.now(); });
+    section.addEventListener('touchstart', e => { const t=e.touches[0]; if(!t)return; isInside=true; setPtr(t.clientX,t.clientY,1); start(); }, {passive:true});
+    section.addEventListener('touchmove',  e => { const t=e.touches[0]; if(!t)return; setPtr(t.clientX,t.clientY,1); }, {passive:true});
+    section.addEventListener('touchend',   () => { isInside=false; ptr.targetPressure=0.30; lastInteraction=performance.now(); }, {passive:true});
 
     new IntersectionObserver(entries => {
       isVisible = entries[0]?.isIntersecting ?? true;
       if (isVisible) start();
-    }, { threshold: 0.05 }).observe(section);
+    }, {threshold:0.05}).observe(section);
 
-    window.addEventListener('resize', () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      resize(); start();
-    });
-
+    window.addEventListener('resize', () => { dpr=Math.min(window.devicePixelRatio||1,1.5); resize(); start(); });
     resize();
     start();
   })();
