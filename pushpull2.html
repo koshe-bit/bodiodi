@@ -459,12 +459,7 @@
     }
 
     if (!canvas || !tunnel) return;
-
-    // ── Reduced motion: skip to final state ──
-    if (reduced) {
-      aboutText.classList.add('visible');
-      return;
-    }
+    if (reduced) { aboutText.classList.add('visible'); return; }
 
     const ctx = canvas.getContext('2d');
     let VW = 0, VH = 0, dpr = 1;
@@ -473,16 +468,16 @@
       VW  = window.innerWidth;
       VH  = window.innerHeight;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width         = Math.round(VW * dpr);
-      canvas.height        = Math.round(VH * dpr);
-      canvas.style.width   = VW + 'px';
-      canvas.style.height  = VH + 'px';
+      canvas.width        = Math.round(VW * dpr);
+      canvas.height       = Math.round(VH * dpr);
+      canvas.style.width  = VW + 'px';
+      canvas.style.height = VH + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    // ── Preload images — nothing starts until all are ready ──
+    // ── Preload all images before any frame renders ──
     const SRC = {
       s2:   'assets/Studio2.jpg',
       s1:   'assets/Studio1.jpg',
@@ -491,182 +486,220 @@
     };
     const IMG = {};
     let loaded = 0;
-    const total = Object.keys(SRC).length;
-
+    const totalImgs = Object.keys(SRC).length;
     Object.entries(SRC).forEach(([key, src]) => {
       const img = new Image();
-      img.onload  = () => { loaded++; if (loaded === total) boot(); };
-      img.onerror = () => { loaded++; if (loaded === total) boot(); };
+      img.onload  = () => { loaded++; if (loaded === totalImgs) boot(); };
+      img.onerror = () => { loaded++; if (loaded === totalImgs) boot(); };
       img.src = src;
       IMG[key] = img;
     });
 
-    // ── Math helpers ──
-    const clamp  = (v, a, b) => Math.max(a, Math.min(b, v));
-    const lerp   = (a, b, t) => a + (b - a) * t;
-    const mapR   = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v-ia)/(ib-ia), 0, 1));
-    const ease   = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-
-    // Elastic out — springy overshoot for Studio1 drop
+    // ── Helpers ──
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp  = (a, b, t) => a + (b - a) * t;
+    const mapR  = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1));
+    const ease  = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
     const elasticOut = t => {
       if (t <= 0 || t >= 1) return t;
       return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
     };
 
-    // ── Scroll progress (0 = tunnel top at viewport top, 1 = tunnel scrolled through) ──
-    function scrollProgress() {
+    // Scroll progress: 0 when tunnel top hits viewport top, 1 when fully scrolled through
+    function scrollP() {
       const r = tunnel.getBoundingClientRect();
       return clamp(-r.top / (r.height - VH), 0, 1);
     }
 
-    // ── Draw one image centered at (cx,cy), width w, rotated, with opacity ──
-    function drawImg(img, cx, cy, w, rot, alpha) {
-      if (alpha < 0.005 || w < 1) return;
-      const ar = img.naturalHeight / img.naturalWidth || 1.333;
+    // Draw image cropped into a portrait rectangle (cx,cy = center, w,h = box dimensions)
+    // object-fit: cover behavior — fills the box, crops the excess
+    function drawCropped(img, cx, cy, w, h, rot, alpha) {
+      if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
+
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+
+      // Scale so image covers the target box (cover logic)
+      const scale = Math.max(w / iw, h / ih);
+      const sw = iw * scale;  // scaled image width
+      const sh = ih * scale;  // scaled image height
+
+      // Source crop: centered
+      const sx = (sw - w) / 2;
+      const sy = (sh - h) / 2;
+
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+
+      // Clip to the portrait box
+      ctx.beginPath();
+      ctx.rect(-w/2, -h/2, w, h);
+      ctx.clip();
+
+      // Shadow (drawn as a separate rect behind, since clip prevents overflow)
+      ctx.shadowColor   = 'rgba(0,0,0,0.20)';
+      ctx.shadowBlur    = 28;
+      ctx.shadowOffsetY = 10;
+
+      // Draw scaled image, offset so it's centered in the box
+      ctx.drawImage(img, -w/2 - sx, -h/2 - sy, sw, sh);
+
+      ctx.restore();
+    }
+
+    // Draw shoe (no crop, natural aspect ratio)
+    function drawShoe(img, cx, cy, w, rot, alpha) {
+      if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
+      const ar = img.naturalHeight / img.naturalWidth || 1;
       const h  = w * ar;
       ctx.save();
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
       ctx.rotate(rot);
       ctx.shadowColor   = 'rgba(0,0,0,0.22)';
-      ctx.shadowBlur    = 24;
-      ctx.shadowOffsetY = 8;
+      ctx.shadowBlur    = 20;
+      ctx.shadowOffsetY = 6;
       ctx.drawImage(img, -w/2, -h/2, w, h);
       ctx.restore();
     }
 
-    // ── Main render ──
     let raf       = null;
     let tick      = 0;
     let lastTs    = null;
     let textShown = false;
 
     function frame(ts) {
-      raf = requestAnimationFrame(frame);
+      raf    = requestAnimationFrame(frame);
       const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
-      lastTs   = ts;
-      tick    += dt;
+      lastTs = ts;
+      tick  += dt;
 
-      const p = scrollProgress();
-
+      const p = scrollP();
       ctx.clearRect(0, 0, VW, VH);
 
-      // ── Layout constants ──
+      // ── Layout ──
       const cx  = VW * 0.5;
       const cy  = VH * 0.5;
 
-      // Final row: 3 images side by side
-      const rowW   = VW * 0.27;
-      const gap    = VW * 0.022;
-      const rTotal = rowW * 3 + gap * 2;
-      const rLeft  = (VW - rTotal) / 2;
-      const r1cx   = rLeft + rowW * 0.5;
-      const r2cx   = rLeft + rowW + gap + rowW * 0.5;
-      const r3cx   = rLeft + rowW * 2 + gap * 2 + rowW * 0.5;
-      const rowCY  = VH * 0.50;
+      // Portrait crop box: all three images share this exact height
+      const imgH = VH * 0.62;           // unified height — 62% of viewport
+      const imgW = imgH * 0.68;         // portrait aspect ~2:3
+      const gap  = VW * 0.020;
 
-      // Hero size for Studio2 before kick
-      const heroW  = VW * 0.36;
-      const shoeW  = VW * 0.115;
+      // Final row: centered trio
+      const rowTotal = imgW * 3 + gap * 2;
+      const rowLeft  = (VW - rowTotal) / 2;
+      const r1cx = rowLeft + imgW * 0.5;
+      const r2cx = rowLeft + imgW + gap + imgW * 0.5;
+      const r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
+      const rowCY = VH * 0.50;
 
-      // Idle bob — smooth sine, always running
-      const bobY   = Math.sin(tick * 0.85) * 7;
-      const bobRot = Math.sin(tick * 0.70) * 0.010;
-      // Shoe bobs with offset phase so they feel independent
-      const shoeBobY   = Math.sin(tick * 0.85 + 1.9) * 6;
-      const shoeBobRot = Math.sin(tick * 0.68 + 1.2) * 0.08 - 0.07;
+      // Shoe sizing
+      const shoeW = VW * 0.10;
 
-      // ────────────────────────────────────────────────
-      // PHASE BREAKDOWN  (p = 0 → 1 across tunnel scroll)
+      // Idle bobs — always running, continuous sine
+      const bobY2    = Math.sin(tick * 0.82) * 6;
+      const bobR2    = Math.sin(tick * 0.68) * 0.009;
+      const shoeBobY = Math.sin(tick * 0.82 + 2.0) * 5;
+      const shoeBobR = Math.sin(tick * 0.66 + 1.3) * 0.07 - 0.06;
+
+      // ────────────────────────────────────────────────────
+      // PHASE MAP  (p = 0 → 1)
       //
-      //  0.00 – 0.18  Studio2 + shoe fade in, floating
-      //  0.18 – 0.38  Bobbing / contemplation phase
-      //  0.38 – 0.60  Shoe kicks, Studio2 slides to row position
-      //  0.50 – 0.70  Studio1 drops in from above
-      //  0.54 – 0.76  Studio3 breathes in from below-right
-      //  0.80 – 1.00  All settled, subtle parallax drift
-      // ────────────────────────────────────────────────
+      //  0.00        Studio2 is already present, hovering
+      //  0.00–0.18   Shoe floats in from left
+      //  0.18–0.36   Both bob together — contemplation
+      //  0.36–0.58   Shoe kicks, Studio2 slides to row pos
+      //  0.48–0.68   Studio1 drops from above
+      //  0.52–0.72   Studio3 breathes in
+      //  0.85+       Text appears
+      // ────────────────────────────────────────────────────
 
-      const fadeIn  = ease(mapR(p, 0.00, 0.18, 0, 1));
-      const bobbing = mapR(p, 0.18, 0.38, 0, 1);
-      const kickP   = mapR(p, 0.38, 0.60, 0, 1);
+      const shoeIn  = ease(mapR(p, 0.00, 0.18, 0, 1));  // shoe fade-in
+      const bobbing = mapR(p, 0.18, 0.36, 0, 1);         // bob ramp
+      const kickP   = mapR(p, 0.36, 0.58, 0, 1);
       const kickE   = ease(kickP);
-      const s1P     = ease(elasticOut(mapR(p, 0.50, 0.70, 0, 1)));
-      const s3P     = ease(mapR(p, 0.54, 0.76, 0, 1));
+      const s1P     = elasticOut(ease(mapR(p, 0.48, 0.68, 0, 1)));
+      const s3P     = ease(mapR(p, 0.52, 0.72, 0, 1));
 
-      // Bob contribution fades out as kick starts
+      // Bob fades out as kick starts
       const bobMult = bobbing * (1 - kickE);
 
       // ── STUDIO 2 ──
+      // Present from p=0, already at center hovering
       const s2X = lerp(cx, r2cx, kickE);
-      const s2Y = lerp(cy, rowCY, kickE) + bobY * bobMult;
-      const s2R = lerp(bobRot * bobMult, 0, kickE);
-      const s2W = lerp(heroW, rowW, kickE);
-      const s2A = fadeIn;
+      const s2Y = lerp(cy, rowCY, kickE) + bobY2 * bobMult;
+      const s2R = lerp(bobR2 * bobMult, 0, kickE);
+      // Before kick: slightly larger as the hero image; after: row size
+      const s2W = lerp(imgW * 1.22, imgW, kickE);
+      const s2H = lerp(imgH * 1.22, imgH, kickE);
 
       // ── SHOE ──
-      // Rests at left edge of Studio2 hero, overlapping ~30%
-      const shoeRestX = cx - heroW * 0.44;
-      const shoeRestY = cy - VH * 0.04;
+      // Floats in from the left during 0–0.18
+      // Rests overlapping left edge of Studio2
+      const shoeRestX = cx - s2W * 0.44;
+      const shoeRestY = cy - VH * 0.03;
 
       let shoeX, shoeY, shoeR, shoeCurW, shoeA;
 
       if (kickP < 0.01) {
-        // Pre-kick: bob gently
-        shoeX    = shoeRestX;
-        shoeY    = shoeRestY + shoeBobY * bobbing;
-        shoeR    = shoeBobRot * bobbing;
+        shoeX    = lerp(cx - VW * 0.48, shoeRestX, ease(shoeIn));
+        shoeY    = lerp(shoeRestY - VH * 0.04, shoeRestY, ease(shoeIn))
+                   + shoeBobY * bobMult;
+        shoeR    = shoeBobR * bobMult;
         shoeCurW = shoeW;
-        shoeA    = fadeIn * bobbing;
+        shoeA    = shoeIn;
       } else {
-        // Kick phases
-        const windUp = ease(mapR(kickP, 0.00, 0.20, 0, 1)); // pulls back
-        const impact = ease(mapR(kickP, 0.20, 0.48, 0, 1)); // lunges right
-        const tumble = ease(mapR(kickP, 0.48, 1.00, 0, 1)); // shoots off
+        const windUp = ease(mapR(kickP, 0.00, 0.18, 0, 1));
+        const impact = ease(mapR(kickP, 0.18, 0.46, 0, 1));
+        const tumble = ease(mapR(kickP, 0.46, 1.00, 0, 1));
 
         shoeX    = shoeRestX
-                    + lerp(0, -VW * 0.025, windUp)
-                    + lerp(0,  VW * 0.20,  impact)
-                    + lerp(0,  VW * 0.85,  tumble);
-        shoeY    = shoeRestY - lerp(0, VH * 0.10, tumble);
-        shoeR    = lerp(-0.07, Math.PI * 3.2, ease(kickP)); // 3+ spins
-        shoeCurW = shoeW * lerp(1, 0.18, tumble);
-        shoeA    = lerp(1, 0, mapR(kickP, 0.72, 1.0, 0, 1));
+                   + lerp(0, -VW * 0.022, windUp)
+                   + lerp(0,  VW * 0.18,  impact)
+                   + lerp(0,  VW * 0.88,  tumble);
+        shoeY    = shoeRestY - lerp(0, VH * 0.09, tumble);
+        shoeR    = lerp(-0.06, Math.PI * 3.4, ease(kickP));
+        shoeCurW = shoeW * lerp(1, 0.15, tumble);
+        shoeA    = lerp(1, 0, mapR(kickP, 0.70, 1.0, 0, 1));
       }
 
       // ── STUDIO 1 ──
-      // Drops from above with elastic bounce
+      // Drops from above, elastic overshoot
+      const s1A = ease(mapR(mapR(p, 0.48, 0.68, 0, 1), 0, 0.28, 0, 1));
       const s1X = r1cx;
-      const s1Y = lerp(rowCY - VH * 0.50, rowCY, s1P);
-      const s1R = lerp(-0.055, -0.010, s1P);
-      const s1W = rowW;
-      const s1A = ease(mapR(mapR(p, 0.50, 0.70, 0, 1), 0, 0.30, 0, 1));
+      const s1Y = lerp(rowCY - VH * 0.52, rowCY, s1P);
+      const s1R = lerp(-0.05, -0.008, s1P);
 
       // ── STUDIO 3 ──
-      // Breathes in — scales up from small + slight rise
+      // Breathes in: scales from small + slight rise
+      const s3A = ease(mapR(mapR(p, 0.52, 0.72, 0, 1), 0, 0.36, 0, 1));
       const s3X = r3cx;
-      const s3Y = lerp(rowCY + VH * 0.05, rowCY, s3P);
-      const s3W = lerp(rowW * 0.52, rowW, s3P);
-      const s3R = lerp(0.048, 0.008, s3P);
-      const s3A = ease(mapR(mapR(p, 0.54, 0.76, 0, 1), 0, 0.38, 0, 1));
+      const s3Y = lerp(rowCY + VH * 0.04, rowCY, s3P);
+      const s3W_scale = lerp(0.50, 1.0, s3P); // scale factor for breathing in
+      const s3R = lerp(0.044, 0.007, s3P);
 
-      // ── Draw order: back → front ──
-      drawImg(IMG.s1,   s1X, s1Y, s1W, s1R, s1A);
-      drawImg(IMG.s3,   s3X, s3Y, s3W, s3R, s3A);
-      drawImg(IMG.s2,   s2X, s2Y, s2W, s2R, s2A);
-      drawImg(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
+      // ── Draw (back to front) ──
+      // Studio1
+      drawCropped(IMG.s1, s1X, s1Y, imgW, imgH, s1R, s1A);
+      // Studio3 (breathes in via scaled width+height)
+      drawCropped(IMG.s3, s3X, s3Y, imgW * s3W_scale, imgH * s3W_scale, s3R, s3A);
+      // Studio2 (hero center, transitions to row)
+      drawCropped(IMG.s2, s2X, s2Y, s2W, s2H, s2R, 1.0);
+      // Shoe on top
+      drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
 
-      // Show text once tunnel is mostly scrolled through
-      if (p > 0.86 && !textShown) { textShown = true; aboutText.classList.add('visible'); }
-      if (p < 0.80 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
+      // Text fades in near end of tunnel
+      if (p > 0.85 && !textShown) { textShown = true;  aboutText.classList.add('visible'); }
+      if (p < 0.78 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
     }
 
     function boot() {
-      // Seed the first frame so canvas isn't blank before first scroll event
       raf = requestAnimationFrame(frame);
     }
 
-    // Pause canvas loop when tunnel is off-screen entirely
     new IntersectionObserver(entries => {
       const vis = entries[0].isIntersecting;
       if (vis && !raf)  { lastTs = null; raf = requestAnimationFrame(frame); }
