@@ -43,7 +43,6 @@
 
     /* =====================
        HERO
-       z-index: 0 — mesh sits on top
     ===================== */
     .hero.hero-image {
       position: relative;
@@ -52,32 +51,23 @@
       overflow: hidden;
       z-index: 0;
     }
-
     .hero-bg-photo {
       position: absolute;
       inset: 0;
       z-index: 0;
-      background: url("assets/bodiodispace.jpg") center 18% / cover no-repeat;
+      background: url("assets/BodiodiSpace4.jpg") center 18% / cover no-repeat;
       transform: scale(1.03);
       filter: saturate(.92) contrast(.96) brightness(.96);
       pointer-events: none;
     }
-
     .hero.hero-image::before {
       content: "";
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: linear-gradient(
-        170deg,
-        rgba(0,0,0,.06) 0%,
-        rgba(0,0,0,.02) 35%,
-        rgba(0,0,0,.18) 68%,
-        rgba(0,0,0,.30) 100%
-      );
+      background: linear-gradient(170deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.02) 35%,rgba(0,0,0,.18) 68%,rgba(0,0,0,.30) 100%);
     }
-
     .hero.hero-image::after {
       content: "";
       position: absolute;
@@ -86,26 +76,9 @@
       z-index: 2;
       pointer-events: none;
       background: url("BGFlipped.png") center bottom / cover no-repeat;
-      -webkit-mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.06) 12%,
-        rgba(0,0,0,.28) 32%,
-        rgba(0,0,0,.62) 58%,
-        rgba(0,0,0,.88) 78%,
-        black 100%
-      );
-      mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.06) 12%,
-        rgba(0,0,0,.28) 32%,
-        rgba(0,0,0,.62) 58%,
-        rgba(0,0,0,.88) 78%,
-        black 100%
-      );
+      -webkit-mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.06) 12%,rgba(0,0,0,.28) 32%,rgba(0,0,0,.62) 58%,rgba(0,0,0,.88) 78%,black 100%);
+      mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.06) 12%,rgba(0,0,0,.28) 32%,rgba(0,0,0,.62) 58%,rgba(0,0,0,.88) 78%,black 100%);
     }
-
     .hero.hero-image .hero-inner {
       position: relative;
       z-index: 3;
@@ -114,10 +87,7 @@
       align-items: flex-end;
       width: 100%;
     }
-
     .hero.hero-image .logo-outline { display: none; }
-
-    /* hero copy sits above everything including mesh overlap */
     .hero.hero-image .hero-copy {
       margin-left: clamp(32px, 8vw, 120px);
       margin-bottom: clamp(72px, 10vw, 130px);
@@ -126,7 +96,6 @@
       z-index: 10;
       pointer-events: auto;
     }
-
     .hero.hero-image .h1 {
       color: var(--hero-gold);
       max-width: 10ch;
@@ -136,7 +105,6 @@
       margin: 0 0 14px 0;
       text-shadow: 0 2px 24px rgba(0,0,0,.22);
     }
-
     .hero.hero-image .sub {
       color: var(--hero-gold);
       font-weight: 400;
@@ -147,17 +115,12 @@
       opacity: .88;
       text-shadow: 0 1px 12px rgba(0,0,0,.28);
     }
-
     .hero.hero-image .btn {
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
-
     @media (max-width: 820px) {
-      .hero.hero-image .hero-copy {
-        margin-left: clamp(22px, 6vw, 40px);
-        margin-bottom: clamp(54px, 10vw, 88px);
-      }
+      .hero.hero-image .hero-copy { margin-left: clamp(22px, 6vw, 40px); margin-bottom: clamp(54px, 10vw, 88px); }
       .hero.hero-image .h1 { font-size: clamp(44px, 12vw, 68px); }
       .hero.hero-image .sub { font-size: clamp(15px, 4.2vw, 19px); }
       .hero.hero-image::after { height: clamp(200px, 30vw, 340px); }
@@ -165,24 +128,19 @@
 
     /* =====================
        MESH SECTION
-       z-index: 1 — sits on top of hero
-       small overlap only — just the orb horizon
-       pointer-events: none so hero buttons stay clickable
     ===================== */
     .mesh-section {
-  position: relative;
-  isolation: isolate;
-  margin-top: 0;
-  padding-top: 16vh;
-  padding-bottom: clamp(280px, 32vw, 480px);
-  overflow: hidden;
-  cursor: default;
-  z-index: 1;
-  background: #444F46;
-  pointer-events: none;
-}
-
-    /* BG.png fixed — bleeds into about section seamlessly */
+      position: relative;
+      isolation: isolate;
+      margin-top: 0;
+      padding-top: 16vh;
+      padding-bottom: clamp(280px, 32vw, 480px);
+      overflow: hidden;
+      cursor: default;
+      z-index: 1;
+      background: #444F46;
+      pointer-events: none;
+    }
     .mesh-section::after {
       content: "";
       position: absolute;
@@ -191,68 +149,25 @@
       z-index: 0;
       pointer-events: none;
       background: url("BG.png") center top / cover fixed;
-      -webkit-mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.05) 14%,
-        rgba(0,0,0,.22) 32%,
-        rgba(0,0,0,.58) 54%,
-        rgba(0,0,0,.86) 74%,
-        black 100%
-      );
-      mask-image: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0,0,0,.05) 14%,
-        rgba(0,0,0,.22) 32%,
-        rgba(0,0,0,.58) 54%,
-        rgba(0,0,0,.86) 74%,
-        black 100%
-      );
+      -webkit-mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.05) 14%,rgba(0,0,0,.22) 32%,rgba(0,0,0,.58) 54%,rgba(0,0,0,.86) 74%,black 100%);
+      mask-image: linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.05) 14%,rgba(0,0,0,.22) 32%,rgba(0,0,0,.58) 54%,rgba(0,0,0,.86) 74%,black 100%);
     }
-
-    /* mobile fallback — fixed attachment doesn't work on iOS */
-   @media (max-width: 820px) {
-  .mesh-section::after {
-    background: url("BGFlipped.png") center top / cover no-repeat;
-  }
-  #about.section {
-    background: url("BGFlipped.png") center top / cover no-repeat;
-  }
-  .strip {
-    background: url("BG.png") center bottom / cover no-repeat;
-  }
-}
-
-    .mesh-canvas-wrap {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
+    @media (max-width: 820px) {
+      .mesh-section::after { background: url("BGFlipped.png") center top / cover no-repeat; background-attachment: scroll !important; }
+      #about.section { background: url("BGFlipped.png") center top / cover no-repeat !important; background-attachment: scroll !important; }
+      .strip { background: url("BG.png") center bottom / cover no-repeat; background-attachment: scroll !important; }
     }
-
-    .mesh-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
+    .mesh-canvas-wrap { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+    .mesh-canvas { width: 100%; height: 100%; display: block; }
     .mesh-pressure {
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(
-        360px circle at var(--meshX) var(--meshY),
-        rgba(236,235,134,.13) 0%,
-        rgba(236,235,134,.04) 32%,
-        transparent 62%
-      );
+      background: radial-gradient(360px circle at var(--meshX) var(--meshY),rgba(236,235,134,.13) 0%,rgba(236,235,134,.04) 32%,transparent 62%);
       opacity: calc(.06 + (var(--meshPressure) * .48));
       mix-blend-mode: screen;
       transition: opacity .2s ease;
     }
-
-    /* mesh inner restores pointer events for text + buttons */
     .mesh-section .mesh-inner {
       position: relative;
       z-index: 2;
@@ -264,12 +179,7 @@
       align-items: center;
       pointer-events: auto;
     }
-
-    .mesh-section .mesh-copy {
-      text-align: center;
-      max-width: 680px;
-    }
-
+    .mesh-section .mesh-copy { text-align: center; max-width: 680px; }
     .mesh-section .h1 {
       color: var(--hero-gold);
       font-size: clamp(38px, 5vw, 72px);
@@ -279,7 +189,6 @@
       transform: translate(var(--meshHeadlineX), var(--meshHeadlineY));
       will-change: transform;
     }
-
     .mesh-section .sub {
       color: rgba(236,235,134,.80);
       font-size: clamp(15px, 1.5vw, 19px);
@@ -289,37 +198,17 @@
       transform: translate(var(--meshSubX), var(--meshSubY));
       will-change: transform;
     }
-
-    .mesh-section .btn-row {
-      justify-content: center;
-      transform: translate(var(--meshBtnX), var(--meshBtnY));
-      will-change: transform;
-    }
-
-    .mesh-section .btn {
-      border-color: rgba(236,235,134,.55);
-      color: var(--hero-gold);
-      pointer-events: auto;
-    }
-    .mesh-section .btn:hover {
-      background: rgba(236,235,134,.12);
-      color: var(--hero-gold);
-      border-color: var(--hero-gold);
-    }
-
+    .mesh-section .btn-row { justify-content: center; transform: translate(var(--meshBtnX), var(--meshBtnY)); will-change: transform; }
+    .mesh-section .btn { border-color: rgba(236,235,134,.55); color: var(--hero-gold); pointer-events: auto; }
+    .mesh-section .btn:hover { background: rgba(236,235,134,.12); color: var(--hero-gold); border-color: var(--hero-gold); }
     @media (max-width: 820px) {
-      .mesh-section {
-        margin-top: -8vh;
-        padding-top: 12vh;
-        padding-bottom: clamp(200px, 28vw, 320px);
-      }
+      .mesh-section { margin-top: -8vh; padding-top: 12vh; padding-bottom: clamp(200px, 28vw, 320px); }
       .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
     }
 
     /* =====================
        ABOUT SECTION
-       BG.png fixed — continuous with mesh
     ===================== */
     .rule { display: none !important; }
 
@@ -327,18 +216,16 @@
       position: relative;
       z-index: 1;
       margin-top: 0;
-      padding-top: clamp(80px, 10vw, 140px);
+      padding-top: 0;
       padding-bottom: clamp(60px, 8vw, 120px);
       background: url("BG.png") center top / cover fixed;
       width: 100%;
     }
-
     #about .content-col {
       width: min(760px, 92vw);
       margin: 0 auto;
       padding: 0 12px;
     }
-
     #about h2 {
       margin: 0 0 14px 0;
       font-family: "Inter";
@@ -348,7 +235,6 @@
       line-height: 1.02;
       color: var(--dk);
     }
-
     #about p {
       margin: 0;
       font-size: 16px;
@@ -356,40 +242,89 @@
       max-width: 58ch;
       color: var(--dk);
     }
-
     .strip {
       height: 44vh;
       background: url("BG.png") center top / cover fixed;
     }
-
-    @media (max-width: 820px) {
-      #about.section { padding-top: clamp(60px, 10vw, 100px); }
-    }
-
     .only-mobile { display: none; }
     @media (max-width: 740px) {
       .only-mobile { display: inline; }
       .menu-btn { display: inline-flex; }
       .navlinks { display: none; }
     }
-
     @media (prefers-reduced-motion: reduce) {
       .mesh-canvas { display: none; }
     }
-    @media (max-width: 820px) {
-  .mesh-section::after {
-    background-attachment: scroll !important;
-    background-position: center top !important;
-  }
-  #about.section {
-    background-attachment: scroll !important;
-    background-position: center top !important;
-  }
-  .strip {
-    background-attachment: scroll !important;
-    background-position: center bottom !important;
-  }
-}
+
+    /* =====================
+       SCROLL TUNNEL + GALLERY CANVAS
+    ===================== */
+
+    /* Tall spacer — scroll through this to drive the animation */
+    .gallery-tunnel {
+      position: relative;
+      height: 280vh;
+    }
+
+    /* Sticky frame — stays in viewport, canvas fills it */
+    .gallery-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #galleryCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* About text below the tunnel */
+    .about-text-wrap {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.85s ease, transform 0.85s ease;
+      padding-top: clamp(48px, 6vw, 80px);
+    }
+    .about-text-wrap.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Mobile: simple stacked, no canvas */
+    @media (max-width: 700px) {
+      .gallery-tunnel { height: auto; }
+      .gallery-sticky {
+        position: relative;
+        height: auto;
+        padding: clamp(48px, 8vw, 72px) 0 24px;
+      }
+      #galleryCanvas { display: none; }
+      .mobile-gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 84vw;
+        margin: 0 auto;
+      }
+      .mobile-gallery img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 6px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+      .mobile-gallery img.vis { opacity: 1; transform: translateY(0); }
+    }
+    @media (min-width: 701px) {
+      .mobile-gallery { display: none; }
+    }
+
   </style>
 </head>
 
@@ -462,7 +397,23 @@
   <div class="rule" aria-hidden="true"></div>
 
   <section id="about" class="section">
-    <div class="content-col">
+
+    <!-- SCROLL TUNNEL -->
+    <div class="gallery-tunnel" id="galleryTunnel">
+      <div class="gallery-sticky">
+        <!-- Desktop: canvas-driven animation -->
+        <canvas id="galleryCanvas"></canvas>
+        <!-- Mobile: simple stacked images -->
+        <div class="mobile-gallery">
+          <img src="assets/Studio2.jpg" alt="Bodiodi studio" id="mob2">
+          <img src="assets/Studio1.jpg" alt="Bodiodi studio" id="mob1">
+          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail" id="mob3">
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT TEXT -->
+    <div class="content-col about-text-wrap" id="aboutText">
       <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
       <p>
         Yes, it's technically a garage. And it's also one of the best workouts you'll find
@@ -473,10 +424,356 @@
         intentionally personal — because this is training built for real people, not crowds.
       </p>
     </div>
+
   </section>
 
   <div class="strip" id="contact"></div>
 
+  <!-- =====================
+       GALLERY ANIMATION ENGINE
+  ===================== -->
+  <script>
+  (() => {
+    const tunnel    = document.getElementById('galleryTunnel');
+    const canvas    = document.getElementById('galleryCanvas');
+    const aboutText = document.getElementById('aboutText');
+    const isMobile  = window.matchMedia('(max-width: 700px)').matches;
+    const reduced   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── Mobile ──
+    if (isMobile) {
+      const mobImgs = document.querySelectorAll('.mobile-gallery img');
+      const mobObs = new IntersectionObserver(entries => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('vis'), i * 160);
+            mobObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      mobImgs.forEach(img => mobObs.observe(img));
+      new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) aboutText.classList.add('visible');
+      }, { threshold: 0.1 }).observe(aboutText);
+      return;
+    }
+
+    if (!canvas || !tunnel) return;
+    if (reduced) { aboutText.classList.add('visible'); return; }
+
+    const ctx = canvas.getContext('2d');
+    let VW = 0, VH = 0, dpr = 1;
+
+    function resize() {
+      VW  = window.innerWidth;
+      VH  = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width        = Math.round(VW * dpr);
+      canvas.height       = Math.round(VH * dpr);
+      canvas.style.width  = VW + 'px';
+      canvas.style.height = VH + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    // ── Preload all images ──
+    const SRC = {
+      s2:   'assets/Studio2.jpg',
+      s1:   'assets/Studio1.jpg',
+      s3:   'assets/Studio3.jpg',
+      shoe: 'assets/shoes.png'
+    };
+    const IMG = {};
+    let loaded = 0;
+    const totalImgs = Object.keys(SRC).length;
+    Object.entries(SRC).forEach(([key, src]) => {
+      const img = new Image();
+      img.onload  = () => { loaded++; if (loaded === totalImgs) boot(); };
+      img.onerror = () => { loaded++; if (loaded === totalImgs) boot(); };
+      img.src = src;
+      IMG[key] = img;
+    });
+
+    // ── Helpers ──
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp  = (a, b, t) => a + (b - a) * t;
+    const mapR  = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1));
+    const ease  = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const easeOut = t => 1 - (1-t)*(1-t);
+    const elasticOut = t => {
+      if (t <= 0 || t >= 1) return t;
+      return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
+    };
+
+    function scrollP() {
+      const r = tunnel.getBoundingClientRect();
+      return clamp(-r.top / (r.height - VH), 0, 1);
+    }
+
+    // Draw image with object-fit:cover crop into a rect (cx,cy = center)
+    function drawCropped(img, cx, cy, w, h, rot, alpha) {
+      if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(w / iw, h / ih);
+      const sw = iw * scale, sh = ih * scale;
+      const ox = (sw - w) / 2, oy = (sh - h) / 2;
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.beginPath();
+      ctx.rect(-w/2, -h/2, w, h);
+      ctx.clip();
+      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
+      ctx.shadowBlur    = 30;
+      ctx.shadowOffsetY = 10;
+      ctx.drawImage(img, -w/2 - ox, -h/2 - oy, sw, sh);
+      ctx.restore();
+    }
+
+    // Draw image uncropped at its natural aspect ratio — for Studio2's initial state
+    function drawNatural(img, cx, cy, w, rot, alpha) {
+      if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
+      const h = w * (img.naturalHeight / img.naturalWidth);
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
+      ctx.shadowBlur    = 30;
+      ctx.shadowOffsetY = 10;
+      ctx.drawImage(img, -w/2, -h/2, w, h);
+      ctx.restore();
+    }
+
+    // Crossfade between natural and cropped draw for Studio2's kick transition
+    // cropT = 0 → fully natural, cropT = 1 → fully cropped
+    function drawS2Transitioning(img, cx, cy, naturalW, cropW, cropH, rot, alpha, cropT) {
+      if (alpha < 0.005 || !img.complete || !img.naturalWidth) return;
+
+      const naturalH = naturalW * (img.naturalHeight / img.naturalWidth);
+
+      // Interpolate dimensions
+      const w = lerp(naturalW, cropW, cropT);
+      const h = lerp(naturalH, cropH, cropT);
+
+      // At cropT=0, no clip (show full image). At cropT=1, clip to portrait box.
+      // We blend by lerping the clip rect from natural size to crop size.
+      const clipW = lerp(w * 1.02, cropW, cropT); // tiny epsilon at 0 so clip doesn't flash
+      const clipH = lerp(h * 1.02, cropH, cropT);
+
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(w / iw, h / ih);
+      const sw = iw * scale, sh = ih * scale;
+      const ox = (sw - w) / 2, oy = (sh - h) / 2;
+
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.beginPath();
+      ctx.rect(-clipW/2, -clipH/2, clipW, clipH);
+      ctx.clip();
+      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
+      ctx.shadowBlur    = 30;
+      ctx.shadowOffsetY = 10;
+      ctx.drawImage(img, -w/2 - ox, -h/2 - oy, sw, sh);
+      ctx.restore();
+    }
+
+    // Draw shoe (natural aspect, no crop)
+    function drawShoe(img, cx, cy, w, rot, alpha) {
+      if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
+      const h = w * (img.naturalHeight / img.naturalWidth);
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.shadowColor   = 'rgba(0,0,0,0.20)';
+      ctx.shadowBlur    = 18;
+      ctx.shadowOffsetY = 6;
+      ctx.drawImage(img, -w/2, -h/2, w, h);
+      ctx.restore();
+    }
+
+    let raf = null, tick = 0, lastTs = null, textShown = false;
+
+    function frame(ts) {
+      raf    = requestAnimationFrame(frame);
+      const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
+      lastTs = ts;
+      tick  += dt;
+
+      const p = scrollP();
+      ctx.clearRect(0, 0, VW, VH);
+
+      // ── Layout ──
+      const cx = VW * 0.5;
+      const cy = VH * 0.5;
+
+      // Portrait crop dimensions — all three final images share these exactly
+      const imgH = VH * 0.60;
+      const imgW = imgH * 0.68;           // ~2:3 portrait
+      const gap  = VW * 0.022;
+
+      // Row centers
+      const rowTotal = imgW * 3 + gap * 2;
+      const rowLeft  = (VW - rowTotal) / 2;
+      const r1cx = rowLeft + imgW * 0.5;
+      const r2cx = rowLeft + imgW + gap + imgW * 0.5;
+      const r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
+      const rowCY = VH * 0.50;
+
+      // Studio2 hero size (natural, uncropped) — generous but not full-screen
+      const heroW = VW * 0.34;
+
+      const shoeW = VW * 0.10;
+
+      // ── Bobs — ultra subtle, always running ──
+      // Studio2: barely-there hover, like something weightless
+      const bobY2 = Math.sin(tick * 0.75) * 3.5;        // very small amplitude
+      const bobR2 = Math.sin(tick * 0.62) * 0.005;       // almost imperceptible tilt
+
+      // Shoe: slightly different phase & speed so they feel independent
+      const shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
+      const shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
+
+      // ────────────────────────────────────────────
+      // PHASE MAP  (p = 0 → 1)
+      //
+      //  0.00        Studio2 present, uncropped, hovering
+      //  0.00–0.20   Shoe drifts in from left, starts bobbing
+      //  0.20–0.36   Both bob together — moment of stillness
+      //  0.36–0.58   Kick sequence
+      //              • 0.36–0.44  shoe winds up
+      //              • 0.44–0.58  shoe impacts + tumbles
+      //              • 0.40–0.60  Studio2 slides to row, crops into portrait
+      //  0.48–0.68   Studio1 drops from above (elastic)
+      //  0.52–0.72   Studio3 breathes in
+      //  0.85+       Text rises into view
+      // ────────────────────────────────────────────
+
+      const shoeIn = ease(mapR(p, 0.00, 0.20, 0, 1));
+      const bobbing = mapR(p, 0.20, 0.36, 0, 1);
+      const kickP   = mapR(p, 0.36, 0.58, 0, 1);
+      const kickE   = ease(kickP);
+
+      // crop transition: Studio2 morphs from natural → portrait during kick
+      // starts morphing a beat after kick begins, finishes as it lands in row
+      const cropT   = ease(mapR(p, 0.42, 0.60, 0, 1));
+
+      const s1P = elasticOut(ease(mapR(p, 0.48, 0.68, 0, 1)));
+      const s3P = ease(mapR(p, 0.52, 0.72, 0, 1));
+
+      const bobMult = bobbing * (1 - kickE);
+
+      // ── STUDIO 2 ──
+      const s2X = lerp(cx, r2cx, kickE);
+      const s2Y = lerp(cy, rowCY, kickE) + bobY2 * (1 - kickE);
+      const s2R = lerp(bobR2 * (1 - kickE), 0, kickE);
+
+      // ── SHOE ──
+      const shoeRestX = cx - heroW * 0.46;
+      const shoeRestY = cy - VH * 0.03;
+
+      let shoeX, shoeY, shoeR, shoeCurW, shoeA;
+
+      if (kickP < 0.01) {
+        // Drifting in, then bobbing
+        shoeX    = lerp(cx - VW * 0.50, shoeRestX, ease(shoeIn));
+        shoeY    = shoeRestY + shoeBobY * bobMult + lerp(-VH * 0.03, 0, ease(shoeIn));
+        shoeR    = shoeBobR * bobMult;
+        shoeCurW = shoeW;
+        shoeA    = shoeIn;
+      } else {
+        const windUp = ease(mapR(kickP, 0.00, 0.22, 0, 1));
+        const impact = ease(mapR(kickP, 0.22, 0.50, 0, 1));
+        const tumble = ease(mapR(kickP, 0.50, 1.00, 0, 1));
+
+        shoeX    = shoeRestX
+                   + lerp(0, -VW * 0.022, windUp)
+                   + lerp(0,  VW * 0.19,  impact)
+                   + lerp(0,  VW * 0.90,  tumble);
+        shoeY    = shoeRestY - lerp(0, VH * 0.08, tumble);
+        shoeR    = lerp(-0.05, Math.PI * 3.4, ease(kickP));
+        shoeCurW = shoeW * lerp(1, 0.12, tumble);
+        shoeA    = lerp(1, 0, mapR(kickP, 0.68, 1.0, 0, 1));
+      }
+
+      // ── STUDIO 1 ──
+      const s1A = ease(mapR(mapR(p, 0.48, 0.68, 0, 1), 0, 0.28, 0, 1));
+      const s1Y = lerp(rowCY - VH * 0.52, rowCY, s1P);
+      const s1R = lerp(-0.05, -0.008, s1P);
+
+      // ── STUDIO 3 ──
+      const s3A     = ease(mapR(mapR(p, 0.52, 0.72, 0, 1), 0, 0.36, 0, 1));
+      const s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
+      const s3Scale = lerp(0.48, 1.0, s3P);
+      const s3R     = lerp(0.042, 0.007, s3P);
+
+      // ── Draw back → front ──
+      drawCropped(IMG.s1, r1cx, s1Y, imgW, imgH, s1R, s1A);
+      drawCropped(IMG.s3, r3cx, s3Y, imgW * s3Scale, imgH * s3Scale, s3R, s3A);
+      // Studio2: transitions from natural uncropped → portrait cropped
+      drawS2Transitioning(IMG.s2, s2X, s2Y, heroW, imgW, imgH, s2R, 1.0, cropT);
+      drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
+
+      // ── Text reveal ──
+      if (p > 0.85 && !textShown) { textShown = true;  aboutText.classList.add('visible'); }
+      if (p < 0.78 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
+    }
+
+    function boot() { raf = requestAnimationFrame(frame); }
+
+    new IntersectionObserver(entries => {
+      const vis = entries[0].isIntersecting;
+      if (vis && !raf)  { lastTs = null; raf = requestAnimationFrame(frame); }
+      if (!vis && raf)  { cancelAnimationFrame(raf); raf = null; }
+    }, { threshold: 0.01 }).observe(tunnel);
+
+  })();
+  </script>
+
+  <!-- About text — subtle rise on reveal, handled via CSS transition + JS class -->
+  <style>
+    .about-text-wrap {
+      opacity: 0;
+      transform: translateY(32px);
+      /* gentle stagger: h2 leads, p follows */
+      transition:
+        opacity  0.90s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.90s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .about-text-wrap.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* h2 leads by 80ms, paragraph follows */
+    .about-text-wrap h2 {
+      opacity: 0;
+      transform: translateY(20px);
+      transition:
+        opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s,
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+    }
+    .about-text-wrap p {
+      opacity: 0;
+      transform: translateY(16px);
+      transition:
+        opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+    }
+    .about-text-wrap.visible h2,
+    .about-text-wrap.visible p {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
+  <!-- =====================
+       MESH CANVAS SCRIPT
+  ===================== -->
   <script>
   (() => {
     const section = document.getElementById('meshSection');
@@ -530,23 +827,13 @@
     function buildGrid(){
       nodes  = [];
       rowMap = [];
-
       const orbCX = W * 0.50;
       const orbCY = H * 0.28;
       const orbRX = W * 0.62;
       const orbRY = H * 0.58;
-
-      const center = {
-        r: 0, c: 0, rowCols: 1,
-        baseX: orbCX, baseY: orbCY,
-        x: orbCX, y: orbCY,
-        seed: Math.random() * 1000,
-        orbAlpha: 1.0,
-        perspScale: 1.0
-      };
+      const center = { r:0,c:0,rowCols:1,baseX:orbCX,baseY:orbCY,x:orbCX,y:orbCY,seed:Math.random()*1000,orbAlpha:1.0,perspScale:1.0 };
       nodes.push(center);
       rowMap.push([center]);
-
       for (let ring = 1; ring < RINGS; ring++){
         const t      = ring / (RINGS - 1);
         const easeT  = Math.pow(t, 0.82);
@@ -555,33 +842,16 @@
         const orbAlpha = 1 - Math.pow(t, 1.2) * 0.90;
         const numPts = Math.round(5 + ring * 3.4);
         const row    = [];
-
         for (let i = 0; i < numPts; i++){
           const angle  = (i / numPts) * Math.PI * 2;
           const sinA   = Math.sin(angle);
-          const perspY = sinA < 0
-            ? sinA * 0.42
-            : sinA * 1.15;
-
+          const perspY = sinA < 0 ? sinA * 0.42 : sinA * 1.15;
           const nx = orbCX + Math.cos(angle) * rx;
           const ny = orbCY + perspY * ry;
-
           const relY        = (ny - orbCY) / orbRY;
-          const horizonFade = relY < 0
-            ? Math.pow(Math.max(0, 1 + relY * 1.6), 1.4)
-            : 1.0;
-          const perspScale  = relY < 0
-            ? lerp(0.2, 1.0, Math.max(0, 1 + relY))
-            : 1.0;
-
-          row.push({
-            r: ring, c: i, rowCols: numPts,
-            baseX: nx, baseY: ny,
-            x: nx, y: ny,
-            seed: Math.random() * 1000,
-            orbAlpha: orbAlpha * horizonFade,
-            perspScale
-          });
+          const horizonFade = relY < 0 ? Math.pow(Math.max(0, 1 + relY * 1.6), 1.4) : 1.0;
+          const perspScale  = relY < 0 ? lerp(0.2, 1.0, Math.max(0, 1 + relY)) : 1.0;
+          row.push({ r:ring,c:i,rowCols:numPts,baseX:nx,baseY:ny,x:nx,y:ny,seed:Math.random()*1000,orbAlpha:orbAlpha*horizonFade,perspScale });
         }
         nodes.push(...row);
         rowMap.push(row);
@@ -591,14 +861,12 @@
     function influence(x, y){
       const dx = ptr.x * W - x;
       const dy = ptr.y * H - y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      return 1 - smoothstep(0, Math.min(W,H) * INF_RADIUS, dist);
+      return 1 - smoothstep(0, Math.min(W,H) * INF_RADIUS, Math.sqrt(dx*dx + dy*dy));
     }
 
     function update(){
       tick += 0.016;
       const active = isInside || (performance.now() - lastInteraction < (coarsePointer ? 1800 : 1400));
-
       if (!reducedMotion){
         if (!active){
           ptr.tx = lerp(ptr.tx, 0.50 + Math.cos(tick * 0.30) * 0.05, 0.025);
@@ -609,179 +877,106 @@
         ptr.y = lerp(ptr.y, ptr.ty, active ? 0.15 : 0.04);
         ptr.pressure = lerp(ptr.pressure, ptr.targetPressure, active ? 0.18 : 0.06);
       }
-
       root.style.setProperty('--meshX',        `${(ptr.x*100).toFixed(2)}%`);
       root.style.setProperty('--meshY',        `${(ptr.y*100).toFixed(2)}%`);
       root.style.setProperty('--meshPressure', ptr.pressure.toFixed(3));
-
-      const cx = ptr.x - 0.5;
-      const cy = ptr.y - 0.5;
-      const p  = ptr.pressure;
-
+      const cx = ptr.x - 0.5, cy = ptr.y - 0.5, p = ptr.pressure;
       root.style.setProperty('--meshHeadlineX', `${(cx*HEADLINE_DRIFT*p).toFixed(2)}px`);
       root.style.setProperty('--meshHeadlineY', `${(cy*HEADLINE_DRIFT*0.7*p).toFixed(2)}px`);
       root.style.setProperty('--meshSubX',      `${(cx*SUB_DRIFT*p).toFixed(2)}px`);
       root.style.setProperty('--meshSubY',      `${(cy*SUB_DRIFT*0.75*p).toFixed(2)}px`);
       root.style.setProperty('--meshBtnX',      `${(cx*BTN_DRIFT*p).toFixed(2)}px`);
       root.style.setProperty('--meshBtnY',      `${(cy*BTN_DRIFT*0.9*p).toFixed(2)}px`);
-
       for (let i = 0; i < nodes.length; i++){
-        const n     = nodes[i];
-        const infl  = influence(n.baseX, n.baseY);
+        const n = nodes[i];
+        const infl = influence(n.baseX, n.baseY);
         const depth = n.r / Math.max(1, RINGS - 1);
         const relY  = (n.baseY - (H * 0.28)) / (H * 0.58);
-        const isForeground = relY > 0;
-        const breathAmp = isForeground
-          ? lerp(0.12, 0.60, depth)
-          : lerp(0.01, 0.08, depth);
-
-        const bx = Math.cos(tick * 0.52 + n.seed) * breathAmp * (1 - p * 0.5);
-        const by = Math.sin(tick * 0.45 + n.seed) * breathAmp * (1 - p * 0.5);
-        const toX = ptr.x * W - n.baseX;
-        const toY = ptr.y * H - n.baseY;
-        const pullStrength = isForeground
-          ? lerp(4, 22, depth)
-          : lerp(0, 3, depth);
-        const pull = infl * p * pullStrength;
-
-        n.x = n.baseX + bx + toX * (pull / (W * 0.5));
-        n.y = n.baseY + by + toY * (pull / (H * 0.5));
+        const isFG  = relY > 0;
+        const bAmp  = isFG ? lerp(0.12, 0.60, depth) : lerp(0.01, 0.08, depth);
+        const bx = Math.cos(tick * 0.52 + n.seed) * bAmp * (1 - p * 0.5);
+        const by = Math.sin(tick * 0.45 + n.seed) * bAmp * (1 - p * 0.5);
+        const pull = infl * p * (isFG ? lerp(4, 22, depth) : lerp(0, 3, depth));
+        n.x = n.baseX + bx + (ptr.x*W - n.baseX) * (pull / (W*0.5));
+        n.y = n.baseY + by + (ptr.y*H - n.baseY) * (pull / (H*0.5));
       }
     }
 
-    function drawLine(a, b, emphasisMult){
-      const mx  = (a.x + b.x) * .5;
-      const my  = (a.y + b.y) * .5;
-      const hot = Math.max(
-        influence(a.x, a.y),
-        influence(b.x, b.y),
-        influence(mx, my)
-      ) * ptr.pressure;
-
-      const orbA      = ((a.orbAlpha || 1) + (b.orbAlpha || 1)) * 0.5;
-      const depth     = a.r / Math.max(1, RINGS - 1);
-      const baseAlpha = orbA * lerp(0.005, 0.026, depth) * emphasisMult;
-      const alpha     = lerp(baseAlpha, 0.24, hot * orbA);
-      const perspW    = ((a.perspScale || 1) + (b.perspScale || 1)) * 0.5;
-      const lineW     = lerp(
-        lerp(0.15, 0.65, depth) * perspW,
-        1.4, hot
-      );
-
-      ctx.lineWidth   = lineW;
+    function drawLine(a, b, em){
+      const mx = (a.x+b.x)*.5, my = (a.y+b.y)*.5;
+      const hot = Math.max(influence(a.x,a.y),influence(b.x,b.y),influence(mx,my)) * ptr.pressure;
+      const orbA = ((a.orbAlpha||1)+(b.orbAlpha||1))*0.5;
+      const depth = a.r / Math.max(1, RINGS-1);
+      const alpha = lerp(orbA*lerp(0.005,0.026,depth)*em, 0.24, hot*orbA);
+      const perspW = ((a.perspScale||1)+(b.perspScale||1))*0.5;
+      ctx.lineWidth   = lerp(lerp(0.15,0.65,depth)*perspW, 1.4, hot);
       ctx.strokeStyle = `rgba(240,238,210,${alpha})`;
       ctx.beginPath();
-      const cvx = mx + Math.sin(tick*0.75+a.seed)*0.8*hot;
-      const cvy = my + Math.cos(tick*0.65+b.seed)*0.8*hot;
       ctx.moveTo(a.x, a.y);
-      ctx.quadraticCurveTo(cvx, cvy, b.x, b.y);
+      ctx.quadraticCurveTo(mx+Math.sin(tick*.75+a.seed)*.8*hot, my+Math.cos(tick*.65+b.seed)*.8*hot, b.x, b.y);
       ctx.stroke();
     }
 
     function drawNode(n){
-      const hot        = influence(n.x, n.y) * ptr.pressure;
-      const depth      = n.r / Math.max(1, RINGS - 1);
-      const orbAlpha   = n.orbAlpha || 1;
-      const perspScale = n.perspScale || 1;
-      const baseAlpha  = orbAlpha * lerp(0.004, 0.05, depth);
-      const alpha      = lerp(baseAlpha, 0.28, hot * orbAlpha);
-      const size       = lerp(
-        lerp(0.3, 1.2, depth) * perspScale,
-        2.4, hot
-      );
-      const shimmer = (Math.sin(tick*1.3+n.seed)+1)*.5;
-
+      const hot = influence(n.x, n.y) * ptr.pressure;
+      const depth = n.r / Math.max(1, RINGS-1);
+      const orbA = n.orbAlpha||1, pS = n.perspScale||1;
+      const alpha = lerp(orbA*lerp(0.004,0.05,depth), 0.28, hot*orbA);
+      const size  = lerp(lerp(0.3,1.2,depth)*pS, 2.4, hot);
+      const shim  = (Math.sin(tick*1.3+n.seed)+1)*.5;
       ctx.beginPath();
-      ctx.fillStyle = `rgba(240,238,210,${alpha*lerp(0.5,1.0,shimmer)})`;
-      ctx.arc(n.x, n.y, Math.max(0.2, size), 0, Math.PI*2);
+      ctx.fillStyle = `rgba(240,238,210,${alpha*lerp(0.5,1.0,shim)})`;
+      ctx.arc(n.x, n.y, Math.max(0.2,size), 0, Math.PI*2);
       ctx.fill();
-
       if (hot > 0.12){
         ctx.beginPath();
         ctx.fillStyle = `rgba(236,235,134,${0.04+hot*0.12})`;
-        ctx.arc(n.x, n.y, Math.max(0.4, size*2.4), 0, Math.PI*2);
+        ctx.arc(n.x, n.y, Math.max(0.4,size*2.4), 0, Math.PI*2);
         ctx.fill();
       }
     }
 
     function draw(){
       ctx.clearRect(0, 0, W, H);
-
       for (let r = 0; r < rowMap.length; r++){
-        const row  = rowMap[r];
-        const next = rowMap[r + 1] || null;
-
+        const row = rowMap[r], next = rowMap[r+1]||null;
         for (let c = 0; c < row.length; c++){
           const n = row[c];
-
-          if (row.length > 1){
-            const nextInRing = row[(c + 1) % row.length];
-            drawLine(n, nextInRing, 1.0);
-          }
-
+          if (row.length > 1) drawLine(n, row[(c+1)%row.length], 1.0);
           if (next && next.length > 1){
-            const ratio  = c / Math.max(1, row.length);
-            const mapped = Math.round(ratio * next.length) % next.length;
-            const b      = next[mapped];
-            const b2     = next[(mapped + 1) % next.length];
-            if (b)  drawLine(n, b,  0.78);
-            if (b2) drawLine(n, b2, 0.44);
+            const mapped = Math.round((c/Math.max(1,row.length))*next.length) % next.length;
+            if (next[mapped])              drawLine(n, next[mapped], 0.78);
+            if (next[(mapped+1)%next.length]) drawLine(n, next[(mapped+1)%next.length], 0.44);
           }
         }
       }
-
       for (let i = 0; i < nodes.length; i++) drawNode(nodes[i]);
     }
 
-    function loop(){
-      if (!isVisible){ raf = null; return; }
-      update(); draw();
-      raf = requestAnimationFrame(loop);
-    }
-
-    function start(){ if (!raf) raf = requestAnimationFrame(loop); }
+    function loop(){ if (!isVisible){ raf=null; return; } update(); draw(); raf=requestAnimationFrame(loop); }
+    function start(){ if (!raf) raf=requestAnimationFrame(loop); }
 
     function setPtr(clientX, clientY, pressure){
       const r = section.getBoundingClientRect();
-      ptr.tx = clamp((clientX-r.left)/r.width,  0, 1);
-      ptr.ty = clamp((clientY-r.top) /r.height, 0, 1);
+      ptr.tx = clamp((clientX-r.left)/r.width, 0, 1);
+      ptr.ty = clamp((clientY-r.top)/r.height, 0, 1);
       ptr.targetPressure = pressure;
       lastInteraction = performance.now();
     }
 
-    section.addEventListener('pointerenter', () => {
-      isInside = true; ptr.targetPressure = 1;
-      lastInteraction = performance.now(); start();
-    });
-    section.addEventListener('pointermove', e => setPtr(e.clientX, e.clientY, 1));
-    section.addEventListener('pointerleave', () => {
-      isInside = false;
-      ptr.targetPressure = coarsePointer ? 0.28 : 0.06;
-      lastInteraction = performance.now();
-    });
-    section.addEventListener('touchstart', e => {
-      const t = e.touches[0]; if (!t) return;
-      isInside = true; setPtr(t.clientX, t.clientY, 1); start();
-    }, { passive: true });
-    section.addEventListener('touchmove', e => {
-      const t = e.touches[0]; if (!t) return;
-      setPtr(t.clientX, t.clientY, 1);
-    }, { passive: true });
-    section.addEventListener('touchend', () => {
-      isInside = false; ptr.targetPressure = 0.30;
-      lastInteraction = performance.now();
-    }, { passive: true });
+    section.addEventListener('pointerenter', () => { isInside=true; ptr.targetPressure=1; lastInteraction=performance.now(); start(); });
+    section.addEventListener('pointermove',  e => setPtr(e.clientX, e.clientY, 1));
+    section.addEventListener('pointerleave', () => { isInside=false; ptr.targetPressure=coarsePointer?0.28:0.06; lastInteraction=performance.now(); });
+    section.addEventListener('touchstart', e => { const t=e.touches[0]; if(!t)return; isInside=true; setPtr(t.clientX,t.clientY,1); start(); }, {passive:true});
+    section.addEventListener('touchmove',  e => { const t=e.touches[0]; if(!t)return; setPtr(t.clientX,t.clientY,1); }, {passive:true});
+    section.addEventListener('touchend',   () => { isInside=false; ptr.targetPressure=0.30; lastInteraction=performance.now(); }, {passive:true});
 
     new IntersectionObserver(entries => {
       isVisible = entries[0]?.isIntersecting ?? true;
       if (isVisible) start();
-    }, { threshold: 0.05 }).observe(section);
+    }, {threshold:0.05}).observe(section);
 
-    window.addEventListener('resize', () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      resize(); start();
-    });
-
+    window.addEventListener('resize', () => { dpr=Math.min(window.devicePixelRatio||1,1.5); resize(); start(); });
     resize();
     start();
   })();
