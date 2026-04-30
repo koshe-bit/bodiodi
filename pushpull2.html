@@ -439,30 +439,42 @@
 
   <div class="strip" id="contact"></div>
 
-  <!-- =====================
+<!-- =====================
        GALLERY ANIMATION ENGINE
   ===================== -->
   <script>
   (() => {
-    const tunnel    = document.getElementById('galleryTunnel');
-    const canvas    = document.getElementById('galleryCanvas');
-    const aboutText = document.getElementById('aboutText');
-    const isMobile  = window.matchMedia('(max-width: 700px)').matches;
-    const reduced   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // ── ALL variables declared first — no hoisting issues ──
+    var tunnel    = document.getElementById('galleryTunnel');
+    var canvas    = document.getElementById('galleryCanvas');
+    var aboutText = document.getElementById('aboutText');
+    var isMobile  = window.matchMedia('(max-width: 700px)').matches;
+    var reduced   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var ctx, VW, VH, dpr;
+    var raf = null, tick = 0, lastTs = null, textShown = false;
+    var mouseX = 0.5, mouseY = 0.5;
+
+    var NUM_VASO_PTS = 72;
+    var vasoSeeds = [];
+
+    var IMG = {};
+    var loaded = 0;
+    var totalImgs = 4;
 
     // ── Mobile ──
     if (isMobile) {
-      const mobImgs = document.querySelectorAll('.mobile-gallery img');
-      const mobObs = new IntersectionObserver(entries => {
-        entries.forEach((e, i) => {
+      var mobImgs = document.querySelectorAll('.mobile-gallery img');
+      var mobObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e, i) {
           if (e.isIntersecting) {
-            setTimeout(() => e.target.classList.add('vis'), i * 160);
+            setTimeout(function() { e.target.classList.add('vis'); }, i * 160);
             mobObs.unobserve(e.target);
           }
         });
       }, { threshold: 0.15 });
-      mobImgs.forEach(img => mobObs.observe(img));
-      new IntersectionObserver(entries => {
+      mobImgs.forEach(function(img) { mobObs.observe(img); });
+      new IntersectionObserver(function(entries) {
         if (entries[0].isIntersecting) aboutText.classList.add('visible');
       }, { threshold: 0.1 }).observe(aboutText);
       return;
@@ -471,9 +483,20 @@
     if (!canvas || !tunnel) return;
     if (reduced) { aboutText.classList.add('visible'); return; }
 
-    const ctx = canvas.getContext('2d');
-    let VW = 0, VH = 0, dpr = 1;
+    ctx = canvas.getContext('2d');
 
+    // ── Helpers ──
+    function clamp(v, a, b)  { return Math.max(a, Math.min(b, v)); }
+    function lerp(a, b, t)   { return a + (b - a) * t; }
+    function mapR(v, ia, ib, oa, ob) { return lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1)); }
+    function ease(t)     { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+    function easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
+    function elasticOut(t) {
+      if (t <= 0 || t >= 1) return t;
+      return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
+    }
+
+    // ── Resize ──
     function resize() {
       VW  = window.innerWidth;
       VH  = window.innerHeight;
@@ -483,165 +506,80 @@
       canvas.style.width  = VW + 'px';
       canvas.style.height = VH + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildVasomotionRing();
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    // ── Preload all images ──
-    const SRC = {
-      p2:   'assets/People2.jpg',
-      s2:   'assets/Studio2.jpg',
-      s3:   'assets/Studio3.jpg',
-      shoe: 'assets/shoes.png'
-    };
-    const IMG = {};
-    let loaded = 0;
-    const totalImgs = Object.keys(SRC).length;
-    Object.entries(SRC).forEach(([key, src]) => {
-      const img = new Image();
-      img.onload  = () => { loaded++; if (loaded === totalImgs) boot(); };
-      img.onerror = () => { loaded++; if (loaded === totalImgs) boot(); };
-      img.src = src;
-      IMG[key] = img;
-    });
+    // ── Mouse ──
+    window.addEventListener('mousemove', function(e) {
+      mouseX = e.clientX / window.innerWidth;
+      mouseY = e.clientY / window.innerHeight;
+    }, { passive: true });
 
-    // ── Helpers ──
-    const clamp  = (v, a, b) => Math.max(a, Math.min(b, v));
-    const lerp   = (a, b, t) => a + (b - a) * t;
-    const mapR   = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1));
-    const ease   = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-    const easeOut3 = t => 1 - Math.pow(1 - t, 3);
-    const elasticOut = t => {
-      if (t <= 0 || t >= 1) return t;
-      return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
-    };
-
-    function scrollP() {
-      const r = tunnel.getBoundingClientRect();
-      return clamp(-r.top / (r.height - VH), 0, 1);
-    }
-
-    // ── VASOMOTION RING ──
-    // 72 points arranged in an ellipse around the center of the image.
-    // Each point has an independent oscillation seed so the perimeter
-    // breathes and ripples like the vessel walls in the video.
-    const NUM_VASO_PTS = 72;
-    var vasoSeeds = [];
-
+    // ── Build vasomotion ring ──
     function buildVasomotionRing() {
       vasoSeeds = [];
-      for (let i = 0; i < NUM_VASO_PTS; i++) {
+      for (var i = 0; i < NUM_VASO_PTS; i++) {
         vasoSeeds.push({
-          freq:  0.55 + Math.random() * 0.9,   // oscillation frequency
-          phase: Math.random() * Math.PI * 2,   // phase offset
-          amp:   0.018 + Math.random() * 0.038  // amplitude as fraction of radius
+          freq:  0.55 + Math.random() * 0.9,
+          phase: Math.random() * Math.PI * 2,
+          amp:   0.018 + Math.random() * 0.038
         });
       }
     }
 
-    // Draw People2 with a vasomotion organic mask.
-    // openT: 0 = nothing visible, 1 = fully open
-    // tick: current time for oscillation
-    // cx, cy: center of image on canvas
-    // imgW, imgH: rendered image dimensions
-    function drawVasomotion(img, cx, cy, imgW, imgH, openT, tick, alpha) {
+    // ── Scroll progress ──
+    function scrollP() {
+      var r = tunnel.getBoundingClientRect();
+      return clamp(-r.top / (r.height - VH), 0, 1);
+    }
+
+    // ── Draw: vasomotion organic reveal for People2 ──
+    function drawVasomotion(img, cx, cy, imgW, imgH, openT, alpha) {
       if (alpha < 0.005 || openT < 0.005 || !img.complete || !img.naturalWidth) return;
+      var expandT = easeOut3(openT);
+      var baseRX  = imgW * 0.5 * expandT;
+      var baseRY  = imgH * 0.5 * expandT;
 
-      // The mask expands from 0 to full image size as openT goes 0→1
-      // Use easeOut so it opens confidently, not tentatively
-      const expandT = easeOut3(openT);
-
-      // Base ellipse radii — grow with expandT
-      const baseRX = imgW * 0.5 * expandT;
-      const baseRY = imgH * 0.5 * expandT;
-
-      // Build the organic perimeter path
       ctx.save();
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
-
       ctx.beginPath();
-      for (let i = 0; i <= NUM_VASO_PTS; i++) {
-        const idx   = i % NUM_VASO_PTS;
-        const seed  = vasoSeeds[idx];
-        const angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
-
-        // Organic ripple on the radius — multiple harmonics like vasomotion
-        const ripple = 1
+      for (var i = 0; i <= NUM_VASO_PTS; i++) {
+        var idx   = i % NUM_VASO_PTS;
+        var seed  = vasoSeeds[idx];
+        var angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
+        var ripple = 1
           + Math.sin(tick * seed.freq + seed.phase) * seed.amp
           + Math.sin(tick * seed.freq * 1.7 + seed.phase + 1.1) * seed.amp * 0.5
           + Math.sin(tick * seed.freq * 0.4 + seed.phase + 2.3) * seed.amp * 0.3;
-
-        const rx = baseRX * ripple;
-        const ry = baseRY * ripple;
-
-        const x = Math.cos(angle) * rx;
-        const y = Math.sin(angle) * ry;
-
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        var x = Math.cos(angle) * baseRX * ripple;
+        var y = Math.sin(angle) * baseRY * ripple;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.closePath();
       ctx.clip();
-
-      // Shadow
       ctx.shadowColor   = 'rgba(0,0,0,0.20)';
       ctx.shadowBlur    = 32;
       ctx.shadowOffsetY = 10;
-
-      // Draw the actual image (cover-fit into the full imgW × imgH box)
-      const iw = img.naturalWidth, ih = img.naturalHeight;
-      const scale = Math.max(imgW / iw, imgH / ih);
-      const sw = iw * scale, sh = ih * scale;
-      const ox = (sw - imgW) / 2, oy = (sh - imgH) / 2;
-      ctx.drawImage(img, -imgW/2 - ox, -imgH/2 - oy, sw, sh);
-
+      var iw = img.naturalWidth, ih = img.naturalHeight;
+      var scale = Math.max(imgW / iw, imgH / ih);
+      var sw = iw * scale, sh = ih * scale;
+      ctx.drawImage(img, -imgW/2 - (sw-imgW)/2, -imgH/2 - (sh-imgH)/2, sw, sh);
       ctx.restore();
     }
 
-    // Draw image with object-fit:cover crop into a portrait rect
-    function drawCropped(img, cx, cy, w, h, rot, alpha) {
-      if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
-      const iw = img.naturalWidth, ih = img.naturalHeight;
-      const scale = Math.max(w / iw, h / ih);
-      const sw = iw * scale, sh = ih * scale;
-      const ox = (sw - w) / 2, oy = (sh - h) / 2;
-      ctx.save();
-      ctx.globalAlpha = clamp(alpha, 0, 1);
-      ctx.translate(cx, cy);
-      ctx.rotate(rot);
-      ctx.beginPath();
-      ctx.rect(-w/2, -h/2, w, h);
-      ctx.clip();
-      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
-      ctx.shadowBlur    = 30;
-      ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, -w/2 - ox, -h/2 - oy, sw, sh);
-      ctx.restore();
-    }
-
-    // Transition People2 from full-width vasomotion state → portrait cropped row position
-    // cropT: 0 = full-width, 1 = portrait crop
-    function drawP2Transitioning(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT, tick) {
+    // ── Draw: People2 transitioning from full-width → portrait crop ──
+    function drawP2Transitioning(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT) {
       if (alpha < 0.005 || !img.complete || !img.naturalWidth) return;
-
-      const w = lerp(fullW, cropW, cropT);
-      const h = lerp(fullH, cropH, cropT);
-
-      // clip rect lerps from full size → portrait
-      const clipW = lerp(fullW, cropW, cropT);
-      const clipH = lerp(fullH, cropH, cropT);
-
-      // During transition, organic edges gradually tighten into a clean rect
-      // We do this by blending a vasomotion clip (at cropT=0) with a rect clip (at cropT=1)
-      // Practically: at low cropT we use the vasomotion path, at high cropT a rect
-      const useVaso = cropT < 0.85;
-
-      const iw = img.naturalWidth, ih = img.naturalHeight;
-      const scale = Math.max(w / iw, h / ih);
-      const sw = iw * scale, sh = ih * scale;
-      const ox = (sw - w) / 2, oy = (sh - h) / 2;
+      var w = lerp(fullW, cropW, cropT);
+      var h = lerp(fullH, cropH, cropT);
+      var clipW = lerp(fullW, cropW, cropT);
+      var clipH = lerp(fullH, cropH, cropT);
+      var useVaso = cropT < 0.85;
+      var iw = img.naturalWidth, ih = img.naturalHeight;
+      var scale = Math.max(w / iw, h / ih);
+      var sw = iw * scale, sh = ih * scale;
 
       ctx.save();
       ctx.globalAlpha = clamp(alpha, 0, 1);
@@ -649,24 +587,18 @@
       ctx.rotate(rot);
 
       if (useVaso) {
-        // Organic vasomotion clip that tightens as cropT increases
-        const tighten = ease(cropT / 0.85); // 0→1 over first 85% of transition
+        var tighten = ease(cropT / 0.85);
         ctx.beginPath();
-        for (let i = 0; i <= NUM_VASO_PTS; i++) {
-          const idx   = i % NUM_VASO_PTS;
-          const seed  = vasoSeeds[idx];
-          const angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
-
-          // As tighten → 1, amplitude fades to zero (edges solidify)
-          const ampMult = 1 - tighten;
-          const ripple  = 1
+        for (var i = 0; i <= NUM_VASO_PTS; i++) {
+          var idx   = i % NUM_VASO_PTS;
+          var seed  = vasoSeeds[idx];
+          var angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
+          var ampMult = 1 - tighten;
+          var ripple  = 1
             + Math.sin(tick * seed.freq + seed.phase) * seed.amp * ampMult
             + Math.sin(tick * seed.freq * 1.7 + seed.phase + 1.1) * seed.amp * 0.5 * ampMult;
-
-          const rx = (clipW / 2) * ripple;
-          const ry = (clipH / 2) * ripple;
-          const x  = Math.cos(angle) * rx;
-          const y  = Math.sin(angle) * ry;
+          var x = Math.cos(angle) * (clipW/2) * ripple;
+          var y = Math.sin(angle) * (clipH/2) * ripple;
           if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
         ctx.closePath();
@@ -680,14 +612,34 @@
       ctx.shadowColor   = 'rgba(0,0,0,0.18)';
       ctx.shadowBlur    = 30;
       ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, -w/2 - ox, -h/2 - oy, sw, sh);
+      ctx.drawImage(img, -w/2 - (sw-w)/2, -h/2 - (sh-h)/2, sw, sh);
       ctx.restore();
     }
 
-    // Draw shoe
+    // ── Draw: portrait cropped image ──
+    function drawCropped(img, cx, cy, w, h, rot, alpha) {
+      if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
+      var iw = img.naturalWidth, ih = img.naturalHeight;
+      var scale = Math.max(w / iw, h / ih);
+      var sw = iw * scale, sh = ih * scale;
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.beginPath();
+      ctx.rect(-w/2, -h/2, w, h);
+      ctx.clip();
+      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
+      ctx.shadowBlur    = 30;
+      ctx.shadowOffsetY = 10;
+      ctx.drawImage(img, -w/2 - (sw-w)/2, -h/2 - (sh-h)/2, sw, sh);
+      ctx.restore();
+    }
+
+    // ── Draw: shoe ──
     function drawShoe(img, cx, cy, w, rot, alpha) {
       if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
-      const h = w * (img.naturalHeight / img.naturalWidth);
+      var h = w * (img.naturalHeight / img.naturalWidth);
       ctx.save();
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
@@ -699,96 +651,63 @@
       ctx.restore();
     }
 
-    let raf = null, tick = 0, lastTs = null, textShown = false;
-
-    // Mouse position for hover parallax on the fully revealed People2
-    let mouseX = 0.5, mouseY = 0.5;
-    window.addEventListener('mousemove', e => {
-      mouseX = e.clientX / window.innerWidth;
-      mouseY = e.clientY / window.innerHeight;
-    }, { passive: true });
-
+    // ── Main frame ──
     function frame(ts) {
-      raf    = requestAnimationFrame(frame);
-      const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
+      raf = requestAnimationFrame(frame);
+      var dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
       lastTs = ts;
       tick  += dt;
 
-      const p = scrollP();
+      var p = scrollP();
       ctx.clearRect(0, 0, VW, VH);
 
-      // ── Layout constants ──
-      const cx = VW * 0.5;
-      const cy = VH * 0.5;
+      var cx = VW * 0.5;
+      var cy = VH * 0.5;
 
-      // Portrait crop dimensions for all three final images
-      const imgH   = VH * 0.60;
-      const imgW   = imgH * 0.68;
-      const gap    = VW * 0.022;
-      const rowTotal = imgW * 3 + gap * 2;
-      const rowLeft  = (VW - rowTotal) / 2;
-      const r1cx = rowLeft + imgW * 0.5;
-      const r2cx = rowLeft + imgW + gap + imgW * 0.5;
-      const r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
-      const rowCY = VH * 0.50;
+      var imgH     = VH * 0.60;
+      var imgW     = imgH * 0.68;
+      var gap      = VW * 0.022;
+      var rowTotal = imgW * 3 + gap * 2;
+      var rowLeft  = (VW - rowTotal) / 2;
+      var r1cx = rowLeft + imgW * 0.5;
+      var r2cx = rowLeft + imgW + gap + imgW * 0.5;
+      var r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
+      var rowCY = VH * 0.50;
 
-      // People2 full-width state dimensions
-      // Wide but not bleed — ~88vw so there's a hint of breathing room
-      const fullW = VW * 0.88;
-      const fullH = VH * 0.58;
+      var fullW = VW * 0.88;
+      var fullH = VH * 0.58;
+      var shoeW = VW * 0.10;
 
-      const shoeW = VW * 0.10;
+      var hoverDX = (mouseX - 0.5) * 10;
+      var hoverDY = (mouseY - 0.5) * 6;
 
-      // ── Subtle hover parallax on fully revealed image ──
-      const hoverDX = (mouseX - 0.5) * 10;
-      const hoverDY = (mouseY - 0.5) * 6;
+      var bobY2    = Math.sin(tick * 0.75) * 3.5;
+      var bobR2    = Math.sin(tick * 0.62) * 0.005;
+      var shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
+      var shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
 
-      // ── Bobs ──
-      const bobY2    = Math.sin(tick * 0.75) * 3.5;
-      const bobR2    = Math.sin(tick * 0.62) * 0.005;
-      const shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
-      const shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
+      var vasoT    = ease(mapR(p, 0.00, 0.20, 0, 1));
+      var fullyOpen= mapR(p, 0.20, 0.32, 0, 1);
+      var shoeIn   = ease(mapR(p, 0.32, 0.42, 0, 1));
+      var bobbing  = mapR(p, 0.42, 0.50, 0, 1);
+      var kickP    = mapR(p, 0.50, 0.68, 0, 1);
+      var kickE    = ease(kickP);
+      var cropT    = ease(mapR(p, 0.54, 0.70, 0, 1));
+      var s2P      = elasticOut(ease(mapR(p, 0.58, 0.76, 0, 1)));
+      var s3P      = ease(mapR(p, 0.62, 0.80, 0, 1));
+      var bobMult  = (bobbing + fullyOpen * 0.4) * (1 - kickE);
 
-      // ────────────────────────────────────────────────────
-      // PHASE MAP  (p = 0 → 1, tunnel = 340vh)
-      //
-      //  0.00–0.20   People2 vasomotion reveal (organic expand)
-      //  0.20–0.32   Fully revealed, hovering + mouseover parallax
-      //  0.32–0.42   Shoe drifts in from left, bobs with People2
-      //  0.42–0.50   Both bob together — moment of stillness
-      //  0.50–0.68   Kick: shoe winds up, impacts, tumbles off
-      //              People2 slides to center row + crops to portrait
-      //  0.58–0.76   Studio2 (left) drops from above
-      //  0.62–0.80   Studio3 (right) breathes in
-      //  0.88+       Text rises
-      // ────────────────────────────────────────────────────
+      // People2
+      var p2HoverX = lerp(0, hoverDX, fullyOpen * (1 - kickE));
+      var p2HoverY = lerp(0, hoverDY, fullyOpen * (1 - kickE));
+      var p2X = lerp(cx + p2HoverX, r2cx, kickE);
+      var p2Y = lerp(cy + p2HoverY, rowCY, kickE) + bobY2 * bobMult;
+      var p2R = lerp(bobR2 * bobMult, 0, kickE);
 
-      const vasoT  = ease(mapR(p, 0.00, 0.20, 0, 1));   // 0→1 reveal
-      const fullyOpen = mapR(p, 0.20, 0.32, 0, 1);       // ramp into bob phase
-      const shoeIn = ease(mapR(p, 0.32, 0.42, 0, 1));
-      const bobbing = mapR(p, 0.42, 0.50, 0, 1);
-      const kickP  = mapR(p, 0.50, 0.68, 0, 1);
-      const kickE  = ease(kickP);
-      const cropT  = ease(mapR(p, 0.54, 0.70, 0, 1));
-      const s2P    = elasticOut(ease(mapR(p, 0.58, 0.76, 0, 1)));
-      const s3P    = ease(mapR(p, 0.62, 0.80, 0, 1));
-
-      const bobMult = (bobbing + fullyOpen * 0.4) * (1 - kickE);
-
-      // ── PEOPLE 2 position ──
-      // During reveal + hover: centered, with subtle mouse parallax
-      // During kick: slides to r2cx
-      const p2HoverX = lerp(0, hoverDX, fullyOpen * (1 - kickE));
-      const p2HoverY = lerp(0, hoverDY, fullyOpen * (1 - kickE));
-      const p2X = lerp(cx + p2HoverX, r2cx, kickE);
-      const p2Y = lerp(cy + p2HoverY, rowCY, kickE) + bobY2 * bobMult;
-      const p2R = lerp(bobR2 * bobMult, 0, kickE);
-
-      // ── SHOE ──
-      const shoeRestX = cx - fullW * 0.46;
-      const shoeRestY = cy - VH * 0.03;
-
-      let shoeX, shoeY, shoeR, shoeCurW, shoeA;
+      // Shoe
+      var shoeRestX = cx - fullW * 0.46;
+      var shoeRestY = cy - VH * 0.03;
+      var shoeX, shoeY, shoeR, shoeCurW, shoeA;
 
       if (kickP < 0.01) {
         shoeX    = lerp(cx - VW * 0.54, shoeRestX, ease(shoeIn));
@@ -797,9 +716,9 @@
         shoeCurW = shoeW;
         shoeA    = shoeIn;
       } else {
-        const windUp = ease(mapR(kickP, 0.00, 0.20, 0, 1));
-        const impact = ease(mapR(kickP, 0.20, 0.48, 0, 1));
-        const tumble = ease(mapR(kickP, 0.48, 1.00, 0, 1));
+        var windUp = ease(mapR(kickP, 0.00, 0.20, 0, 1));
+        var impact = ease(mapR(kickP, 0.20, 0.48, 0, 1));
+        var tumble = ease(mapR(kickP, 0.48, 1.00, 0, 1));
         shoeX    = shoeRestX
                    + lerp(0, -VW * 0.022, windUp)
                    + lerp(0,  VW * 0.20,  impact)
@@ -810,48 +729,57 @@
         shoeA    = lerp(1, 0, mapR(kickP, 0.70, 1.0, 0, 1));
       }
 
-      // ── STUDIO 2 (left) ──
-      const s2A = ease(mapR(mapR(p, 0.58, 0.76, 0, 1), 0, 0.28, 0, 1));
-      const s2Y = lerp(rowCY - VH * 0.52, rowCY, s2P);
-      const s2R = lerp(-0.05, -0.008, s2P);
+      // Studio2 left
+      var s2A = ease(mapR(mapR(p, 0.58, 0.76, 0, 1), 0, 0.28, 0, 1));
+      var s2Y = lerp(rowCY - VH * 0.52, rowCY, s2P);
+      var s2R = lerp(-0.05, -0.008, s2P);
 
-      // ── STUDIO 3 (right) ──
-      const s3A     = ease(mapR(mapR(p, 0.62, 0.80, 0, 1), 0, 0.36, 0, 1));
-      const s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
-      const s3Scale = lerp(0.48, 1.0, s3P);
-      const s3R     = lerp(0.042, 0.007, s3P);
+      // Studio3 right
+      var s3A     = ease(mapR(mapR(p, 0.62, 0.80, 0, 1), 0, 0.36, 0, 1));
+      var s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
+      var s3Scale = lerp(0.48, 1.0, s3P);
+      var s3R     = lerp(0.042, 0.007, s3P);
 
-      // ── Draw order: back → front ──
-
-      // Studio2 left (drops from above)
+      // Draw
       drawCropped(IMG.s2, r1cx, s2Y, imgW, imgH, s2R, s2A);
-
-      // Studio3 right (breathes in)
       drawCropped(IMG.s3, r3cx, s3Y, imgW * s3Scale, imgH * s3Scale, s3R, s3A);
 
-      // People2 center — vasomotion reveal → full-width hover → kick → portrait crop
       if (cropT < 0.01) {
-        // Pure vasomotion reveal or hovering full-width
-        drawVasomotion(IMG.p2, p2X, p2Y, fullW, fullH, vasoT, tick, 1.0);
+        drawVasomotion(IMG.p2, p2X, p2Y, fullW, fullH, vasoT, 1.0);
       } else {
-        // Transitioning to portrait crop during kick
-        drawP2Transitioning(IMG.p2, p2X, p2Y, fullW, fullH, imgW, imgH, p2R, 1.0, cropT, tick);
+        drawP2Transitioning(IMG.p2, p2X, p2Y, fullW, fullH, imgW, imgH, p2R, 1.0, cropT);
       }
 
-      // Shoe on top
       drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
 
-      // Text
       if (p > 0.88 && !textShown) { textShown = true;  aboutText.classList.add('visible'); }
       if (p < 0.82 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
     }
 
+    // ── Boot: called once all images are loaded ──
     function boot() {
+      buildVasomotionRing();
       raf = requestAnimationFrame(frame);
     }
 
-    new IntersectionObserver(entries => {
-      const vis = entries[0].isIntersecting;
+    // ── Preload images ──
+    var srcs = {
+      p2:   'assets/People2.jpg',
+      s2:   'assets/Studio2.jpg',
+      s3:   'assets/Studio3.jpg',
+      shoe: 'assets/shoes.png'
+    };
+    Object.keys(srcs).forEach(function(key) {
+      var img = new Image();
+      img.onload  = function() { loaded++; if (loaded === totalImgs) boot(); };
+      img.onerror = function() { loaded++; if (loaded === totalImgs) boot(); };
+      img.src = srcs[key];
+      IMG[key] = img;
+    });
+
+    // ── Pause when off-screen ──
+    new IntersectionObserver(function(entries) {
+      var vis = entries[0].isIntersecting;
       if (vis && !raf)  { lastTs = null; raf = requestAnimationFrame(frame); }
       if (!vis && raf)  { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0.01 }).observe(tunnel);
