@@ -454,17 +454,17 @@
     var raf = null, tick = 0, lastTs = null, textShown = false;
     var mouseX = 0.5, mouseY = 0.5;
 
-    var NUM_PTS  = 120;   // points on the organic perimeter — more = smoother
-    var vasoSeeds = [];
-
-    // Offscreen canvas for grain texture
-    var grainCanvas = document.createElement('canvas');
-    var grainCtx    = grainCanvas.getContext('2d');
-    var grainBuilt  = false;
-
     var IMG    = {};
     var loaded = 0;
     var totalImgs = 4;
+
+    // Per-column noise seeds — each column gets its own breathing personality
+    var colSeeds = [];
+    var NUM_COLS = 0; // set on resize
+
+    // Offscreen canvas for rendering People2 before compositing
+    var offscreen    = document.createElement('canvas');
+    var offCtx       = offscreen.getContext('2d');
 
     // ── Mobile ──
     if (isMobile) {
@@ -495,10 +495,36 @@
     function mapR(v, ia, ib, oa, ob) { return lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1)); }
     function ease(t)     { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
     function easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
-    function easeOut5(t) { return 1 - Math.pow(1 - t, 5); }
     function elasticOut(t) {
       if (t <= 0 || t >= 1) return t;
       return Math.pow(2, -10*t) * Math.sin((t * 10 - 0.75) * (Math.PI * 2 / 3)) + 1;
+    }
+
+    // ── Build per-column seeds ──
+    // Each column gets 3 sine wave layers with independent frequencies/phases
+    // Layer 1: slow vasomotion breathing (large amplitude)
+    // Layer 2: medium organic undulation
+    // Layer 3: fast micro-flutter (tiny amplitude — the "sparkle grain" feel)
+    function buildColSeeds(numCols) {
+      colSeeds = [];
+      for (var i = 0; i < numCols; i++) {
+        colSeeds.push({
+          // Slow breath — the vessel wall contracting/expanding
+          f1: 0.08 + Math.random() * 0.12,
+          p1: Math.random() * Math.PI * 2,
+          a1: 0.06 + Math.random() * 0.10,  // large — creates dramatic ragged shape
+
+          // Medium undulation — organic variation between neighbors
+          f2: 0.22 + Math.random() * 0.28,
+          p2: Math.random() * Math.PI * 2,
+          a2: 0.02 + Math.random() * 0.04,
+
+          // Fast micro-flutter — the tiny sparkles at the boundary
+          f3: 2.5  + Math.random() * 4.0,
+          p3: Math.random() * Math.PI * 2,
+          a3: 0.004 + Math.random() * 0.008  // tiny — just a glimmer
+        });
+      }
     }
 
     // ── Resize ──
@@ -511,7 +537,15 @@
       canvas.style.width  = VW + 'px';
       canvas.style.height = VH + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildGrain();
+
+      // Offscreen canvas matches main canvas
+      offscreen.width  = canvas.width;
+      offscreen.height = canvas.height;
+      offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Rebuild seeds at column resolution — 1 seed per 3px column for performance
+      NUM_COLS = Math.ceil(VW / 3);
+      buildColSeeds(NUM_COLS);
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
@@ -521,265 +555,149 @@
       mouseY = e.clientY / window.innerHeight;
     }, { passive: true });
 
-    // ── Build grain texture ──
-    // A static noise canvas we tile over the image — gives it that
-    // organic, slightly-film-like texture especially at the dissolving edges
-    function buildGrain() {
-      var gW = 320, gH = 320;
-      grainCanvas.width  = gW;
-      grainCanvas.height = gH;
-      var gd = grainCtx.createImageData(gW, gH);
-      for (var i = 0; i < gd.data.length; i += 4) {
-        var v = Math.random() * 255 | 0;
-        gd.data[i]     = v;
-        gd.data[i + 1] = v;
-        gd.data[i + 2] = v;
-        gd.data[i + 3] = Math.random() * 38 | 0; // very subtle, max ~15% opacity
-      }
-      grainCtx.putImageData(gd, 0, 0);
-      grainBuilt = true;
+    // ── Scroll progress ──
+    function scrollP() {
+      var r = tunnel.getBoundingClientRect();
+      return clamp(-r.top / (r.height - VH), 0, 1);
     }
 
-    // ── Build vasomotion seeds ──
-    // Three layered sine waves per point at very low amplitudes
-    // Creates complex non-repeating organic breathing
-    function buildVasomotionRing() {
-      vasoSeeds = [];
-      for (var i = 0; i < NUM_PTS; i++) {
-        vasoSeeds.push({
-          f1: 0.12 + Math.random() * 0.18,  // very slow primary breath
-          p1: Math.random() * Math.PI * 2,
-          a1: 0.003 + Math.random() * 0.006, // tiny amplitude
-          f2: 0.28 + Math.random() * 0.38,
-          p2: Math.random() * Math.PI * 2,
-          a2: 0.002 + Math.random() * 0.004,
-          f3: 0.7  + Math.random() * 1.0,    // micro flutter
-          p3: Math.random() * Math.PI * 2,
-          a3: 0.001 + Math.random() * 0.002
-        });
-      }
+    // ── Get the noise offset for a column at current tick ──
+    // Returns a value roughly in [-1, 1] representing how much
+    // this column's reveal threshold is offset from the base
+    function colNoise(colIdx) {
+      var s = colSeeds[colIdx % NUM_COLS];
+      if (!s) return 0;
+      return Math.sin(tick * s.f1 + s.p1) * s.a1
+           + Math.sin(tick * s.f2 + s.p2) * s.a2
+           + Math.sin(tick * s.f3 + s.p3) * s.a3;
     }
 
-    // ── Radius multiplier for a vasomotion point at current tick ──
-    function vasoR(idx) {
-      var s = vasoSeeds[idx % NUM_PTS];
-      if (!s) return 1;
-      return 1
-        + Math.sin(tick * s.f1 + s.p1) * s.a1
-        + Math.sin(tick * s.f2 + s.p2) * s.a2
-        + Math.sin(tick * s.f3 + s.p3) * s.a3;
-    }
+    // ── Draw People2 with column-based noise reveal (bottom up) ──
+    // revealT: 0 = nothing shown, 1 = fully revealed
+    // The image is drawn column-strip by column-strip. Each strip is clipped
+    // to reveal from the bottom up, but each column's reveal line is offset
+    // by its noise value — creating the ragged, breathing edge.
+    function drawVasomotion(img, cx, cy, imgW, imgH, revealT, alpha) {
+      if (alpha < 0.005 || revealT < 0.005 || !img.complete || !img.naturalWidth) return;
 
-    // ── Trace a smooth closed organic ellipse path ──
-    // Uses cubic bezier tangents so the perimeter is always smooth —
-    // no corners or jagged edges ever
-    // rx, ry: ellipse radii
-    // fm: feather multiplier (1 = full size, <1 = shrunk for inner layers)
-    function traceVasoPath(rx, ry, fm) {
-      var f = fm || 1;
-      // Bezier handle length for a smooth ellipse approximation
-      var kx = rx * f * 0.5523;
-      var ky = ry * f * 0.5523;
-
-      ctx.beginPath();
-
-      // We build points then connect with smooth bezier curves
-      var pts = [];
-      for (var i = 0; i < NUM_PTS; i++) {
-        var angle = (i / NUM_PTS) * Math.PI * 2;
-        var r = vasoR(i);
-        pts.push({
-          x: Math.cos(angle) * rx * f * r,
-          y: Math.sin(angle) * ry * f * r,
-          angle: angle,
-          r: r
-        });
-      }
-
-      // Move to first point
-      ctx.moveTo(pts[0].x, pts[0].y);
-
-      // Connect each point with a smooth bezier
-      for (var i = 0; i < NUM_PTS; i++) {
-        var curr = pts[i];
-        var next = pts[(i + 1) % NUM_PTS];
-
-        // Tangent-based control points for smooth curvature
-        var cp = (Math.PI * 2 / NUM_PTS) * 0.52;
-
-        var cp1x = curr.x - Math.sin(curr.angle) * rx * f * curr.r * cp;
-        var cp1y = curr.y + Math.cos(curr.angle) * ry * f * curr.r * cp;
-        var cp2x = next.x + Math.sin(next.angle) * rx * f * next.r * cp;
-        var cp2y = next.y - Math.cos(next.angle) * ry * f * next.r * cp;
-
-        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, next.x, next.y);
-      }
-      ctx.closePath();
-    }
-
-    // ── Draw People2 with feathered vasomotion reveal ──
-    // Core technique: draw the image multiple times, each pass clipped
-    // to a slightly different-sized organic path, with opacity that
-    // increases toward the center. This creates the dissolving,
-    // fizzling edge that fades into the background like the video.
-    function drawVasomotion(img, cx, cy, imgW, imgH, openT, alpha) {
-      if (alpha < 0.005 || openT < 0.005 || !img.complete || !img.naturalWidth) return;
-
-      var expandT = easeOut5(openT);
-      var baseRX  = imgW * 0.5 * expandT;
-      var baseRY  = imgH * 0.5 * expandT;
-
-      // Cover-fit image into the box
+      // Cover-fit the image
       var iw = img.naturalWidth, ih = img.naturalHeight;
       var scale = Math.max(imgW / iw, imgH / ih);
       var sw = iw * scale, sh = ih * scale;
-      var drawX = -imgW / 2 - (sw - imgW) / 2;
-      var drawY = -imgH / 2 - (sh - imgH) / 2;
+      var imgLeft = cx - imgW / 2;
+      var imgTop  = cy - imgH / 2;
+      var drawX   = imgLeft - (sw - imgW) / 2;
+      var drawY   = imgTop  - (sh - imgH) / 2;
 
-      // ── Feather layers ──
-      // Layer 0 = outermost (most transparent, largest path)
-      // Layer N = innermost (most opaque, smallest path — core of the image)
-      var LAYERS = 10;
+      // Base reveal: how far up from the bottom the image is revealed
+      // revealT=0 → base at bottom of image, revealT=1 → base at top
+      // We use easeOut so it opens confidently
+      var expandT  = easeOut3(revealT);
+      // revealY is the Y position of the reveal line in canvas coords
+      // At expandT=0: reveal line is at bottom of image (nothing shown)
+      // At expandT=1: reveal line is at top of image (fully shown)
+      var revealY  = imgTop + imgH * (1 - expandT);
 
-      for (var layer = 0; layer < LAYERS; layer++) {
-        var t = layer / (LAYERS - 1); // 0→1 outer→inner
+      // Column strip width in pixels
+      var STRIP = 3;
 
-        // Outer layers extend slightly beyond the image boundary to
-        // create a soft halo of dissolving texture
-        // Inner layers pull in slightly so the core is crisply revealed
-        var fm = lerp(1.08, 0.94, t);
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
 
-        // Opacity curve: near-zero at edge, strong in center
-        // Power curve makes the fade feel organic not linear
-        var layerAlpha = clamp(alpha * lerp(0.0, 1.0, Math.pow(t, 1.8)), 0, 1);
-        if (layerAlpha < 0.008) continue;
+      // Draw the image once into offscreen canvas so we can sample it
+      offCtx.clearRect(0, 0, VW, VH);
+      offCtx.save();
+      offCtx.shadowColor   = 'rgba(0,0,0,0.20)';
+      offCtx.shadowBlur    = 28;
+      offCtx.shadowOffsetY = 10;
+      offCtx.drawImage(img, drawX, drawY, sw, sh);
+      offCtx.restore();
 
+      // For each vertical column strip, clip to the reveal region
+      // and draw that strip from the offscreen canvas
+      for (var col = 0; col < NUM_COLS; col++) {
+        var stripX = imgLeft + col * STRIP;
+        if (stripX > imgLeft + imgW) break;
+        var stripW = Math.min(STRIP, imgLeft + imgW - stripX);
+        if (stripW <= 0) continue;
+
+        // Noise offset for this column — shifts the reveal line up or down
+        // The noise is in [-~0.18, +~0.18] of imgH at full amplitude
+        var noise  = colNoise(col);
+        var offset = noise * imgH;
+
+        // This column's reveal Y threshold
+        var colRevealY = revealY + offset;
+
+        // How much of this column is revealed
+        var revealedH = imgTop + imgH - colRevealY;
+        if (revealedH <= 0) continue;
+
+        // Clip and draw this strip
         ctx.save();
-        ctx.globalAlpha = layerAlpha;
-        ctx.translate(cx, cy);
-
-        // Clip to the organic path for this layer
-        traceVasoPath(baseRX, baseRY, fm);
+        ctx.beginPath();
+        ctx.rect(stripX, colRevealY, stripW, revealedH);
         ctx.clip();
-
-        // Shadow only on the innermost few layers to avoid muddy look
-        if (t > 0.65) {
-          ctx.shadowColor   = 'rgba(0,0,0,0.16)';
-          ctx.shadowBlur    = 28;
-          ctx.shadowOffsetY = 8;
-        }
-
-        ctx.drawImage(img, drawX, drawY, sw, sh);
-
-        // ── Grain overlay ──
-        // Applied on outermost layers at higher opacity — gives the
-        // dissolving edge a grainy, organic, almost biological texture
-        if (grainBuilt && t < 0.7) {
-          var grainAlpha = lerp(0.28, 0.0, t / 0.7);
-          ctx.globalAlpha = grainAlpha;
-          ctx.globalCompositeOperation = 'overlay';
-          // Tile the grain canvas across the image area
-          var gW = grainCanvas.width, gH = grainCanvas.height;
-          for (var gx = drawX; gx < drawX + sw; gx += gW) {
-            for (var gy = drawY; gy < drawY + sh; gy += gH) {
-              ctx.drawImage(grainCanvas, gx, gy);
-            }
-          }
-          ctx.globalCompositeOperation = 'source-over';
-        }
-
+        ctx.drawImage(offscreen, 0, 0, VW, VH);
         ctx.restore();
+
+        // ── Edge sparkles ──
+        // Draw a thin band of semi-transparent noise right at the reveal line
+        // This is the "tiny blood grain sparkles" at the boundary
+        var sparkH = 18 + Math.abs(noise) * 40; // taller where edge is more offset
+        var sparkY = colRevealY - sparkH * 0.3;  // straddle the edge line
+
+        if (sparkY < imgTop + imgH && sparkY + sparkH > imgTop) {
+          ctx.save();
+          // Clip sparkles to image bounds
+          ctx.beginPath();
+          ctx.rect(stripX, Math.max(imgTop, sparkY), stripW, Math.min(sparkH, imgTop + imgH - sparkY));
+          ctx.clip();
+
+          // Gradient: transparent above edge, grain at edge, transparent below
+          var grad = ctx.createLinearGradient(stripX, sparkY, stripX, sparkY + sparkH);
+          // Fast micro-flicker: randomise each frame for sparkle feel
+          var flicker = 0.15 + Math.random() * 0.30;
+          grad.addColorStop(0,   'rgba(255,255,255,0)');
+          grad.addColorStop(0.3, 'rgba(255,255,255,' + (flicker * 0.4).toFixed(3) + ')');
+          grad.addColorStop(0.5, 'rgba(220,210,190,' + flicker.toFixed(3) + ')');
+          grad.addColorStop(0.7, 'rgba(255,255,255,' + (flicker * 0.3).toFixed(3) + ')');
+          grad.addColorStop(1,   'rgba(255,255,255,0)');
+
+          ctx.globalAlpha = 0.7;
+          ctx.fillStyle = grad;
+          ctx.fillRect(stripX, sparkY, stripW, sparkH);
+          ctx.restore();
+        }
       }
 
-      // ── Persistent subtle grain on the whole revealed image ──
-      // Gives the fully-open image a slight film texture
-      if (grainBuilt && openT > 0.5) {
-        var fullGrainAlpha = lerp(0, 0.12, mapR(openT, 0.5, 1.0, 0, 1));
-        ctx.save();
-        ctx.globalAlpha = fullGrainAlpha * alpha;
-        ctx.translate(cx, cy);
-        traceVasoPath(baseRX * 0.94, baseRY * 0.94, 1);
-        ctx.clip();
-        ctx.globalCompositeOperation = 'overlay';
-        var gW = grainCanvas.width, gH = grainCanvas.height;
-        for (var gx = drawX; gx < drawX + sw; gx += gW) {
-          for (var gy = drawY; gy < drawY + sh; gy += gH) {
-            ctx.drawImage(grainCanvas, gx, gy);
-          }
-        }
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.restore();
-      }
+      ctx.restore();
     }
 
     // ── Draw People2 transitioning from full-width → portrait crop ──
-    // Organic edges solidify into a clean rect as cropT → 1
-    function drawP2Transitioning(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT) {
+    // Once kicked, edges are clean — simple rect clip
+    function drawP2Kicking(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT) {
       if (alpha < 0.005 || !img.complete || !img.naturalWidth) return;
-
       var w = lerp(fullW, cropW, cropT);
       var h = lerp(fullH, cropH, cropT);
-
       var iw = img.naturalWidth, ih = img.naturalHeight;
       var scale = Math.max(w / iw, h / ih);
       var sw = iw * scale, sh = ih * scale;
-      var drawX = -w / 2 - (sw - w) / 2;
-      var drawY = -h / 2 - (sh - h) / 2;
-
-      // Edges tighten from organic → rect as tighten → 1
-      var tighten = ease(cropT);
-
       ctx.save();
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
       ctx.rotate(rot);
-
-      if (cropT < 0.92) {
-        // Organic path with amplitude fading to zero
-        var rx = w / 2;
-        var ry = h / 2;
-
-        // Recalculate organic path with tightening amplitude
-        var pts = [];
-        for (var i = 0; i < NUM_PTS; i++) {
-          var angle = (i / NUM_PTS) * Math.PI * 2;
-          var s = vasoSeeds[i % NUM_PTS];
-          if (!s) { pts.push({ x: Math.cos(angle)*rx, y: Math.sin(angle)*ry, angle: angle, r: 1 }); continue; }
-          var ampFade = 1 - tighten;
-          var r = 1
-            + Math.sin(tick * s.f1 + s.p1) * s.a1 * ampFade
-            + Math.sin(tick * s.f2 + s.p2) * s.a2 * ampFade;
-          pts.push({ x: Math.cos(angle)*rx*r, y: Math.sin(angle)*ry*r, angle: angle, r: r });
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        var cp = (Math.PI * 2 / NUM_PTS) * 0.52;
-        for (var i = 0; i < NUM_PTS; i++) {
-          var curr = pts[i];
-          var next = pts[(i + 1) % NUM_PTS];
-          var cp1x = curr.x - Math.sin(curr.angle) * rx * curr.r * cp;
-          var cp1y = curr.y + Math.cos(curr.angle) * ry * curr.r * cp;
-          var cp2x = next.x + Math.sin(next.angle) * rx * next.r * cp;
-          var cp2y = next.y - Math.cos(next.angle) * ry * next.r * cp;
-          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, next.x, next.y);
-        }
-        ctx.closePath();
-        ctx.clip();
-      } else {
-        ctx.beginPath();
-        ctx.rect(-w / 2, -h / 2, w, h);
-        ctx.clip();
-      }
-
+      ctx.beginPath();
+      ctx.rect(-w / 2, -h / 2, w, h);
+      ctx.clip();
       ctx.shadowColor   = 'rgba(0,0,0,0.18)';
       ctx.shadowBlur    = 30;
       ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, drawX, drawY, sw, sh);
+      ctx.drawImage(img, -w/2 - (sw-w)/2, -h/2 - (sh-h)/2, sw, sh);
       ctx.restore();
     }
 
-    // ── Draw cropped portrait image (Studio2, Studio3) ──
+    // ── Draw cropped portrait image ──
     function drawCropped(img, cx, cy, w, h, rot, alpha) {
       if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
       var iw = img.naturalWidth, ih = img.naturalHeight;
@@ -814,13 +732,7 @@
       ctx.restore();
     }
 
-    // ── Scroll progress ──
-    function scrollP() {
-      var r = tunnel.getBoundingClientRect();
-      return clamp(-r.top / (r.height - VH), 0, 1);
-    }
-
-    // ── Main animation frame ──
+    // ── Main frame ──
     function frame(ts) {
       raf = requestAnimationFrame(frame);
       var dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
@@ -859,16 +771,25 @@
       var shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
       var shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
 
-      // Phase map
-      var vasoT    = ease(mapR(p, 0.00, 0.20, 0, 1));
-      var fullyOpen= mapR(p, 0.20, 0.32, 0, 1);
-      var shoeIn   = ease(mapR(p, 0.32, 0.42, 0, 1));
-      var bobbing  = mapR(p, 0.42, 0.50, 0, 1);
-      var kickP    = mapR(p, 0.50, 0.68, 0, 1);
+      // ── Phase map ──
+      //  0.00–0.22  People2 reveals bottom-up with noise edge
+      //  0.22–0.34  Fully revealed, hovering + parallax
+      //  0.34–0.44  Shoe drifts in from left
+      //  0.44–0.52  Both bob
+      //  0.52–0.70  Kick: shoe tumbles, People2 → portrait
+      //  0.60–0.78  Studio2 drops from above
+      //  0.64–0.82  Studio3 breathes in
+      //  0.88+      Text rises
+
+      var revealT  = ease(mapR(p, 0.00, 0.22, 0, 1));
+      var fullyOpen= mapR(p, 0.22, 0.34, 0, 1);
+      var shoeIn   = ease(mapR(p, 0.34, 0.44, 0, 1));
+      var bobbing  = mapR(p, 0.44, 0.52, 0, 1);
+      var kickP    = mapR(p, 0.52, 0.70, 0, 1);
       var kickE    = ease(kickP);
-      var cropT    = ease(mapR(p, 0.54, 0.70, 0, 1));
-      var s2P      = elasticOut(ease(mapR(p, 0.58, 0.76, 0, 1)));
-      var s3P      = ease(mapR(p, 0.62, 0.80, 0, 1));
+      var cropT    = ease(mapR(p, 0.56, 0.72, 0, 1));
+      var s2P      = elasticOut(ease(mapR(p, 0.60, 0.78, 0, 1)));
+      var s3P      = ease(mapR(p, 0.64, 0.82, 0, 1));
       var bobMult  = (bobbing + fullyOpen * 0.4) * (1 - kickE);
 
       // People2 position
@@ -904,12 +825,12 @@
       }
 
       // Studio2 left
-      var s2A = ease(mapR(mapR(p, 0.58, 0.76, 0, 1), 0, 0.28, 0, 1));
+      var s2A = ease(mapR(mapR(p, 0.60, 0.78, 0, 1), 0, 0.28, 0, 1));
       var s2Y = lerp(rowCY - VH * 0.52, rowCY, s2P);
       var s2R = lerp(-0.05, -0.008, s2P);
 
       // Studio3 right
-      var s3A     = ease(mapR(mapR(p, 0.62, 0.80, 0, 1), 0, 0.36, 0, 1));
+      var s3A     = ease(mapR(mapR(p, 0.64, 0.82, 0, 1), 0, 0.36, 0, 1));
       var s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
       var s3Scale = lerp(0.48, 1.0, s3P);
       var s3R     = lerp(0.042, 0.007, s3P);
@@ -918,10 +839,11 @@
       drawCropped(IMG.s2, r1cx, s2Y, imgW, imgH, s2R, s2A);
       drawCropped(IMG.s3, r3cx, s3Y, imgW * s3Scale, imgH * s3Scale, s3R, s3A);
 
+      // People2: noise reveal until kick starts, then clean crop transition
       if (cropT < 0.01) {
-        drawVasomotion(IMG.p2, p2X, p2Y, fullW, fullH, vasoT, 1.0);
+        drawVasomotion(IMG.p2, p2X, p2Y, fullW, fullH, revealT, 1.0);
       } else {
-        drawP2Transitioning(IMG.p2, p2X, p2Y, fullW, fullH, imgW, imgH, p2R, 1.0, cropT);
+        drawP2Kicking(IMG.p2, p2X, p2Y, fullW, fullH, imgW, imgH, p2R, 1.0, cropT);
       }
 
       drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
@@ -933,8 +855,6 @@
 
     // ── Boot ──
     function boot() {
-      buildVasomotionRing();
-      buildGrain();
       raf = requestAnimationFrame(frame);
     }
 
