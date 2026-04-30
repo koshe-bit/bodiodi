@@ -55,7 +55,7 @@
       position: absolute;
       inset: 0;
       z-index: 0;
-      background: url("assets/BodiodiSpace4.jpg") center 18% / cover no-repeat;
+      background: url("assets/BodiodiSpace4.jpg") center 55% / cover no-repeat;
       transform: scale(1.03);
       filter: saturate(.92) contrast(.96) brightness(.96);
       pointer-events: none;
@@ -120,6 +120,10 @@
       -webkit-backdrop-filter: blur(8px);
     }
     @media (max-width: 820px) {
+      .hero-bg-photo {
+        /* shift focal point down on mobile — less ceiling, more floor */
+        background-position: center 72%;
+      }
       .hero.hero-image .hero-copy { margin-left: clamp(22px, 6vw, 40px); margin-bottom: clamp(54px, 10vw, 88px); }
       .hero.hero-image .h1 { font-size: clamp(44px, 12vw, 68px); }
       .hero.hero-image .sub { font-size: clamp(15px, 4.2vw, 19px); }
@@ -259,21 +263,17 @@
     /* =====================
        SCROLL TUNNEL + GALLERY CANVAS
     ===================== */
-
-    /* Tall spacer — scroll through this to drive the animation */
     .gallery-tunnel {
       position: relative;
-      height: 280vh;
+      /* extra tall to give the vasomotion reveal plenty of scroll room */
+      height: 340vh;
     }
-
-    /* Sticky frame — stays in viewport, canvas fills it */
     .gallery-sticky {
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: hidden;
     }
-
     #galleryCanvas {
       position: absolute;
       inset: 0;
@@ -282,19 +282,34 @@
       display: block;
     }
 
-    /* About text below the tunnel */
+    /* About text */
     .about-text-wrap {
       opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.85s ease, transform 0.85s ease;
+      transform: translateY(32px);
+      transition:
+        opacity  0.90s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.90s cubic-bezier(0.22, 1, 0.36, 1);
       padding-top: clamp(48px, 6vw, 80px);
     }
-    .about-text-wrap.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .about-text-wrap.visible { opacity: 1; transform: translateY(0); }
+    .about-text-wrap h2 {
+      opacity: 0;
+      transform: translateY(20px);
+      transition:
+        opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s,
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
     }
+    .about-text-wrap p {
+      opacity: 0;
+      transform: translateY(16px);
+      transition:
+        opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+    }
+    .about-text-wrap.visible h2,
+    .about-text-wrap.visible p { opacity: 1; transform: translateY(0); }
 
-    /* Mobile: simple stacked, no canvas */
+    /* Mobile */
     @media (max-width: 700px) {
       .gallery-tunnel { height: auto; }
       .gallery-sticky {
@@ -324,7 +339,6 @@
     @media (min-width: 701px) {
       .mobile-gallery { display: none; }
     }
-
   </style>
 </head>
 
@@ -398,21 +412,17 @@
 
   <section id="about" class="section">
 
-    <!-- SCROLL TUNNEL -->
     <div class="gallery-tunnel" id="galleryTunnel">
       <div class="gallery-sticky">
-        <!-- Desktop: canvas-driven animation -->
         <canvas id="galleryCanvas"></canvas>
-        <!-- Mobile: simple stacked images -->
         <div class="mobile-gallery">
-          <img src="assets/Studio2.jpg" alt="Bodiodi studio" id="mob2">
-          <img src="assets/Studio1.jpg" alt="Bodiodi studio" id="mob1">
-          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail" id="mob3">
+          <img src="assets/People2.jpg" alt="Bodiodi trainers" id="mob-p2">
+          <img src="assets/Studio2.jpg" alt="Bodiodi studio" id="mob-s2">
+          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail" id="mob-s3">
         </div>
       </div>
     </div>
 
-    <!-- ABOUT TEXT -->
     <div class="content-col about-text-wrap" id="aboutText">
       <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
       <p>
@@ -473,14 +483,15 @@
       canvas.style.width  = VW + 'px';
       canvas.style.height = VH + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildVasomotionRing();
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
     // ── Preload all images ──
     const SRC = {
+      p2:   'assets/People2.jpg',
       s2:   'assets/Studio2.jpg',
-      s1:   'assets/Studio1.jpg',
       s3:   'assets/Studio3.jpg',
       shoe: 'assets/shoes.png'
     };
@@ -496,11 +507,11 @@
     });
 
     // ── Helpers ──
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-    const lerp  = (a, b, t) => a + (b - a) * t;
-    const mapR  = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1));
-    const ease  = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-    const easeOut = t => 1 - (1-t)*(1-t);
+    const clamp  = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp   = (a, b, t) => a + (b - a) * t;
+    const mapR   = (v, ia, ib, oa, ob) => lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1));
+    const ease   = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const easeOut3 = t => 1 - Math.pow(1 - t, 3);
     const elasticOut = t => {
       if (t <= 0 || t >= 1) return t;
       return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
@@ -511,7 +522,85 @@
       return clamp(-r.top / (r.height - VH), 0, 1);
     }
 
-    // Draw image with object-fit:cover crop into a rect (cx,cy = center)
+    // ── VASOMOTION RING ──
+    // 72 points arranged in an ellipse around the center of the image.
+    // Each point has an independent oscillation seed so the perimeter
+    // breathes and ripples like the vessel walls in the video.
+    const NUM_VASO_PTS = 72;
+    let vasoSeeds = [];
+
+    function buildVasomotionRing() {
+      vasoSeeds = [];
+      for (let i = 0; i < NUM_VASO_PTS; i++) {
+        vasoSeeds.push({
+          freq:  0.55 + Math.random() * 0.9,   // oscillation frequency
+          phase: Math.random() * Math.PI * 2,   // phase offset
+          amp:   0.018 + Math.random() * 0.038  // amplitude as fraction of radius
+        });
+      }
+    }
+
+    // Draw People2 with a vasomotion organic mask.
+    // openT: 0 = nothing visible, 1 = fully open
+    // tick: current time for oscillation
+    // cx, cy: center of image on canvas
+    // imgW, imgH: rendered image dimensions
+    function drawVasomotion(img, cx, cy, imgW, imgH, openT, tick, alpha) {
+      if (alpha < 0.005 || openT < 0.005 || !img.complete || !img.naturalWidth) return;
+
+      // The mask expands from 0 to full image size as openT goes 0→1
+      // Use easeOut so it opens confidently, not tentatively
+      const expandT = easeOut3(openT);
+
+      // Base ellipse radii — grow with expandT
+      const baseRX = imgW * 0.5 * expandT;
+      const baseRY = imgH * 0.5 * expandT;
+
+      // Build the organic perimeter path
+      ctx.save();
+      ctx.globalAlpha = clamp(alpha, 0, 1);
+      ctx.translate(cx, cy);
+
+      ctx.beginPath();
+      for (let i = 0; i <= NUM_VASO_PTS; i++) {
+        const idx   = i % NUM_VASO_PTS;
+        const seed  = vasoSeeds[idx];
+        const angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
+
+        // Organic ripple on the radius — multiple harmonics like vasomotion
+        const ripple = 1
+          + Math.sin(tick * seed.freq + seed.phase) * seed.amp
+          + Math.sin(tick * seed.freq * 1.7 + seed.phase + 1.1) * seed.amp * 0.5
+          + Math.sin(tick * seed.freq * 0.4 + seed.phase + 2.3) * seed.amp * 0.3;
+
+        const rx = baseRX * ripple;
+        const ry = baseRY * ripple;
+
+        const x = Math.cos(angle) * rx;
+        const y = Math.sin(angle) * ry;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.clip();
+
+      // Shadow
+      ctx.shadowColor   = 'rgba(0,0,0,0.20)';
+      ctx.shadowBlur    = 32;
+      ctx.shadowOffsetY = 10;
+
+      // Draw the actual image (cover-fit into the full imgW × imgH box)
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(imgW / iw, imgH / ih);
+      const sw = iw * scale, sh = ih * scale;
+      const ox = (sw - imgW) / 2, oy = (sh - imgH) / 2;
+      ctx.drawImage(img, -imgW/2 - ox, -imgH/2 - oy, sw, sh);
+
+      ctx.restore();
+    }
+
+    // Draw image with object-fit:cover crop into a portrait rect
     function drawCropped(img, cx, cy, w, h, rot, alpha) {
       if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
       const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -532,36 +621,22 @@
       ctx.restore();
     }
 
-    // Draw image uncropped at its natural aspect ratio — for Studio2's initial state
-    function drawNatural(img, cx, cy, w, rot, alpha) {
-      if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
-      const h = w * (img.naturalHeight / img.naturalWidth);
-      ctx.save();
-      ctx.globalAlpha = clamp(alpha, 0, 1);
-      ctx.translate(cx, cy);
-      ctx.rotate(rot);
-      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
-      ctx.shadowBlur    = 30;
-      ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, -w/2, -h/2, w, h);
-      ctx.restore();
-    }
-
-    // Crossfade between natural and cropped draw for Studio2's kick transition
-    // cropT = 0 → fully natural, cropT = 1 → fully cropped
-    function drawS2Transitioning(img, cx, cy, naturalW, cropW, cropH, rot, alpha, cropT) {
+    // Transition People2 from full-width vasomotion state → portrait cropped row position
+    // cropT: 0 = full-width, 1 = portrait crop
+    function drawP2Transitioning(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT, tick) {
       if (alpha < 0.005 || !img.complete || !img.naturalWidth) return;
 
-      const naturalH = naturalW * (img.naturalHeight / img.naturalWidth);
+      const w = lerp(fullW, cropW, cropT);
+      const h = lerp(fullH, cropH, cropT);
 
-      // Interpolate dimensions
-      const w = lerp(naturalW, cropW, cropT);
-      const h = lerp(naturalH, cropH, cropT);
+      // clip rect lerps from full size → portrait
+      const clipW = lerp(fullW, cropW, cropT);
+      const clipH = lerp(fullH, cropH, cropT);
 
-      // At cropT=0, no clip (show full image). At cropT=1, clip to portrait box.
-      // We blend by lerping the clip rect from natural size to crop size.
-      const clipW = lerp(w * 1.02, cropW, cropT); // tiny epsilon at 0 so clip doesn't flash
-      const clipH = lerp(h * 1.02, cropH, cropT);
+      // During transition, organic edges gradually tighten into a clean rect
+      // We do this by blending a vasomotion clip (at cropT=0) with a rect clip (at cropT=1)
+      // Practically: at low cropT we use the vasomotion path, at high cropT a rect
+      const useVaso = cropT < 0.85;
 
       const iw = img.naturalWidth, ih = img.naturalHeight;
       const scale = Math.max(w / iw, h / ih);
@@ -572,9 +647,36 @@
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
       ctx.rotate(rot);
-      ctx.beginPath();
-      ctx.rect(-clipW/2, -clipH/2, clipW, clipH);
-      ctx.clip();
+
+      if (useVaso) {
+        // Organic vasomotion clip that tightens as cropT increases
+        const tighten = ease(cropT / 0.85); // 0→1 over first 85% of transition
+        ctx.beginPath();
+        for (let i = 0; i <= NUM_VASO_PTS; i++) {
+          const idx   = i % NUM_VASO_PTS;
+          const seed  = vasoSeeds[idx];
+          const angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
+
+          // As tighten → 1, amplitude fades to zero (edges solidify)
+          const ampMult = 1 - tighten;
+          const ripple  = 1
+            + Math.sin(tick * seed.freq + seed.phase) * seed.amp * ampMult
+            + Math.sin(tick * seed.freq * 1.7 + seed.phase + 1.1) * seed.amp * 0.5 * ampMult;
+
+          const rx = (clipW / 2) * ripple;
+          const ry = (clipH / 2) * ripple;
+          const x  = Math.cos(angle) * rx;
+          const y  = Math.sin(angle) * ry;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.clip();
+      } else {
+        ctx.beginPath();
+        ctx.rect(-clipW/2, -clipH/2, clipW, clipH);
+        ctx.clip();
+      }
+
       ctx.shadowColor   = 'rgba(0,0,0,0.18)';
       ctx.shadowBlur    = 30;
       ctx.shadowOffsetY = 10;
@@ -582,7 +684,7 @@
       ctx.restore();
     }
 
-    // Draw shoe (natural aspect, no crop)
+    // Draw shoe
     function drawShoe(img, cx, cy, w, rot, alpha) {
       if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
       const h = w * (img.naturalHeight / img.naturalWidth);
@@ -590,14 +692,21 @@
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
       ctx.rotate(rot);
-      ctx.shadowColor   = 'rgba(0,0,0,0.20)';
-      ctx.shadowBlur    = 18;
+      ctx.shadowColor   = 'rgba(0,0,0,0.22)';
+      ctx.shadowBlur    = 20;
       ctx.shadowOffsetY = 6;
       ctx.drawImage(img, -w/2, -h/2, w, h);
       ctx.restore();
     }
 
     let raf = null, tick = 0, lastTs = null, textShown = false;
+
+    // Mouse position for hover parallax on the fully revealed People2
+    let mouseX = 0.5, mouseY = 0.5;
+    window.addEventListener('mousemove', e => {
+      mouseX = e.clientX / window.innerWidth;
+      mouseY = e.clientY / window.innerHeight;
+    }, { passive: true });
 
     function frame(ts) {
       raf    = requestAnimationFrame(frame);
@@ -608,16 +717,14 @@
       const p = scrollP();
       ctx.clearRect(0, 0, VW, VH);
 
-      // ── Layout ──
+      // ── Layout constants ──
       const cx = VW * 0.5;
       const cy = VH * 0.5;
 
-      // Portrait crop dimensions — all three final images share these exactly
-      const imgH = VH * 0.60;
-      const imgW = imgH * 0.68;           // ~2:3 portrait
-      const gap  = VW * 0.022;
-
-      // Row centers
+      // Portrait crop dimensions for all three final images
+      const imgH   = VH * 0.60;
+      const imgW   = imgH * 0.68;
+      const gap    = VW * 0.022;
       const rowTotal = imgW * 3 + gap * 2;
       const rowLeft  = (VW - rowTotal) / 2;
       const r1cx = rowLeft + imgW * 0.5;
@@ -625,106 +732,124 @@
       const r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
       const rowCY = VH * 0.50;
 
-      // Studio2 hero size (natural, uncropped) — generous but not full-screen
-      const heroW = VW * 0.34;
+      // People2 full-width state dimensions
+      // Wide but not bleed — ~88vw so there's a hint of breathing room
+      const fullW = VW * 0.88;
+      const fullH = VH * 0.58;
 
       const shoeW = VW * 0.10;
 
-      // ── Bobs — ultra subtle, always running ──
-      // Studio2: barely-there hover, like something weightless
-      const bobY2 = Math.sin(tick * 0.75) * 3.5;        // very small amplitude
-      const bobR2 = Math.sin(tick * 0.62) * 0.005;       // almost imperceptible tilt
+      // ── Subtle hover parallax on fully revealed image ──
+      const hoverDX = (mouseX - 0.5) * 10;
+      const hoverDY = (mouseY - 0.5) * 6;
 
-      // Shoe: slightly different phase & speed so they feel independent
+      // ── Bobs ──
+      const bobY2    = Math.sin(tick * 0.75) * 3.5;
+      const bobR2    = Math.sin(tick * 0.62) * 0.005;
       const shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
       const shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
 
-      // ────────────────────────────────────────────
-      // PHASE MAP  (p = 0 → 1)
+      // ────────────────────────────────────────────────────
+      // PHASE MAP  (p = 0 → 1, tunnel = 340vh)
       //
-      //  0.00        Studio2 present, uncropped, hovering
-      //  0.00–0.20   Shoe drifts in from left, starts bobbing
-      //  0.20–0.36   Both bob together — moment of stillness
-      //  0.36–0.58   Kick sequence
-      //              • 0.36–0.44  shoe winds up
-      //              • 0.44–0.58  shoe impacts + tumbles
-      //              • 0.40–0.60  Studio2 slides to row, crops into portrait
-      //  0.48–0.68   Studio1 drops from above (elastic)
-      //  0.52–0.72   Studio3 breathes in
-      //  0.85+       Text rises into view
-      // ────────────────────────────────────────────
+      //  0.00–0.20   People2 vasomotion reveal (organic expand)
+      //  0.20–0.32   Fully revealed, hovering + mouseover parallax
+      //  0.32–0.42   Shoe drifts in from left, bobs with People2
+      //  0.42–0.50   Both bob together — moment of stillness
+      //  0.50–0.68   Kick: shoe winds up, impacts, tumbles off
+      //              People2 slides to center row + crops to portrait
+      //  0.58–0.76   Studio2 (left) drops from above
+      //  0.62–0.80   Studio3 (right) breathes in
+      //  0.88+       Text rises
+      // ────────────────────────────────────────────────────
 
-      const shoeIn = ease(mapR(p, 0.00, 0.20, 0, 1));
-      const bobbing = mapR(p, 0.20, 0.36, 0, 1);
-      const kickP   = mapR(p, 0.36, 0.58, 0, 1);
-      const kickE   = ease(kickP);
+      const vasoT  = ease(mapR(p, 0.00, 0.20, 0, 1));   // 0→1 reveal
+      const fullyOpen = mapR(p, 0.20, 0.32, 0, 1);       // ramp into bob phase
+      const shoeIn = ease(mapR(p, 0.32, 0.42, 0, 1));
+      const bobbing = mapR(p, 0.42, 0.50, 0, 1);
+      const kickP  = mapR(p, 0.50, 0.68, 0, 1);
+      const kickE  = ease(kickP);
+      const cropT  = ease(mapR(p, 0.54, 0.70, 0, 1));
+      const s2P    = elasticOut(ease(mapR(p, 0.58, 0.76, 0, 1)));
+      const s3P    = ease(mapR(p, 0.62, 0.80, 0, 1));
 
-      // crop transition: Studio2 morphs from natural → portrait during kick
-      // starts morphing a beat after kick begins, finishes as it lands in row
-      const cropT   = ease(mapR(p, 0.42, 0.60, 0, 1));
+      const bobMult = (bobbing + fullyOpen * 0.4) * (1 - kickE);
 
-      const s1P = elasticOut(ease(mapR(p, 0.48, 0.68, 0, 1)));
-      const s3P = ease(mapR(p, 0.52, 0.72, 0, 1));
-
-      const bobMult = bobbing * (1 - kickE);
-
-      // ── STUDIO 2 ──
-      const s2X = lerp(cx, r2cx, kickE);
-      const s2Y = lerp(cy, rowCY, kickE) + bobY2 * (1 - kickE);
-      const s2R = lerp(bobR2 * (1 - kickE), 0, kickE);
+      // ── PEOPLE 2 position ──
+      // During reveal + hover: centered, with subtle mouse parallax
+      // During kick: slides to r2cx
+      const p2HoverX = lerp(0, hoverDX, fullyOpen * (1 - kickE));
+      const p2HoverY = lerp(0, hoverDY, fullyOpen * (1 - kickE));
+      const p2X = lerp(cx + p2HoverX, r2cx, kickE);
+      const p2Y = lerp(cy + p2HoverY, rowCY, kickE) + bobY2 * bobMult;
+      const p2R = lerp(bobR2 * bobMult, 0, kickE);
 
       // ── SHOE ──
-      const shoeRestX = cx - heroW * 0.46;
+      const shoeRestX = cx - fullW * 0.46;
       const shoeRestY = cy - VH * 0.03;
 
       let shoeX, shoeY, shoeR, shoeCurW, shoeA;
 
       if (kickP < 0.01) {
-        // Drifting in, then bobbing
-        shoeX    = lerp(cx - VW * 0.50, shoeRestX, ease(shoeIn));
+        shoeX    = lerp(cx - VW * 0.54, shoeRestX, ease(shoeIn));
         shoeY    = shoeRestY + shoeBobY * bobMult + lerp(-VH * 0.03, 0, ease(shoeIn));
         shoeR    = shoeBobR * bobMult;
         shoeCurW = shoeW;
         shoeA    = shoeIn;
       } else {
-        const windUp = ease(mapR(kickP, 0.00, 0.22, 0, 1));
-        const impact = ease(mapR(kickP, 0.22, 0.50, 0, 1));
-        const tumble = ease(mapR(kickP, 0.50, 1.00, 0, 1));
-
+        const windUp = ease(mapR(kickP, 0.00, 0.20, 0, 1));
+        const impact = ease(mapR(kickP, 0.20, 0.48, 0, 1));
+        const tumble = ease(mapR(kickP, 0.48, 1.00, 0, 1));
         shoeX    = shoeRestX
                    + lerp(0, -VW * 0.022, windUp)
-                   + lerp(0,  VW * 0.19,  impact)
+                   + lerp(0,  VW * 0.20,  impact)
                    + lerp(0,  VW * 0.90,  tumble);
-        shoeY    = shoeRestY - lerp(0, VH * 0.08, tumble);
+        shoeY    = shoeRestY - lerp(0, VH * 0.09, tumble);
         shoeR    = lerp(-0.05, Math.PI * 3.4, ease(kickP));
         shoeCurW = shoeW * lerp(1, 0.12, tumble);
-        shoeA    = lerp(1, 0, mapR(kickP, 0.68, 1.0, 0, 1));
+        shoeA    = lerp(1, 0, mapR(kickP, 0.70, 1.0, 0, 1));
       }
 
-      // ── STUDIO 1 ──
-      const s1A = ease(mapR(mapR(p, 0.48, 0.68, 0, 1), 0, 0.28, 0, 1));
-      const s1Y = lerp(rowCY - VH * 0.52, rowCY, s1P);
-      const s1R = lerp(-0.05, -0.008, s1P);
+      // ── STUDIO 2 (left) ──
+      const s2A = ease(mapR(mapR(p, 0.58, 0.76, 0, 1), 0, 0.28, 0, 1));
+      const s2Y = lerp(rowCY - VH * 0.52, rowCY, s2P);
+      const s2R = lerp(-0.05, -0.008, s2P);
 
-      // ── STUDIO 3 ──
-      const s3A     = ease(mapR(mapR(p, 0.52, 0.72, 0, 1), 0, 0.36, 0, 1));
+      // ── STUDIO 3 (right) ──
+      const s3A     = ease(mapR(mapR(p, 0.62, 0.80, 0, 1), 0, 0.36, 0, 1));
       const s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
       const s3Scale = lerp(0.48, 1.0, s3P);
       const s3R     = lerp(0.042, 0.007, s3P);
 
-      // ── Draw back → front ──
-      drawCropped(IMG.s1, r1cx, s1Y, imgW, imgH, s1R, s1A);
+      // ── Draw order: back → front ──
+
+      // Studio2 left (drops from above)
+      drawCropped(IMG.s2, r1cx, s2Y, imgW, imgH, s2R, s2A);
+
+      // Studio3 right (breathes in)
       drawCropped(IMG.s3, r3cx, s3Y, imgW * s3Scale, imgH * s3Scale, s3R, s3A);
-      // Studio2: transitions from natural uncropped → portrait cropped
-      drawS2Transitioning(IMG.s2, s2X, s2Y, heroW, imgW, imgH, s2R, 1.0, cropT);
+
+      // People2 center — vasomotion reveal → full-width hover → kick → portrait crop
+      if (cropT < 0.01) {
+        // Pure vasomotion reveal or hovering full-width
+        drawVasomotion(IMG.p2, p2X, p2Y, fullW, fullH, vasoT, tick, 1.0);
+      } else {
+        // Transitioning to portrait crop during kick
+        drawP2Transitioning(IMG.p2, p2X, p2Y, fullW, fullH, imgW, imgH, p2R, 1.0, cropT, tick);
+      }
+
+      // Shoe on top
       drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
 
-      // ── Text reveal ──
-      if (p > 0.85 && !textShown) { textShown = true;  aboutText.classList.add('visible'); }
-      if (p < 0.78 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
+      // Text
+      if (p > 0.88 && !textShown) { textShown = true;  aboutText.classList.add('visible'); }
+      if (p < 0.82 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
     }
 
-    function boot() { raf = requestAnimationFrame(frame); }
+    function boot() {
+      buildVasomotionRing();
+      raf = requestAnimationFrame(frame);
+    }
 
     new IntersectionObserver(entries => {
       const vis = entries[0].isIntersecting;
@@ -734,42 +859,6 @@
 
   })();
   </script>
-
-  <!-- About text — subtle rise on reveal, handled via CSS transition + JS class -->
-  <style>
-    .about-text-wrap {
-      opacity: 0;
-      transform: translateY(32px);
-      /* gentle stagger: h2 leads, p follows */
-      transition:
-        opacity  0.90s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.90s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .about-text-wrap.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    /* h2 leads by 80ms, paragraph follows */
-    .about-text-wrap h2 {
-      opacity: 0;
-      transform: translateY(20px);
-      transition:
-        opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s,
-        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
-    }
-    .about-text-wrap p {
-      opacity: 0;
-      transform: translateY(16px);
-      transition:
-        opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,
-        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
-    }
-    .about-text-wrap.visible h2,
-    .about-text-wrap.visible p {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
 
   <!-- =====================
        MESH CANVAS SCRIPT
@@ -880,13 +969,13 @@
       root.style.setProperty('--meshX',        `${(ptr.x*100).toFixed(2)}%`);
       root.style.setProperty('--meshY',        `${(ptr.y*100).toFixed(2)}%`);
       root.style.setProperty('--meshPressure', ptr.pressure.toFixed(3));
-      const cx = ptr.x - 0.5, cy = ptr.y - 0.5, p = ptr.pressure;
-      root.style.setProperty('--meshHeadlineX', `${(cx*HEADLINE_DRIFT*p).toFixed(2)}px`);
-      root.style.setProperty('--meshHeadlineY', `${(cy*HEADLINE_DRIFT*0.7*p).toFixed(2)}px`);
-      root.style.setProperty('--meshSubX',      `${(cx*SUB_DRIFT*p).toFixed(2)}px`);
-      root.style.setProperty('--meshSubY',      `${(cy*SUB_DRIFT*0.75*p).toFixed(2)}px`);
-      root.style.setProperty('--meshBtnX',      `${(cx*BTN_DRIFT*p).toFixed(2)}px`);
-      root.style.setProperty('--meshBtnY',      `${(cy*BTN_DRIFT*0.9*p).toFixed(2)}px`);
+      const cx = ptr.x - 0.5, cy = ptr.y - 0.5, pp = ptr.pressure;
+      root.style.setProperty('--meshHeadlineX', `${(cx*HEADLINE_DRIFT*pp).toFixed(2)}px`);
+      root.style.setProperty('--meshHeadlineY', `${(cy*HEADLINE_DRIFT*0.7*pp).toFixed(2)}px`);
+      root.style.setProperty('--meshSubX',      `${(cx*SUB_DRIFT*pp).toFixed(2)}px`);
+      root.style.setProperty('--meshSubY',      `${(cy*SUB_DRIFT*0.75*pp).toFixed(2)}px`);
+      root.style.setProperty('--meshBtnX',      `${(cx*BTN_DRIFT*pp).toFixed(2)}px`);
+      root.style.setProperty('--meshBtnY',      `${(cy*BTN_DRIFT*0.9*pp).toFixed(2)}px`);
       for (let i = 0; i < nodes.length; i++){
         const n = nodes[i];
         const infl = influence(n.baseX, n.baseY);
@@ -894,9 +983,9 @@
         const relY  = (n.baseY - (H * 0.28)) / (H * 0.58);
         const isFG  = relY > 0;
         const bAmp  = isFG ? lerp(0.12, 0.60, depth) : lerp(0.01, 0.08, depth);
-        const bx = Math.cos(tick * 0.52 + n.seed) * bAmp * (1 - p * 0.5);
-        const by = Math.sin(tick * 0.45 + n.seed) * bAmp * (1 - p * 0.5);
-        const pull = infl * p * (isFG ? lerp(4, 22, depth) : lerp(0, 3, depth));
+        const bx = Math.cos(tick * 0.52 + n.seed) * bAmp * (1 - pp * 0.5);
+        const by = Math.sin(tick * 0.45 + n.seed) * bAmp * (1 - pp * 0.5);
+        const pull = infl * pp * (isFG ? lerp(4, 22, depth) : lerp(0, 3, depth));
         n.x = n.baseX + bx + (ptr.x*W - n.baseX) * (pull / (W*0.5));
         n.y = n.baseY + by + (ptr.y*H - n.baseY) * (pull / (H*0.5));
       }
@@ -945,8 +1034,8 @@
           if (row.length > 1) drawLine(n, row[(c+1)%row.length], 1.0);
           if (next && next.length > 1){
             const mapped = Math.round((c/Math.max(1,row.length))*next.length) % next.length;
-            if (next[mapped])              drawLine(n, next[mapped], 0.78);
-            if (next[(mapped+1)%next.length]) drawLine(n, next[(mapped+1)%next.length], 0.44);
+            if (next[mapped])                    drawLine(n, next[mapped], 0.78);
+            if (next[(mapped+1)%next.length])    drawLine(n, next[(mapped+1)%next.length], 0.44);
           }
         }
       }
