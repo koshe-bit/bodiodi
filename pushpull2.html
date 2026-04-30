@@ -444,7 +444,6 @@
   ===================== -->
   <script>
   (() => {
-    // ── ALL variables declared first — no hoisting issues ──
     var tunnel    = document.getElementById('galleryTunnel');
     var canvas    = document.getElementById('galleryCanvas');
     var aboutText = document.getElementById('aboutText');
@@ -455,10 +454,15 @@
     var raf = null, tick = 0, lastTs = null, textShown = false;
     var mouseX = 0.5, mouseY = 0.5;
 
-    var NUM_VASO_PTS = 72;
+    var NUM_PTS  = 120;   // points on the organic perimeter — more = smoother
     var vasoSeeds = [];
 
-    var IMG = {};
+    // Offscreen canvas for grain texture
+    var grainCanvas = document.createElement('canvas');
+    var grainCtx    = grainCanvas.getContext('2d');
+    var grainBuilt  = false;
+
+    var IMG    = {};
     var loaded = 0;
     var totalImgs = 4;
 
@@ -491,9 +495,10 @@
     function mapR(v, ia, ib, oa, ob) { return lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1)); }
     function ease(t)     { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
     function easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
+    function easeOut5(t) { return 1 - Math.pow(1 - t, 5); }
     function elasticOut(t) {
       if (t <= 0 || t >= 1) return t;
-      return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (Math.PI*2/3)) + 1;
+      return Math.pow(2, -10*t) * Math.sin((t * 10 - 0.75) * (Math.PI * 2 / 3)) + 1;
     }
 
     // ── Resize ──
@@ -506,117 +511,275 @@
       canvas.style.width  = VW + 'px';
       canvas.style.height = VH + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildGrain();
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    // ── Mouse ──
     window.addEventListener('mousemove', function(e) {
       mouseX = e.clientX / window.innerWidth;
       mouseY = e.clientY / window.innerHeight;
     }, { passive: true });
 
-    // ── Build vasomotion ring ──
+    // ── Build grain texture ──
+    // A static noise canvas we tile over the image — gives it that
+    // organic, slightly-film-like texture especially at the dissolving edges
+    function buildGrain() {
+      var gW = 320, gH = 320;
+      grainCanvas.width  = gW;
+      grainCanvas.height = gH;
+      var gd = grainCtx.createImageData(gW, gH);
+      for (var i = 0; i < gd.data.length; i += 4) {
+        var v = Math.random() * 255 | 0;
+        gd.data[i]     = v;
+        gd.data[i + 1] = v;
+        gd.data[i + 2] = v;
+        gd.data[i + 3] = Math.random() * 38 | 0; // very subtle, max ~15% opacity
+      }
+      grainCtx.putImageData(gd, 0, 0);
+      grainBuilt = true;
+    }
+
+    // ── Build vasomotion seeds ──
+    // Three layered sine waves per point at very low amplitudes
+    // Creates complex non-repeating organic breathing
     function buildVasomotionRing() {
       vasoSeeds = [];
-      for (var i = 0; i < NUM_VASO_PTS; i++) {
+      for (var i = 0; i < NUM_PTS; i++) {
         vasoSeeds.push({
-          freq:  0.55 + Math.random() * 0.9,
-          phase: Math.random() * Math.PI * 2,
-          amp:   0.018 + Math.random() * 0.038
+          f1: 0.12 + Math.random() * 0.18,  // very slow primary breath
+          p1: Math.random() * Math.PI * 2,
+          a1: 0.003 + Math.random() * 0.006, // tiny amplitude
+          f2: 0.28 + Math.random() * 0.38,
+          p2: Math.random() * Math.PI * 2,
+          a2: 0.002 + Math.random() * 0.004,
+          f3: 0.7  + Math.random() * 1.0,    // micro flutter
+          p3: Math.random() * Math.PI * 2,
+          a3: 0.001 + Math.random() * 0.002
         });
       }
     }
 
-    // ── Scroll progress ──
-    function scrollP() {
-      var r = tunnel.getBoundingClientRect();
-      return clamp(-r.top / (r.height - VH), 0, 1);
+    // ── Radius multiplier for a vasomotion point at current tick ──
+    function vasoR(idx) {
+      var s = vasoSeeds[idx % NUM_PTS];
+      if (!s) return 1;
+      return 1
+        + Math.sin(tick * s.f1 + s.p1) * s.a1
+        + Math.sin(tick * s.f2 + s.p2) * s.a2
+        + Math.sin(tick * s.f3 + s.p3) * s.a3;
     }
 
-    // ── Draw: vasomotion organic reveal for People2 ──
+    // ── Trace a smooth closed organic ellipse path ──
+    // Uses cubic bezier tangents so the perimeter is always smooth —
+    // no corners or jagged edges ever
+    // rx, ry: ellipse radii
+    // fm: feather multiplier (1 = full size, <1 = shrunk for inner layers)
+    function traceVasoPath(rx, ry, fm) {
+      var f = fm || 1;
+      // Bezier handle length for a smooth ellipse approximation
+      var kx = rx * f * 0.5523;
+      var ky = ry * f * 0.5523;
+
+      ctx.beginPath();
+
+      // We build points then connect with smooth bezier curves
+      var pts = [];
+      for (var i = 0; i < NUM_PTS; i++) {
+        var angle = (i / NUM_PTS) * Math.PI * 2;
+        var r = vasoR(i);
+        pts.push({
+          x: Math.cos(angle) * rx * f * r,
+          y: Math.sin(angle) * ry * f * r,
+          angle: angle,
+          r: r
+        });
+      }
+
+      // Move to first point
+      ctx.moveTo(pts[0].x, pts[0].y);
+
+      // Connect each point with a smooth bezier
+      for (var i = 0; i < NUM_PTS; i++) {
+        var curr = pts[i];
+        var next = pts[(i + 1) % NUM_PTS];
+
+        // Tangent-based control points for smooth curvature
+        var cp = (Math.PI * 2 / NUM_PTS) * 0.52;
+
+        var cp1x = curr.x - Math.sin(curr.angle) * rx * f * curr.r * cp;
+        var cp1y = curr.y + Math.cos(curr.angle) * ry * f * curr.r * cp;
+        var cp2x = next.x + Math.sin(next.angle) * rx * f * next.r * cp;
+        var cp2y = next.y - Math.cos(next.angle) * ry * f * next.r * cp;
+
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, next.x, next.y);
+      }
+      ctx.closePath();
+    }
+
+    // ── Draw People2 with feathered vasomotion reveal ──
+    // Core technique: draw the image multiple times, each pass clipped
+    // to a slightly different-sized organic path, with opacity that
+    // increases toward the center. This creates the dissolving,
+    // fizzling edge that fades into the background like the video.
     function drawVasomotion(img, cx, cy, imgW, imgH, openT, alpha) {
       if (alpha < 0.005 || openT < 0.005 || !img.complete || !img.naturalWidth) return;
-      var expandT = easeOut3(openT);
+
+      var expandT = easeOut5(openT);
       var baseRX  = imgW * 0.5 * expandT;
       var baseRY  = imgH * 0.5 * expandT;
 
-      ctx.save();
-      ctx.globalAlpha = clamp(alpha, 0, 1);
-      ctx.translate(cx, cy);
-      ctx.beginPath();
-      for (var i = 0; i <= NUM_VASO_PTS; i++) {
-        var idx   = i % NUM_VASO_PTS;
-        var seed  = vasoSeeds[idx];
-        var angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
-        var ripple = 1
-          + Math.sin(tick * seed.freq + seed.phase) * seed.amp
-          + Math.sin(tick * seed.freq * 1.7 + seed.phase + 1.1) * seed.amp * 0.5
-          + Math.sin(tick * seed.freq * 0.4 + seed.phase + 2.3) * seed.amp * 0.3;
-        var x = Math.cos(angle) * baseRX * ripple;
-        var y = Math.sin(angle) * baseRY * ripple;
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.clip();
-      ctx.shadowColor   = 'rgba(0,0,0,0.20)';
-      ctx.shadowBlur    = 32;
-      ctx.shadowOffsetY = 10;
+      // Cover-fit image into the box
       var iw = img.naturalWidth, ih = img.naturalHeight;
       var scale = Math.max(imgW / iw, imgH / ih);
       var sw = iw * scale, sh = ih * scale;
-      ctx.drawImage(img, -imgW/2 - (sw-imgW)/2, -imgH/2 - (sh-imgH)/2, sw, sh);
-      ctx.restore();
+      var drawX = -imgW / 2 - (sw - imgW) / 2;
+      var drawY = -imgH / 2 - (sh - imgH) / 2;
+
+      // ── Feather layers ──
+      // Layer 0 = outermost (most transparent, largest path)
+      // Layer N = innermost (most opaque, smallest path — core of the image)
+      var LAYERS = 10;
+
+      for (var layer = 0; layer < LAYERS; layer++) {
+        var t = layer / (LAYERS - 1); // 0→1 outer→inner
+
+        // Outer layers extend slightly beyond the image boundary to
+        // create a soft halo of dissolving texture
+        // Inner layers pull in slightly so the core is crisply revealed
+        var fm = lerp(1.08, 0.94, t);
+
+        // Opacity curve: near-zero at edge, strong in center
+        // Power curve makes the fade feel organic not linear
+        var layerAlpha = clamp(alpha * lerp(0.0, 1.0, Math.pow(t, 1.8)), 0, 1);
+        if (layerAlpha < 0.008) continue;
+
+        ctx.save();
+        ctx.globalAlpha = layerAlpha;
+        ctx.translate(cx, cy);
+
+        // Clip to the organic path for this layer
+        traceVasoPath(baseRX, baseRY, fm);
+        ctx.clip();
+
+        // Shadow only on the innermost few layers to avoid muddy look
+        if (t > 0.65) {
+          ctx.shadowColor   = 'rgba(0,0,0,0.16)';
+          ctx.shadowBlur    = 28;
+          ctx.shadowOffsetY = 8;
+        }
+
+        ctx.drawImage(img, drawX, drawY, sw, sh);
+
+        // ── Grain overlay ──
+        // Applied on outermost layers at higher opacity — gives the
+        // dissolving edge a grainy, organic, almost biological texture
+        if (grainBuilt && t < 0.7) {
+          var grainAlpha = lerp(0.28, 0.0, t / 0.7);
+          ctx.globalAlpha = grainAlpha;
+          ctx.globalCompositeOperation = 'overlay';
+          // Tile the grain canvas across the image area
+          var gW = grainCanvas.width, gH = grainCanvas.height;
+          for (var gx = drawX; gx < drawX + sw; gx += gW) {
+            for (var gy = drawY; gy < drawY + sh; gy += gH) {
+              ctx.drawImage(grainCanvas, gx, gy);
+            }
+          }
+          ctx.globalCompositeOperation = 'source-over';
+        }
+
+        ctx.restore();
+      }
+
+      // ── Persistent subtle grain on the whole revealed image ──
+      // Gives the fully-open image a slight film texture
+      if (grainBuilt && openT > 0.5) {
+        var fullGrainAlpha = lerp(0, 0.12, mapR(openT, 0.5, 1.0, 0, 1));
+        ctx.save();
+        ctx.globalAlpha = fullGrainAlpha * alpha;
+        ctx.translate(cx, cy);
+        traceVasoPath(baseRX * 0.94, baseRY * 0.94, 1);
+        ctx.clip();
+        ctx.globalCompositeOperation = 'overlay';
+        var gW = grainCanvas.width, gH = grainCanvas.height;
+        for (var gx = drawX; gx < drawX + sw; gx += gW) {
+          for (var gy = drawY; gy < drawY + sh; gy += gH) {
+            ctx.drawImage(grainCanvas, gx, gy);
+          }
+        }
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.restore();
+      }
     }
 
-    // ── Draw: People2 transitioning from full-width → portrait crop ──
+    // ── Draw People2 transitioning from full-width → portrait crop ──
+    // Organic edges solidify into a clean rect as cropT → 1
     function drawP2Transitioning(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT) {
       if (alpha < 0.005 || !img.complete || !img.naturalWidth) return;
+
       var w = lerp(fullW, cropW, cropT);
       var h = lerp(fullH, cropH, cropT);
-      var clipW = lerp(fullW, cropW, cropT);
-      var clipH = lerp(fullH, cropH, cropT);
-      var useVaso = cropT < 0.85;
+
       var iw = img.naturalWidth, ih = img.naturalHeight;
       var scale = Math.max(w / iw, h / ih);
       var sw = iw * scale, sh = ih * scale;
+      var drawX = -w / 2 - (sw - w) / 2;
+      var drawY = -h / 2 - (sh - h) / 2;
+
+      // Edges tighten from organic → rect as tighten → 1
+      var tighten = ease(cropT);
 
       ctx.save();
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
       ctx.rotate(rot);
 
-      if (useVaso) {
-        var tighten = ease(cropT / 0.85);
+      if (cropT < 0.92) {
+        // Organic path with amplitude fading to zero
+        var rx = w / 2;
+        var ry = h / 2;
+
+        // Recalculate organic path with tightening amplitude
+        var pts = [];
+        for (var i = 0; i < NUM_PTS; i++) {
+          var angle = (i / NUM_PTS) * Math.PI * 2;
+          var s = vasoSeeds[i % NUM_PTS];
+          if (!s) { pts.push({ x: Math.cos(angle)*rx, y: Math.sin(angle)*ry, angle: angle, r: 1 }); continue; }
+          var ampFade = 1 - tighten;
+          var r = 1
+            + Math.sin(tick * s.f1 + s.p1) * s.a1 * ampFade
+            + Math.sin(tick * s.f2 + s.p2) * s.a2 * ampFade;
+          pts.push({ x: Math.cos(angle)*rx*r, y: Math.sin(angle)*ry*r, angle: angle, r: r });
+        }
+
         ctx.beginPath();
-        for (var i = 0; i <= NUM_VASO_PTS; i++) {
-          var idx   = i % NUM_VASO_PTS;
-          var seed  = vasoSeeds[idx];
-          var angle = (idx / NUM_VASO_PTS) * Math.PI * 2;
-          var ampMult = 1 - tighten;
-          var ripple  = 1
-            + Math.sin(tick * seed.freq + seed.phase) * seed.amp * ampMult
-            + Math.sin(tick * seed.freq * 1.7 + seed.phase + 1.1) * seed.amp * 0.5 * ampMult;
-          var x = Math.cos(angle) * (clipW/2) * ripple;
-          var y = Math.sin(angle) * (clipH/2) * ripple;
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        ctx.moveTo(pts[0].x, pts[0].y);
+        var cp = (Math.PI * 2 / NUM_PTS) * 0.52;
+        for (var i = 0; i < NUM_PTS; i++) {
+          var curr = pts[i];
+          var next = pts[(i + 1) % NUM_PTS];
+          var cp1x = curr.x - Math.sin(curr.angle) * rx * curr.r * cp;
+          var cp1y = curr.y + Math.cos(curr.angle) * ry * curr.r * cp;
+          var cp2x = next.x + Math.sin(next.angle) * rx * next.r * cp;
+          var cp2y = next.y - Math.cos(next.angle) * ry * next.r * cp;
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, next.x, next.y);
         }
         ctx.closePath();
         ctx.clip();
       } else {
         ctx.beginPath();
-        ctx.rect(-clipW/2, -clipH/2, clipW, clipH);
+        ctx.rect(-w / 2, -h / 2, w, h);
         ctx.clip();
       }
 
       ctx.shadowColor   = 'rgba(0,0,0,0.18)';
       ctx.shadowBlur    = 30;
       ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, -w/2 - (sw-w)/2, -h/2 - (sh-h)/2, sw, sh);
+      ctx.drawImage(img, drawX, drawY, sw, sh);
       ctx.restore();
     }
 
-    // ── Draw: portrait cropped image ──
+    // ── Draw cropped portrait image (Studio2, Studio3) ──
     function drawCropped(img, cx, cy, w, h, rot, alpha) {
       if (alpha < 0.005 || w < 1 || h < 1 || !img.complete || !img.naturalWidth) return;
       var iw = img.naturalWidth, ih = img.naturalHeight;
@@ -627,7 +790,7 @@
       ctx.translate(cx, cy);
       ctx.rotate(rot);
       ctx.beginPath();
-      ctx.rect(-w/2, -h/2, w, h);
+      ctx.rect(-w / 2, -h / 2, w, h);
       ctx.clip();
       ctx.shadowColor   = 'rgba(0,0,0,0.18)';
       ctx.shadowBlur    = 30;
@@ -636,7 +799,7 @@
       ctx.restore();
     }
 
-    // ── Draw: shoe ──
+    // ── Draw shoe ──
     function drawShoe(img, cx, cy, w, rot, alpha) {
       if (alpha < 0.005 || w < 1 || !img.complete || !img.naturalWidth) return;
       var h = w * (img.naturalHeight / img.naturalWidth);
@@ -651,7 +814,13 @@
       ctx.restore();
     }
 
-    // ── Main frame ──
+    // ── Scroll progress ──
+    function scrollP() {
+      var r = tunnel.getBoundingClientRect();
+      return clamp(-r.top / (r.height - VH), 0, 1);
+    }
+
+    // ── Main animation frame ──
     function frame(ts) {
       raf = requestAnimationFrame(frame);
       var dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.05) : 0.016;
@@ -664,6 +833,7 @@
       var cx = VW * 0.5;
       var cy = VH * 0.5;
 
+      // Final row portrait dimensions
       var imgH     = VH * 0.60;
       var imgW     = imgH * 0.68;
       var gap      = VW * 0.022;
@@ -674,18 +844,22 @@
       var r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
       var rowCY = VH * 0.50;
 
+      // People2 full-width state
       var fullW = VW * 0.88;
       var fullH = VH * 0.58;
       var shoeW = VW * 0.10;
 
+      // Subtle hover parallax
       var hoverDX = (mouseX - 0.5) * 10;
       var hoverDY = (mouseY - 0.5) * 6;
 
+      // Bobs
       var bobY2    = Math.sin(tick * 0.75) * 3.5;
       var bobR2    = Math.sin(tick * 0.62) * 0.005;
       var shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
       var shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
 
+      // Phase map
       var vasoT    = ease(mapR(p, 0.00, 0.20, 0, 1));
       var fullyOpen= mapR(p, 0.20, 0.32, 0, 1);
       var shoeIn   = ease(mapR(p, 0.32, 0.42, 0, 1));
@@ -697,7 +871,7 @@
       var s3P      = ease(mapR(p, 0.62, 0.80, 0, 1));
       var bobMult  = (bobbing + fullyOpen * 0.4) * (1 - kickE);
 
-      // People2
+      // People2 position
       var p2HoverX = lerp(0, hoverDX, fullyOpen * (1 - kickE));
       var p2HoverY = lerp(0, hoverDY, fullyOpen * (1 - kickE));
       var p2X = lerp(cx + p2HoverX, r2cx, kickE);
@@ -740,7 +914,7 @@
       var s3Scale = lerp(0.48, 1.0, s3P);
       var s3R     = lerp(0.042, 0.007, s3P);
 
-      // Draw
+      // ── Draw back → front ──
       drawCropped(IMG.s2, r1cx, s2Y, imgW, imgH, s2R, s2A);
       drawCropped(IMG.s3, r3cx, s3Y, imgW * s3Scale, imgH * s3Scale, s3R, s3A);
 
@@ -752,13 +926,15 @@
 
       drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
 
+      // Text
       if (p > 0.88 && !textShown) { textShown = true;  aboutText.classList.add('visible'); }
       if (p < 0.82 && textShown)  { textShown = false; aboutText.classList.remove('visible'); }
     }
 
-    // ── Boot: called once all images are loaded ──
+    // ── Boot ──
     function boot() {
       buildVasomotionRing();
+      buildGrain();
       raf = requestAnimationFrame(frame);
     }
 
@@ -786,7 +962,6 @@
 
   })();
   </script>
-
   <!-- =====================
        MESH CANVAS SCRIPT
   ===================== -->
