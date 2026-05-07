@@ -32,6 +32,10 @@
       --meshSubY: 0px;
       --meshBtnX: 0px;
       --meshBtnY: 0px;
+      /* Shared heading scale — all section headings match hero */
+      --h-size: clamp(48px, 5.8vw, 96px);
+      --h-line: 0.93;
+      --h-kern: -0.03em;
     }
 
     html, body {
@@ -96,14 +100,19 @@
       z-index: 10;
       pointer-events: auto;
     }
-    .hero.hero-image .h1 {
-      color: var(--hero-gold);
-      max-width: 10ch;
-      font-size: clamp(52px, 6vw, 96px);
-      line-height: .93;
-      letter-spacing: -0.03em;
+    /* Hero heading — sets the standard all other headings match */
+    .section-heading {
+      font-family: "Inter", sans-serif;
+      font-weight: 800;
+      font-size: var(--h-size);
+      line-height: var(--h-line);
+      letter-spacing: var(--h-kern);
       margin: 0 0 14px 0;
+    }
+    .hero.hero-image .section-heading {
+      color: var(--hero-gold);
       text-shadow: 0 2px 24px rgba(0,0,0,.22);
+      max-width: 10ch;
     }
     .hero.hero-image .sub {
       color: var(--hero-gold);
@@ -120,12 +129,9 @@
       -webkit-backdrop-filter: blur(8px);
     }
     @media (max-width: 820px) {
-      .hero-bg-photo {
-        /* shift focal point down on mobile — less ceiling, more floor */
-        background-position: center 72%;
-      }
+      .hero-bg-photo { background-position: center 72%; }
       .hero.hero-image .hero-copy { margin-left: clamp(22px, 6vw, 40px); margin-bottom: clamp(54px, 10vw, 88px); }
-      .hero.hero-image .h1 { font-size: clamp(44px, 12vw, 68px); }
+      .hero.hero-image .section-heading { font-size: clamp(44px, 12vw, 68px); }
       .hero.hero-image .sub { font-size: clamp(15px, 4.2vw, 19px); }
       .hero.hero-image::after { height: clamp(200px, 30vw, 340px); }
     }
@@ -184,14 +190,12 @@
       pointer-events: auto;
     }
     .mesh-section .mesh-copy { text-align: center; max-width: 680px; }
-    .mesh-section .h1 {
+    /* Mesh heading matches hero scale */
+    .mesh-section .section-heading {
       color: var(--hero-gold);
-      font-size: clamp(38px, 5vw, 72px);
-      line-height: .95;
-      letter-spacing: -0.025em;
-      margin: 0 0 20px 0;
       transform: translate(var(--meshHeadlineX), var(--meshHeadlineY));
       will-change: transform;
+      text-shadow: 0 2px 24px rgba(0,0,0,.18);
     }
     .mesh-section .sub {
       color: rgba(236,235,134,.80);
@@ -207,7 +211,7 @@
     .mesh-section .btn:hover { background: rgba(236,235,134,.12); color: var(--hero-gold); border-color: var(--hero-gold); }
     @media (max-width: 820px) {
       .mesh-section { margin-top: -8vh; padding-top: 12vh; padding-bottom: clamp(200px, 28vw, 320px); }
-      .mesh-section .h1 { font-size: clamp(32px, 10vw, 54px); }
+      .mesh-section .section-heading { font-size: clamp(32px, 10vw, 60px); }
       .mesh-section .sub { font-size: clamp(14px, 4vw, 17px); }
     }
 
@@ -225,48 +229,64 @@
       background: url("BG.png") center top / cover fixed;
       width: 100%;
     }
-    #about .content-col {
-      width: min(760px, 92vw);
-      margin: 0 auto;
-      padding: 0 12px;
+
+    /* ── SCROLL IMAGE BLOCK ── */
+    /* Full-width image with heading overlaid, fades+rises in on scroll */
+    .scroll-image-block {
+      position: relative;
+      width: 100%;
+      /* Extra padding top/bottom so the transparent PNG edges breathe */
+      padding: clamp(40px, 6vw, 80px) 0;
+      overflow: visible;
     }
-    #about h2 {
-      margin: 0 0 14px 0;
-      font-family: "Inter";
-      font-weight: 800;
-      letter-spacing: -.01em;
-      font-size: clamp(26px, 4.2vw, 44px);
-      line-height: 1.02;
-      color: var(--dk);
+    .scroll-image-wrap {
+      position: relative;
+      width: 100%;
+      /* The image itself */
     }
-    #about p {
-      margin: 0;
-      font-size: 16px;
-      line-height: 1.62;
-      max-width: 58ch;
-      color: var(--dk);
+    .scroll-image-wrap img.scroll-bg {
+      display: block;
+      width: 100%;
+      height: auto;
+      /* PNG with transparent top/bottom edges */
     }
-    .strip {
-      height: 44vh;
-      background: url("BG.png") center top / cover fixed;
+    /* Heading overlaid on the image */
+    .scroll-image-heading {
+      position: absolute;
+      bottom: clamp(32px, 6vw, 80px);
+      left: clamp(32px, 8vw, 120px);
+      right: clamp(32px, 8vw, 120px);
+      z-index: 2;
+      color: var(--hero-gold);
+      text-shadow: 0 2px 32px rgba(0,0,0,.38);
+      /* Starts invisible, JS adds .visible */
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        opacity  0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.20s,
+        transform 0.80s cubic-bezier(0.22, 1, 0.36, 1) 0.20s;
     }
-    .only-mobile { display: none; }
-    @media (max-width: 740px) {
-      .only-mobile { display: inline; }
-      .menu-btn { display: inline-flex; }
-      .navlinks { display: none; }
+    .scroll-image-heading.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
-    @media (prefers-reduced-motion: reduce) {
-      .mesh-canvas { display: none; }
+    /* The image block itself animates in */
+    .scroll-image-block {
+      opacity: 0;
+      transform: translateY(36px) scale(1.015);
+      transition:
+        opacity  0.90s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.90s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .scroll-image-block.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
-    /* =====================
-       SCROLL TUNNEL + GALLERY CANVAS
-    ===================== */
+    /* ── GALLERY TUNNEL ── */
     .gallery-tunnel {
       position: relative;
-      /* extra tall to give the vasomotion reveal plenty of scroll room */
-      height: 340vh;
+      height: 280vh;
     }
     .gallery-sticky {
       position: sticky;
@@ -282,7 +302,17 @@
       display: block;
     }
 
-    /* About text */
+    /* ── ABOUT TEXT ── */
+    /* Subhead: same style as current #about h2 */
+    .about-subhead {
+      font-family: "Inter", sans-serif;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      font-size: clamp(26px, 4.2vw, 44px);
+      line-height: 1.02;
+      color: var(--dk);
+      margin: 0 0 14px 0;
+    }
     .about-text-wrap {
       opacity: 0;
       transform: translateY(32px);
@@ -292,7 +322,7 @@
       padding-top: clamp(48px, 6vw, 80px);
     }
     .about-text-wrap.visible { opacity: 1; transform: translateY(0); }
-    .about-text-wrap h2 {
+    .about-text-wrap .about-subhead {
       opacity: 0;
       transform: translateY(20px);
       transition:
@@ -305,11 +335,36 @@
       transition:
         opacity  0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,
         transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.62;
+      max-width: 58ch;
+      color: var(--dk);
     }
-    .about-text-wrap.visible h2,
+    .about-text-wrap.visible .about-subhead,
     .about-text-wrap.visible p { opacity: 1; transform: translateY(0); }
 
-    /* Mobile */
+    #about .content-col {
+      width: min(760px, 92vw);
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+
+    .strip {
+      height: 44vh;
+      background: url("BG.png") center top / cover fixed;
+    }
+    .only-mobile { display: none; }
+    @media (max-width: 740px) {
+      .only-mobile { display: inline; }
+      .menu-btn { display: inline-flex; }
+      .navlinks { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mesh-canvas { display: none; }
+    }
+
+    /* Mobile gallery */
     @media (max-width: 700px) {
       .gallery-tunnel { height: auto; }
       .gallery-sticky {
@@ -335,6 +390,7 @@
         transition: opacity 0.6s ease, transform 0.6s ease;
       }
       .mobile-gallery img.vis { opacity: 1; transform: translateY(0); }
+      .scroll-image-heading { font-size: clamp(36px, 10vw, 56px); }
     }
     @media (min-width: 701px) {
       .mobile-gallery { display: none; }
@@ -372,12 +428,15 @@
     <a href="https://bodiodi.com/faqs.html">FAQs</a>
   </nav>
 
+  <!-- =====================
+       HERO
+  ===================== -->
   <header class="hero hero-image">
     <div class="hero-bg-photo" aria-hidden="true"></div>
     <div class="hero-inner">
       <div class="logo-outline" aria-hidden="true"><h1>BODIODI</h1></div>
       <div class="hero-copy">
-        <h2 class="h1">SMALLER CLASSES<br>BETTER TRAINING</h2>
+        <h2 class="section-heading">SMALLER CLASSES<br>BETTER TRAINING</h2>
         <p class="sub">Spots go fast. Grab yours now.</p>
         <div class="btn-row">
           <a class="btn" href="https://bodiodi.com/schedule.html">Class Schedule</a>
@@ -387,6 +446,9 @@
     </div>
   </header>
 
+  <!-- =====================
+       MESH SECTION
+  ===================== -->
   <section class="mesh-section" id="meshSection">
     <div class="mesh-canvas-wrap" aria-hidden="true">
       <canvas class="mesh-canvas" id="meshCanvas"></canvas>
@@ -394,7 +456,7 @@
     </div>
     <div class="mesh-inner">
       <div class="mesh-copy" id="meshCopy">
-        <h2 class="h1">FIND YOUR<br>FORMULA</h2>
+        <h2 class="section-heading">FIND YOUR<br>FORMULA</h2>
         <p class="sub">
           Progress looks different for everyone. Rebuilding your foundation? Start with Kinetix
           to restore range and function. Craving intensity? Anabolix delivers that beat-driven burn.
@@ -410,23 +472,45 @@
 
   <div class="rule" aria-hidden="true"></div>
 
+  <!-- =====================
+       ABOUT SECTION
+  ===================== -->
   <section id="about" class="section">
 
+    <!-- Full-width scroll image with heading overlaid -->
+    <div class="scroll-image-block" id="scrollImageBlock">
+      <div class="scroll-image-wrap">
+        <img
+          class="scroll-bg"
+          src="assets/bodiodiscroll.png"
+          alt="Bodiodi studio"
+          loading="eager"
+        >
+        <h2
+          class="section-heading scroll-image-heading"
+          id="scrollImageHeading"
+        >A MODERN<br>MICRO STUDIO</h2>
+      </div>
+    </div>
+
+    <!-- Canvas gallery: shoe + three portrait images -->
     <div class="gallery-tunnel" id="galleryTunnel">
       <div class="gallery-sticky">
         <canvas id="galleryCanvas"></canvas>
+        <!-- Mobile fallback -->
         <div class="mobile-gallery">
-          <img src="assets/People2.jpg" alt="Bodiodi trainers" id="mob-p2">
-          <img src="assets/Studio2.jpg" alt="Bodiodi studio" id="mob-s2">
-          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail" id="mob-s3">
+          <img src="assets/People2.jpg" alt="Bodiodi trainers">
+          <img src="assets/Studio2.jpg" alt="Bodiodi studio">
+          <img src="assets/Studio3.jpg" alt="Bodiodi studio detail">
         </div>
       </div>
     </div>
 
+    <!-- About text: subhead + paragraph -->
     <div class="content-col about-text-wrap" id="aboutText">
-      <h2>A MODERN <br class="only-mobile"> MICRO STUDIO</h2>
+      <h3 class="about-subhead">Yes, it's technically a garage.</h3>
       <p>
-        Yes, it's technically a garage. And it's also one of the best workouts you'll find
+        And it's also one of the best workouts you'll find
         in 400 square feet. The studio is tucked inside a converted carriage house right here
         in Heritage Hill. Think small-scale, design-driven, and thoughtfully equipped — proper
         ventilation, soft Marmoleum flooring, and warm lighting that feels more boutique than
@@ -439,7 +523,31 @@
 
   <div class="strip" id="contact"></div>
 
-<!-- =====================
+  <!-- =====================
+       SCROLL IMAGE + HEADING REVEAL
+  ===================== -->
+  <script>
+  (function() {
+    var block   = document.getElementById('scrollImageBlock');
+    var heading = document.getElementById('scrollImageHeading');
+    if (!block) return;
+
+    var obs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        block.classList.add('visible');
+        // Heading enters slightly after the image
+        setTimeout(function() {
+          heading.classList.add('visible');
+        }, 180);
+        obs.disconnect();
+      }
+    }, { threshold: 0.15 });
+
+    obs.observe(block);
+  })();
+  </script>
+
+  <!-- =====================
        GALLERY ANIMATION ENGINE
   ===================== -->
   <script>
@@ -452,19 +560,10 @@
 
     var ctx, VW, VH, dpr;
     var raf = null, tick = 0, lastTs = null, textShown = false;
-    var mouseX = 0.5, mouseY = 0.5;
 
     var IMG    = {};
     var loaded = 0;
     var totalImgs = 4;
-
-    // Per-column noise seeds — each column gets its own breathing personality
-    var colSeeds = [];
-    var NUM_COLS = 0; // set on resize
-
-    // Offscreen canvas for rendering People2 before compositing
-    var offscreen    = document.createElement('canvas');
-    var offCtx       = offscreen.getContext('2d');
 
     // ── Mobile ──
     if (isMobile) {
@@ -494,37 +593,9 @@
     function lerp(a, b, t)   { return a + (b - a) * t; }
     function mapR(v, ia, ib, oa, ob) { return lerp(oa, ob, clamp((v - ia) / (ib - ia), 0, 1)); }
     function ease(t)     { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
-    function easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
     function elasticOut(t) {
       if (t <= 0 || t >= 1) return t;
       return Math.pow(2, -10*t) * Math.sin((t * 10 - 0.75) * (Math.PI * 2 / 3)) + 1;
-    }
-
-    // ── Build per-column seeds ──
-    // Each column gets 3 sine wave layers with independent frequencies/phases
-    // Layer 1: slow vasomotion breathing (large amplitude)
-    // Layer 2: medium organic undulation
-    // Layer 3: fast micro-flutter (tiny amplitude — the "sparkle grain" feel)
-    function buildColSeeds(numCols) {
-      colSeeds = [];
-      for (var i = 0; i < numCols; i++) {
-        colSeeds.push({
-          // Slow breath — the vessel wall contracting/expanding
-          f1: 0.08 + Math.random() * 0.12,
-          p1: Math.random() * Math.PI * 2,
-          a1: 0.06 + Math.random() * 0.10,  // large — creates dramatic ragged shape
-
-          // Medium undulation — organic variation between neighbors
-          f2: 0.22 + Math.random() * 0.28,
-          p2: Math.random() * Math.PI * 2,
-          a2: 0.02 + Math.random() * 0.04,
-
-          // Fast micro-flutter — the tiny sparkles at the boundary
-          f3: 2.5  + Math.random() * 4.0,
-          p3: Math.random() * Math.PI * 2,
-          a3: 0.004 + Math.random() * 0.008  // tiny — just a glimmer
-        });
-      }
     }
 
     // ── Resize ──
@@ -537,164 +608,14 @@
       canvas.style.width  = VW + 'px';
       canvas.style.height = VH + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      // Offscreen canvas matches main canvas
-      offscreen.width  = canvas.width;
-      offscreen.height = canvas.height;
-      offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      // Rebuild seeds at column resolution — 1 seed per 3px column for performance
-      NUM_COLS = Math.ceil(VW / 3);
-      buildColSeeds(NUM_COLS);
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
-
-    window.addEventListener('mousemove', function(e) {
-      mouseX = e.clientX / window.innerWidth;
-      mouseY = e.clientY / window.innerHeight;
-    }, { passive: true });
 
     // ── Scroll progress ──
     function scrollP() {
       var r = tunnel.getBoundingClientRect();
       return clamp(-r.top / (r.height - VH), 0, 1);
-    }
-
-    // ── Get the noise offset for a column at current tick ──
-    // Returns a value roughly in [-1, 1] representing how much
-    // this column's reveal threshold is offset from the base
-    function colNoise(colIdx) {
-      var s = colSeeds[colIdx % NUM_COLS];
-      if (!s) return 0;
-      return Math.sin(tick * s.f1 + s.p1) * s.a1
-           + Math.sin(tick * s.f2 + s.p2) * s.a2
-           + Math.sin(tick * s.f3 + s.p3) * s.a3;
-    }
-
-    // ── Draw People2 with column-based noise reveal (bottom up) ──
-    // revealT: 0 = nothing shown, 1 = fully revealed
-    // The image is drawn column-strip by column-strip. Each strip is clipped
-    // to reveal from the bottom up, but each column's reveal line is offset
-    // by its noise value — creating the ragged, breathing edge.
-    function drawVasomotion(img, cx, cy, imgW, imgH, revealT, alpha) {
-      if (alpha < 0.005 || revealT < 0.005 || !img.complete || !img.naturalWidth) return;
-
-      // Cover-fit the image
-      var iw = img.naturalWidth, ih = img.naturalHeight;
-      var scale = Math.max(imgW / iw, imgH / ih);
-      var sw = iw * scale, sh = ih * scale;
-      var imgLeft = cx - imgW / 2;
-      var imgTop  = cy - imgH / 2;
-      var drawX   = imgLeft - (sw - imgW) / 2;
-      var drawY   = imgTop  - (sh - imgH) / 2;
-
-      // Base reveal: how far up from the bottom the image is revealed
-      // revealT=0 → base at bottom of image, revealT=1 → base at top
-      // We use easeOut so it opens confidently
-      var expandT  = easeOut3(revealT);
-      // revealY is the Y position of the reveal line in canvas coords
-      // At expandT=0: reveal line is at bottom of image (nothing shown)
-      // At expandT=1: reveal line is at top of image (fully shown)
-      var revealY  = imgTop + imgH * (1 - expandT);
-
-      // Column strip width in pixels
-      var STRIP = 3;
-
-      ctx.save();
-      ctx.globalAlpha = clamp(alpha, 0, 1);
-
-      // Draw the image once into offscreen canvas so we can sample it
-      offCtx.clearRect(0, 0, VW, VH);
-      offCtx.save();
-      offCtx.shadowColor   = 'rgba(0,0,0,0.20)';
-      offCtx.shadowBlur    = 28;
-      offCtx.shadowOffsetY = 10;
-      offCtx.drawImage(img, drawX, drawY, sw, sh);
-      offCtx.restore();
-
-      // For each vertical column strip, clip to the reveal region
-      // and draw that strip from the offscreen canvas
-      for (var col = 0; col < NUM_COLS; col++) {
-        var stripX = imgLeft + col * STRIP;
-        if (stripX > imgLeft + imgW) break;
-        var stripW = Math.min(STRIP, imgLeft + imgW - stripX);
-        if (stripW <= 0) continue;
-
-        // Noise offset for this column — shifts the reveal line up or down
-        // The noise is in [-~0.18, +~0.18] of imgH at full amplitude
-        var noise  = colNoise(col);
-        var offset = noise * imgH;
-
-        // This column's reveal Y threshold
-        var colRevealY = revealY + offset;
-
-        // How much of this column is revealed
-        var revealedH = imgTop + imgH - colRevealY;
-        if (revealedH <= 0) continue;
-
-        // Clip and draw this strip
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(stripX, colRevealY, stripW, revealedH);
-        ctx.clip();
-        ctx.drawImage(offscreen, 0, 0, VW, VH);
-        ctx.restore();
-
-        // ── Edge sparkles ──
-        // Draw a thin band of semi-transparent noise right at the reveal line
-        // This is the "tiny blood grain sparkles" at the boundary
-        var sparkH = 18 + Math.abs(noise) * 40; // taller where edge is more offset
-        var sparkY = colRevealY - sparkH * 0.3;  // straddle the edge line
-
-        if (sparkY < imgTop + imgH && sparkY + sparkH > imgTop) {
-          ctx.save();
-          // Clip sparkles to image bounds
-          ctx.beginPath();
-          ctx.rect(stripX, Math.max(imgTop, sparkY), stripW, Math.min(sparkH, imgTop + imgH - sparkY));
-          ctx.clip();
-
-          // Gradient: transparent above edge, grain at edge, transparent below
-          var grad = ctx.createLinearGradient(stripX, sparkY, stripX, sparkY + sparkH);
-          // Fast micro-flicker: randomise each frame for sparkle feel
-          var flicker = 0.15 + Math.random() * 0.30;
-          grad.addColorStop(0,   'rgba(255,255,255,0)');
-          grad.addColorStop(0.3, 'rgba(255,255,255,' + (flicker * 0.4).toFixed(3) + ')');
-          grad.addColorStop(0.5, 'rgba(220,210,190,' + flicker.toFixed(3) + ')');
-          grad.addColorStop(0.7, 'rgba(255,255,255,' + (flicker * 0.3).toFixed(3) + ')');
-          grad.addColorStop(1,   'rgba(255,255,255,0)');
-
-          ctx.globalAlpha = 0.7;
-          ctx.fillStyle = grad;
-          ctx.fillRect(stripX, sparkY, stripW, sparkH);
-          ctx.restore();
-        }
-      }
-
-      ctx.restore();
-    }
-
-    // ── Draw People2 transitioning from full-width → portrait crop ──
-    // Once kicked, edges are clean — simple rect clip
-    function drawP2Kicking(img, cx, cy, fullW, fullH, cropW, cropH, rot, alpha, cropT) {
-      if (alpha < 0.005 || !img.complete || !img.naturalWidth) return;
-      var w = lerp(fullW, cropW, cropT);
-      var h = lerp(fullH, cropH, cropT);
-      var iw = img.naturalWidth, ih = img.naturalHeight;
-      var scale = Math.max(w / iw, h / ih);
-      var sw = iw * scale, sh = ih * scale;
-      ctx.save();
-      ctx.globalAlpha = clamp(alpha, 0, 1);
-      ctx.translate(cx, cy);
-      ctx.rotate(rot);
-      ctx.beginPath();
-      ctx.rect(-w / 2, -h / 2, w, h);
-      ctx.clip();
-      ctx.shadowColor   = 'rgba(0,0,0,0.18)';
-      ctx.shadowBlur    = 30;
-      ctx.shadowOffsetY = 10;
-      ctx.drawImage(img, -w/2 - (sw-w)/2, -h/2 - (sh-h)/2, sw, sh);
-      ctx.restore();
     }
 
     // ── Draw cropped portrait image ──
@@ -725,9 +646,9 @@
       ctx.globalAlpha = clamp(alpha, 0, 1);
       ctx.translate(cx, cy);
       ctx.rotate(rot);
-      ctx.shadowColor   = 'rgba(0,0,0,0.22)';
-      ctx.shadowBlur    = 20;
-      ctx.shadowOffsetY = 6;
+      ctx.shadowColor   = 'rgba(0,0,0,0.28)';
+      ctx.shadowBlur    = 22;
+      ctx.shadowOffsetY = 8;
       ctx.drawImage(img, -w/2, -h/2, w, h);
       ctx.restore();
     }
@@ -745,107 +666,102 @@
       var cx = VW * 0.5;
       var cy = VH * 0.5;
 
-      // Final row portrait dimensions
+      // Portrait dimensions — all three images share these
       var imgH     = VH * 0.60;
       var imgW     = imgH * 0.68;
       var gap      = VW * 0.022;
       var rowTotal = imgW * 3 + gap * 2;
       var rowLeft  = (VW - rowTotal) / 2;
-      var r1cx = rowLeft + imgW * 0.5;
-      var r2cx = rowLeft + imgW + gap + imgW * 0.5;
-      var r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5;
+      var r1cx = rowLeft + imgW * 0.5;           // Studio2 — left
+      var r2cx = rowLeft + imgW + gap + imgW * 0.5;  // People2 — center
+      var r3cx = rowLeft + imgW * 2 + gap * 2 + imgW * 0.5; // Studio3 — right
       var rowCY = VH * 0.50;
-
-      // People2 full-width state
-      var fullW = VW * 0.88;
-      var fullH = VH * 0.58;
       var shoeW = VW * 0.10;
 
-      // Subtle hover parallax
-      var hoverDX = (mouseX - 0.5) * 10;
-      var hoverDY = (mouseY - 0.5) * 6;
-
       // Bobs
-      var bobY2    = Math.sin(tick * 0.75) * 3.5;
-      var bobR2    = Math.sin(tick * 0.62) * 0.005;
-      var shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.0;
-      var shoeBobR = Math.sin(tick * 0.60 + 1.4) * 0.055 - 0.05;
+      var shoeBobY = Math.sin(tick * 0.78 + 2.1) * 3.5;
+      var shoeBobR = Math.sin(tick * 0.62 + 1.4) * 0.06 - 0.05;
 
-      // ── Phase map ──
-      //  0.00–0.22  People2 reveals bottom-up with noise edge
-      //  0.22–0.34  Fully revealed, hovering + parallax
-      //  0.34–0.44  Shoe drifts in from left
-      //  0.44–0.52  Both bob
-      //  0.52–0.70  Kick: shoe tumbles, People2 → portrait
-      //  0.60–0.78  Studio2 drops from above
-      //  0.64–0.82  Studio3 breathes in
+      // ── Phase map (p = 0 → 1) ──
+      //
+      //  0.00–0.18  Shoe drifts in from left, bobs
+      //  0.18–0.30  Shoe bobs, all three images start fading in
+      //  0.18–0.40  People2 rises in (center)
+      //  0.22–0.44  Studio2 drops from above (left)
+      //  0.26–0.48  Studio3 breathes in (right)
+      //  0.48–0.66  Shoe kicks — winds up, impacts, tumbles off right
       //  0.88+      Text rises
 
-      var revealT  = ease(mapR(p, 0.00, 0.22, 0, 1));
-      var fullyOpen= mapR(p, 0.22, 0.34, 0, 1);
-      var shoeIn   = ease(mapR(p, 0.34, 0.44, 0, 1));
-      var bobbing  = mapR(p, 0.44, 0.52, 0, 1);
-      var kickP    = mapR(p, 0.52, 0.70, 0, 1);
-      var kickE    = ease(kickP);
-      var cropT    = ease(mapR(p, 0.56, 0.72, 0, 1));
-      var s2P      = elasticOut(ease(mapR(p, 0.60, 0.78, 0, 1)));
-      var s3P      = ease(mapR(p, 0.64, 0.82, 0, 1));
-      var bobMult  = (bobbing + fullyOpen * 0.4) * (1 - kickE);
+      var shoeIn  = ease(mapR(p, 0.00, 0.18, 0, 1));
+      var bobbing = mapR(p, 0.18, 0.30, 0, 1);
 
-      // People2 position
-      var p2HoverX = lerp(0, hoverDX, fullyOpen * (1 - kickE));
-      var p2HoverY = lerp(0, hoverDY, fullyOpen * (1 - kickE));
-      var p2X = lerp(cx + p2HoverX, r2cx, kickE);
-      var p2Y = lerp(cy + p2HoverY, rowCY, kickE) + bobY2 * bobMult;
-      var p2R = lerp(bobR2 * bobMult, 0, kickE);
+      // People2 center — rises up from below
+      var p2P  = ease(mapR(p, 0.18, 0.40, 0, 1));
+      var p2A  = ease(mapR(p, 0.18, 0.36, 0, 1));
 
-      // Shoe
-      var shoeRestX = cx - fullW * 0.46;
-      var shoeRestY = cy - VH * 0.03;
+      // Studio2 left — drops from above with elastic
+      var s2P  = elasticOut(ease(mapR(p, 0.22, 0.44, 0, 1)));
+      var s2A  = ease(mapR(mapR(p, 0.22, 0.44, 0, 1), 0, 0.30, 0, 1));
+
+      // Studio3 right — breathes in from small
+      var s3P  = ease(mapR(p, 0.26, 0.48, 0, 1));
+      var s3A  = ease(mapR(mapR(p, 0.26, 0.48, 0, 1), 0, 0.38, 0, 1));
+
+      // Kick
+      var kickP = mapR(p, 0.48, 0.66, 0, 1);
+      var kickE = ease(kickP);
+
+      var bobMult = bobbing * (1 - kickE);
+
+      // Image positions — they settle into row, then stay put
+      var p2Y  = lerp(rowCY + VH * 0.06, rowCY, p2P);
+      var p2R  = lerp(0.008, 0, p2P);
+
+      var s2Y  = lerp(rowCY - VH * 0.52, rowCY, s2P);
+      var s2R  = lerp(-0.05, -0.008, s2P);
+
+      var s3Scale = lerp(0.48, 1.0, s3P);
+      var s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
+      var s3R     = lerp(0.042, 0.007, s3P);
+
+      // Shoe — rests between left image and center image
+      var shoeRestX = r2cx - imgW * 0.62;
+      var shoeRestY = rowCY - VH * 0.02;
+
       var shoeX, shoeY, shoeR, shoeCurW, shoeA;
 
       if (kickP < 0.01) {
-        shoeX    = lerp(cx - VW * 0.54, shoeRestX, ease(shoeIn));
+        // Drifting in from far left, then bobbing
+        shoeX    = lerp(cx - VW * 0.58, shoeRestX, ease(shoeIn));
         shoeY    = shoeRestY + shoeBobY * bobMult + lerp(-VH * 0.03, 0, ease(shoeIn));
         shoeR    = shoeBobR * bobMult;
         shoeCurW = shoeW;
         shoeA    = shoeIn;
       } else {
-        var windUp = ease(mapR(kickP, 0.00, 0.20, 0, 1));
-        var impact = ease(mapR(kickP, 0.20, 0.48, 0, 1));
-        var tumble = ease(mapR(kickP, 0.48, 1.00, 0, 1));
+        // Wind up → impact → tumble off right
+        var windUp = ease(mapR(kickP, 0.00, 0.18, 0, 1));
+        var impact = ease(mapR(kickP, 0.18, 0.46, 0, 1));
+        var tumble = ease(mapR(kickP, 0.46, 1.00, 0, 1));
         shoeX    = shoeRestX
-                   + lerp(0, -VW * 0.022, windUp)
-                   + lerp(0,  VW * 0.20,  impact)
-                   + lerp(0,  VW * 0.90,  tumble);
-        shoeY    = shoeRestY - lerp(0, VH * 0.09, tumble);
-        shoeR    = lerp(-0.05, Math.PI * 3.4, ease(kickP));
-        shoeCurW = shoeW * lerp(1, 0.12, tumble);
-        shoeA    = lerp(1, 0, mapR(kickP, 0.70, 1.0, 0, 1));
+                   + lerp(0, -VW * 0.025, windUp)
+                   + lerp(0,  VW * 0.22,  impact)
+                   + lerp(0,  VW * 0.92,  tumble);
+        shoeY    = shoeRestY
+                   - lerp(0, VH * 0.04, ease(impact))
+                   - lerp(0, VH * 0.10, tumble);
+        shoeR    = lerp(-0.05, Math.PI * 3.5, ease(kickP));
+        shoeCurW = shoeW * lerp(1, 0.10, tumble);
+        shoeA    = lerp(1, 0, mapR(kickP, 0.72, 1.0, 0, 1));
       }
-
-      // Studio2 left
-      var s2A = ease(mapR(mapR(p, 0.60, 0.78, 0, 1), 0, 0.28, 0, 1));
-      var s2Y = lerp(rowCY - VH * 0.52, rowCY, s2P);
-      var s2R = lerp(-0.05, -0.008, s2P);
-
-      // Studio3 right
-      var s3A     = ease(mapR(mapR(p, 0.64, 0.82, 0, 1), 0, 0.36, 0, 1));
-      var s3Y     = lerp(rowCY + VH * 0.04, rowCY, s3P);
-      var s3Scale = lerp(0.48, 1.0, s3P);
-      var s3R     = lerp(0.042, 0.007, s3P);
 
       // ── Draw back → front ──
+      // Studio2 left (drops from above)
       drawCropped(IMG.s2, r1cx, s2Y, imgW, imgH, s2R, s2A);
+      // Studio3 right (breathes in)
       drawCropped(IMG.s3, r3cx, s3Y, imgW * s3Scale, imgH * s3Scale, s3R, s3A);
-
-      // People2: noise reveal until kick starts, then clean crop transition
-      if (cropT < 0.01) {
-        drawVasomotion(IMG.p2, p2X, p2Y, fullW, fullH, revealT, 1.0);
-      } else {
-        drawP2Kicking(IMG.p2, p2X, p2Y, fullW, fullH, imgW, imgH, p2R, 1.0, cropT);
-      }
-
+      // People2 center (rises from below)
+      drawCropped(IMG.p2, r2cx, p2Y, imgW, imgH, p2R, p2A);
+      // Shoe on top
       drawShoe(IMG.shoe, shoeX, shoeY, shoeCurW, shoeR, shoeA);
 
       // Text
@@ -882,6 +798,7 @@
 
   })();
   </script>
+
   <!-- =====================
        MESH CANVAS SCRIPT
   ===================== -->
@@ -1056,8 +973,8 @@
           if (row.length > 1) drawLine(n, row[(c+1)%row.length], 1.0);
           if (next && next.length > 1){
             const mapped = Math.round((c/Math.max(1,row.length))*next.length) % next.length;
-            if (next[mapped])                    drawLine(n, next[mapped], 0.78);
-            if (next[(mapped+1)%next.length])    drawLine(n, next[(mapped+1)%next.length], 0.44);
+            if (next[mapped])                 drawLine(n, next[mapped], 0.78);
+            if (next[(mapped+1)%next.length]) drawLine(n, next[(mapped+1)%next.length], 0.44);
           }
         }
       }
