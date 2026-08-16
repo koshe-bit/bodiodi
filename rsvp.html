@@ -182,6 +182,40 @@
       text-align:right;
     }
 
+    /* Retry banner shown when the schedule fetch fails or times out */
+    .retry-banner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:14px 16px;
+      background:rgba(255,240,235,.85);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+      margin-bottom:16px;
+    }
+    .retry-banner p{
+      margin:0;
+      font-size:14px;
+      color:var(--dk);
+    }
+    .retry-banner button{
+      all:unset;
+      cursor:pointer;
+      padding:8px 14px;
+      border-radius:999px;
+      border:2px solid rgba(58,67,60,.35);
+      font-family:"Inter";
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--dk);
+      white-space:nowrap;
+    }
+    .retry-banner button:hover{ opacity:.85; }
+
     /* Modal */
     .modal{
       position:fixed;
@@ -308,6 +342,11 @@
 
     <div class="rule" aria-hidden="true"></div>
 
+    <div class="retry-banner" id="retryBanner" style="display:none;">
+      <p>Having trouble loading the schedule. Your connection or our server may be slow right now.</p>
+      <button type="button" id="retryBtn">Retry</button>
+    </div>
+
     <section class="grid" id="classGrid" aria-label="Upcoming classes"></section>
 
     <p style="margin-top:22px; font-size:14px; opacity:.9;">
@@ -343,12 +382,22 @@
   <script>
     const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycbyHqHeUS--cfAxGkbsD179aB8rhnTptirrAUZkp0BjXo5Ve7GY3GqOYKECngU0d1bFKHQ/exec";
     const TZ = 'America/Detroit';
+    const FETCH_TIMEOUT_MS = 8000;
+
+    /* Week rolls over Sunday at 1:00 AM (America/Detroit).
+       MUST stay identical to schedule.html and the backend's
+       buildCurrentWeekClassMetaMap_, or class_id values built here
+       won't match what the schedule page / reservation counts expect. */
+    const WEEK_CUTOVER_HOUR = 1;
 
     const params = new URLSearchParams(location.search);
     const memberId = params.get('id');
 
     const memberBadge = document.getElementById('memberBadge');
     memberBadge.textContent = memberId ? 'Loading…' : 'Missing member link';
+
+    const retryBanner = document.getElementById('retryBanner');
+    const retryBtn = document.getElementById('retryBtn');
 
     // Show a loading skeleton immediately so members know something is happening
     const grid = document.getElementById('classGrid');
@@ -359,6 +408,17 @@
       </article>
     `;
 
+    async function fetchWithTimeout(url, options, timeoutMs){
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try{
+        const res = await fetch(url, { ...options, signal: controller.signal });
+        return res;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
     async function loadMember(){
       if (!memberId) return null;
       try{
@@ -366,7 +426,7 @@
         url.searchParams.set('action', 'lookup');
         url.searchParams.set('memberId', memberId);
 
-        const res = await fetch(url.toString(), { method:'GET' });
+        const res = await fetchWithTimeout(url.toString(), { method:'GET' }, FETCH_TIMEOUT_MS);
         const data = await res.json().catch(()=> ({}));
 
         if (!res.ok || !data.ok || !data.found) return null;
@@ -427,10 +487,13 @@
         timeZone:TZ,
         year:'numeric',
         month:'numeric',
-        day:'numeric'
+        day:'numeric',
+        hour:'numeric',
+        hour12:false
       }).formatToParts(date).reduce((a,p)=>(a[p.type]=p.value,a),{});
     }
 
+    // Returns ISO weekday number for a given date: Monday=1 ... Sunday=7 (in TZ)
     function weekdayNumToday(d){
       const wd = new Intl.DateTimeFormat('en-US', { timeZone:TZ, weekday:'short' })
         .format(d).toLowerCase();
@@ -508,19 +571,22 @@
     }
 
     async function fetchScheduleRows(){
-      try{
-        const url = new URL(RSVP_ENDPOINT);
-        url.searchParams.set('action', 'schedule');
+      const url = new URL(RSVP_ENDPOINT);
+      url.searchParams.set('action', 'schedule');
 
-        const res = await fetch(url.toString(), { method:'GET' });
-        const data = await res.json().catch(()=> ({}));
-        if (!res.ok || !data.ok) return [];
-        return Array.isArray(data.rows) ? data.rows : [];
-      }catch(_){
-        return [];
-      }
+      const res = await fetchWithTimeout(url.toString(), { method:'GET' }, FETCH_TIMEOUT_MS);
+      const data = await res.json().catch(()=> ({}));
+      if (!res.ok || !data.ok) throw new Error('Schedule API failed.');
+      return Array.isArray(data.rows) ? data.rows : [];
     }
 
+    /**
+     * WEEK START: Sunday at 1:00 AM (America/Detroit). Before 1:00 AM on Sunday,
+     * this still returns the PREVIOUS week — must exactly match schedule.html's
+     * buildWeek() and the backend's buildCurrentWeekClassMetaMap_, since the
+     * ymd embedded in every class_id here has to line up with what the schedule
+     * page and reservation counts expect.
+     */
     function buildCardsFromScheduleRows(rows){
       const byW = new Map();
 
@@ -548,15 +614,26 @@
 
       const now = new Date();
       const p = zonedParts(now);
-      const today = utcNoon(+p.year, +p.month, +p.day);
-      const monday = addDays(today, -(weekdayNumToday(now)-1));
+      let today = utcNoon(+p.year, +p.month, +p.day);
+      const hour = p.hour === '24' ? 0 : +p.hour;
+      let wdToday = weekdayNumToday(now); // Mon=1...Sun=7
+
+      // If it's Sunday before 1:00 AM, the new week hasn't started yet —
+      // treat "today" as still Saturday of the previous week for anchoring.
+      if (wdToday === 7 && hour < WEEK_CUTOVER_HOUR) {
+        today = addDays(today, -1);
+        wdToday = 6; // Saturday
+      }
+
+      // Anchor = the Sunday that starts this week (wd % 7: Sun(7)->0, Mon(1)->1, ... Sat(6)->6)
+      const sunday = addDays(today, -(wdToday % 7));
 
       const out = [];
       for (let i=0;i<7;i++){
-        const date = addDays(monday, i);
+        const date = addDays(sunday, i); // i=0 Sunday ... i=6 Saturday
         const ymd = date.toISOString().slice(0,10);
         const dayLabel = formatDayPipe(date);
-        const wd = i+1;
+        const wd = weekdayNumToday(date); // Mon=1...Sun=7, to look up the right bucket
         const classes = byW.get(wd) || [];
 
         for (const c of classes){
@@ -673,11 +750,11 @@
           policy_confirmed_at: nowIso
         };
 
-        const res = await fetch(RSVP_ENDPOINT, {
+        const res = await fetchWithTimeout(RSVP_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
-        });
+        }, FETCH_TIMEOUT_MS);
 
         const data = await res.json().catch(() => ({}));
 
@@ -690,9 +767,13 @@
         alert('Reserved!');
         closeConfirmModal();
 
-        const freshRows = await fetchScheduleRows();
-        const freshCards = buildCardsFromScheduleRows(freshRows);
-        renderCards(freshCards);
+        try{
+          const freshRows = await fetchScheduleRows();
+          const freshCards = buildCardsFromScheduleRows(freshRows);
+          renderCards(freshCards);
+        }catch(_){
+          // Reservation itself succeeded — just leave the current cards in place if refresh fails
+        }
 
       } catch (err){
         console.error(err);
@@ -707,18 +788,38 @@
       openConfirmModal(payload);
     }
 
+    async function loadSchedule(){
+      retryBanner.style.display = 'none';
+      try{
+        const rows = await fetchScheduleRows();
+        const cards = buildCardsFromScheduleRows(rows);
+        renderCards(cards);
+      }catch(e){
+        console.error(e);
+        retryBanner.style.display = 'flex';
+        grid.innerHTML = '';
+      }
+    }
+
+    retryBtn.addEventListener('click', () => {
+      grid.innerHTML = `
+        <article class="card" style="opacity:.5;">
+          <h3>Loading schedule…</h3>
+          <p class="when">Just a moment.</p>
+        </article>
+      `;
+      loadSchedule();
+    });
+
     // PARALLEL LOAD: member lookup and schedule fetch fire at the same time
     (async () => {
-      const [m, rows] = await Promise.all([
+      const [m] = await Promise.all([
         loadMember(),
-        fetchScheduleRows()
+        loadSchedule()
       ]);
 
       if (!m && memberId) memberBadge.textContent = 'Member link not found';
       if (!memberId) memberBadge.textContent = 'Missing member link';
-
-      const cards = buildCardsFromScheduleRows(rows);
-      renderCards(cards);
     })();
   </script>
 </body>
