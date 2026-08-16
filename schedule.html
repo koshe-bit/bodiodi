@@ -25,7 +25,6 @@
   <style>
     main{ padding-top:96px; }
 
-    /* NEW: one consistent left-aligned column for the whole page */
     .schedule-wrap{
       width: min(640px, 100%);
       margin-left: 0;
@@ -67,13 +66,13 @@
     .grid{
       display:grid;
       grid-template-columns:1fr;
-      gap:16px;            /* slightly more breathable rhythm */
+      gap:16px;
       margin-top:18px;
-      width:100%;          /* fill the schedule-wrap */
+      width:100%;
     }
 
     .card{
-      width:100%;          /* NEW: let the wrap control width */
+      width:100%;
       border:1px solid rgba(0,0,0,.10);
       border-radius:16px;
       padding:16px 18px 14px;
@@ -118,7 +117,6 @@
       min-width:0;
     }
 
-    /* clickable class name */
     .classname button{
       all:unset;
       cursor:pointer;
@@ -155,7 +153,39 @@
       white-space:nowrap;
     }
 
-    /* Description modal */
+    .retry-banner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      padding:14px 16px;
+      background:rgba(255,240,235,.85);
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+      margin-bottom:16px;
+    }
+    .retry-banner p{
+      margin:0;
+      font-size:14px;
+      color:var(--dk);
+    }
+    .retry-banner button{
+      all:unset;
+      cursor:pointer;
+      padding:8px 14px;
+      border-radius:999px;
+      border:2px solid rgba(58,67,60,.35);
+      font-family:"Inter";
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--dk);
+      white-space:nowrap;
+    }
+    .retry-banner button:hover{ opacity:.85; }
+
     .modal{ position:fixed; inset:0; display:none; z-index:250; }
     .modal.open{ display:block; }
     .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); }
@@ -204,7 +234,6 @@
 
 <body class="simple-page">
 
-  <!-- Topbar (exactly like Classes page) -->
   <div class="topbar">
     <div class="topbar-inner">
       <p class="brand">
@@ -236,20 +265,24 @@
   </nav>
 
   <main>
-    <!-- NEW: wrap header + rule + cards + button so everything shares one left edge -->
     <div class="schedule-wrap">
 
       <div class="page-head">
         <div>
           <p class="kicker">Schedule</p>
           <h1 style="margin:0;">Class Schedule</h1>
-          <p class="meta">To reserve your spot in a class please use your personal RSVP link that was emailed to you when you filled out the intake form.</p>
+          <p class="meta">More classes coming soon, be sure to check back.</p>
           <p class="weekline" id="weekLine"></p>
         </div>
         <div></div>
       </div>
 
       <div class="rule" aria-hidden="true"></div>
+
+      <div class="retry-banner" id="retryBanner" style="display:none;">
+        <p>Having trouble loading the schedule. Your connection or our server may be slow right now.</p>
+        <button type="button" id="retryBtn">Retry</button>
+      </div>
 
       <section class="grid" id="dayGrid" aria-label="Weekly schedule"></section>
 
@@ -260,7 +293,6 @@
     </div>
   </main>
 
-  <!-- Description Modal -->
   <div class="modal" id="descModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="descTitle">
     <div class="modal-backdrop" data-close="1"></div>
 
@@ -283,8 +315,12 @@
 
     const EMPTY_NOTE = 'No classes at this time, check back later';
 
-    /* NEW: your live Apps Script web app (exec) */
     const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyHqHeUS--cfAxGkbsD179aB8rhnTptirrAUZkp0BjXo5Ve7GY3GqOYKECngU0d1bFKHQ/exec';
+
+    const FETCH_TIMEOUT_MS = 8000;
+
+    /* Week rolls over Sunday at 1:00 AM (America/Detroit) instead of Monday midnight */
+    const WEEK_CUTOVER_HOUR = 1;
 
     function weekdayNumFromName(name){
       const n = String(name||'').trim().toLowerCase();
@@ -301,14 +337,26 @@
       }).format(d);
     }
 
+    async function fetchWithTimeout(url, options, timeoutMs){
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try{
+        const res = await fetch(url, { ...options, signal: controller.signal });
+        return res;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
     async function loadWeekTemplateFromBackend(){
       const url = `${BACKEND_URL}?action=schedule`;
-      const res = await fetch(url, { cache: 'no-cache' });
+      const res = await fetchWithTimeout(url, { cache: 'no-cache' }, FETCH_TIMEOUT_MS);
       if (!res.ok) throw new Error('Schedule API failed.');
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || 'Schedule API returned ok:false');
 
-      const buckets = new Map(); // weekdayNum -> classes[]
+      // Keyed by ISO weekday number: Monday=1 ... Sunday=7 (matches backend's classId scheme)
+      const buckets = new Map();
       for (const r of (data.rows || [])){
         const wnum = weekdayNumFromName(r.weekday);
         if (!wnum) continue;
@@ -325,19 +373,17 @@
         });
       }
 
-      return Array.from({length:7}, (_,i) => ({
-        weekday: i+1,
-        classes: buckets.get(i+1) || []
-      }));
+      return buckets; // Map: weekdayNum (Mon=1...Sun=7) -> classes[]
     }
 
     function zonedParts(date){
       const parts = new Intl.DateTimeFormat('en-US',{
-        timeZone:TZ, year:'numeric', month:'numeric', day:'numeric'
+        timeZone:TZ, year:'numeric', month:'numeric', day:'numeric', hour:'numeric', hour12:false
       }).formatToParts(date);
       return Object.fromEntries(parts.map(p=>[p.type,p.value]));
     }
 
+    // Returns ISO weekday number: Monday=1 ... Sunday=7 (in TZ)
     function weekdayNum(date){
       const wd = new Intl.DateTimeFormat('en-US',{ timeZone:TZ, weekday:'short' }).format(date).toLowerCase();
       return { mon:1,tue:2,wed:3,thu:4,fri:5,sat:6,sun:7 }[wd];
@@ -352,18 +398,36 @@
       return `${w} | ${md}`;
     }
 
+    /**
+     * Builds the 7-day week, Sunday first.
+     * WEEK START: Sunday at 1:00 AM (America/Detroit). Before 1:00 AM on Sunday,
+     * this still returns the PREVIOUS week — matches the backend's cutover exactly.
+     * Each day also carries wdNum (Mon=1...Sun=7) to match backend's weekday-keyed buckets.
+     */
     function buildWeek(){
       const now = new Date();
       const p = zonedParts(now);
-      const today = utcNoon(+p.year,+p.month,+p.day);
-      const monday = addDays(today, -(weekdayNum(now)-1));
+      let today = utcNoon(+p.year, +p.month, +p.day);
+      const hour = p.hour === '24' ? 0 : +p.hour;
+      let wd = weekdayNum(now); // Mon=1...Sun=7
+
+      // If it's Sunday before 1:00 AM, the new week hasn't started yet —
+      // treat "today" as still Saturday of the previous week for anchoring.
+      if (wd === 7 && hour < WEEK_CUTOVER_HOUR) {
+        today = addDays(today, -1);
+        wd = 6; // Saturday
+      }
+
+      // Anchor = the Sunday that starts this week (wd % 7: Sun(7)->0, Mon(1)->1, ... Sat(6)->6)
+      const sunday = addDays(today, -(wd % 7));
 
       document.getElementById('weekLine').textContent =
-        `Week of ${new Intl.DateTimeFormat('en-US',{ timeZone:TZ, month:'short', day:'numeric' }).format(monday)}`;
+        `Week of ${new Intl.DateTimeFormat('en-US',{ timeZone:TZ, month:'short', day:'numeric' }).format(sunday)}`;
 
-      return Array.from({length:7},(_,i)=>{
-        const date = addDays(monday,i);
-        return { date, header:formatDay(date), classes:[] };
+      // i=0 -> Sunday ... i=6 -> Saturday
+      return Array.from({length:7}, (_,i) => {
+        const date = addDays(sunday, i);
+        return { date, header: formatDay(date), wdNum: weekdayNum(date) };
       });
     }
 
@@ -395,14 +459,13 @@
     async function loadDescriptions(){
       if (classDescCache) return classDescCache;
 
-      const res = await fetch('https://bodiodi.com/classes.html', { cache: 'no-cache' });
+      const res = await fetchWithTimeout('https://bodiodi.com/classes.html', { cache: 'no-cache' }, FETCH_TIMEOUT_MS);
       if (!res.ok) throw new Error('Could not load class descriptions.');
       const html = await res.text();
 
       const doc = new DOMParser().parseFromString(html, 'text/html');
       const sections = {};
 
-      // Your classes page is structured as: ## ClassName (h2), then text until next h2
       const h2s = Array.from(doc.querySelectorAll('h2'));
       h2s.forEach((h2, i) => {
         const name = (h2.textContent || '').trim();
@@ -443,84 +506,97 @@
       }
     }
 
-    async function render(){
-  const grid = document.getElementById('dayGrid');
-
-  grid.innerHTML = `
-    <article class="card">
-      <h3>Loading…</h3>
-      <p class="when">Fetching this week's schedule.</p>
-    </article>
-  `;
-
-  let tpl;
-  try{
-    tpl = await loadWeekTemplateFromBackend();
-  } catch(e){
-    console.error(e);
-    tpl = Array.from({length:7},(_,i)=>({ weekday:i+1, classes:[] }));
-  }
-
-  grid.innerHTML = '';
-  const week = buildWeek();
-
-  const merged = week.map((d, i) => ({
-    ...d,
-    classes: (tpl[i] && tpl[i].classes) ? tpl[i].classes : []
-  }));
-
-  merged.forEach(day=>{
-    // Sort classes within each day by start time ascending
-    day.classes.sort((a, b) => {
-      const parse = str => {
-        const m = String(str || '').toLowerCase().replace(/\s/g,'').match(/^(\d{1,2})(?::(\d{2}))?([ap])$/);
-        if (!m) return 0;
-        let hh = parseInt(m[1], 10);
-        const mm = m[2] ? parseInt(m[2], 10) : 0;
-        if (m[3] === 'p' && hh !== 12) hh += 12;
-        if (m[3] === 'a' && hh === 12) hh = 0;
-        return hh * 60 + mm;
-      };
-      const startA = String(a.time || '').split('–')[0];
-      const startB = String(b.time || '').split('–')[0];
-      return parse(startA) - parse(startB);
+    const retryBanner = document.getElementById('retryBanner');
+    const retryBtn = document.getElementById('retryBtn');
+    retryBtn.addEventListener('click', () => {
+      retryBanner.style.display = 'none';
+      render();
     });
 
-    const card=document.createElement('article');
-    card.className='card';
-    const has=day.classes.length>0;
+    async function render(){
+      const grid = document.getElementById('dayGrid');
 
-    card.innerHTML=`
-      <h3>${day.header}</h3>
-      <p class="when">${has?'':EMPTY_NOTE}</p>
-      <div class="day-lines"></div>
-    `;
+      grid.innerHTML = `
+        <article class="card">
+          <h3>Loading…</h3>
+          <p class="when">Fetching this week's schedule.</p>
+        </article>
+      `;
+      retryBanner.style.display = 'none';
 
-    const lines=card.querySelector('.day-lines');
-    if(has){
-      day.classes.forEach(c=>{
-        const line=document.createElement('div');
-        line.className='classline';
-        line.innerHTML=`
-          <div class="classname">
-            <button type="button" aria-label="View description for ${c.name}">
-              <strong>${c.name}</strong>
-            </button>
-            <span>${c.time} with ${c.instructor}</span>
-          </div>
-        `;
+      let buckets; // Map: weekdayNum (Mon=1...Sun=7) -> classes[]
+      let failed = false;
+      try{
+        buckets = await loadWeekTemplateFromBackend();
+      } catch(e){
+        console.error(e);
+        failed = true;
+        buckets = new Map();
+      }
 
-        line.querySelector('button').addEventListener('click', () => {
-          showClassDescription(c.name);
+      grid.innerHTML = '';
+
+      if (failed){
+        retryBanner.style.display = 'flex';
+      }
+
+      const week = buildWeek(); // Sunday-first array, each day carries wdNum (Mon=1...Sun=7)
+
+      const merged = week.map(d => ({
+        ...d,
+        classes: buckets.get(d.wdNum) || []
+      }));
+
+      merged.forEach(day=>{
+        day.classes.sort((a, b) => {
+          const parse = str => {
+            const m = String(str || '').toLowerCase().replace(/\s/g,'').match(/^(\d{1,2})(?::(\d{2}))?([ap])$/);
+            if (!m) return 0;
+            let hh = parseInt(m[1], 10);
+            const mm = m[2] ? parseInt(m[2], 10) : 0;
+            if (m[3] === 'p' && hh !== 12) hh += 12;
+            if (m[3] === 'a' && hh === 12) hh = 0;
+            return hh * 60 + mm;
+          };
+          const startA = String(a.time || '').split('–')[0];
+          const startB = String(b.time || '').split('–')[0];
+          return parse(startA) - parse(startB);
         });
 
-        lines.appendChild(line);
+        const card=document.createElement('article');
+        card.className='card';
+        const has=day.classes.length>0;
+
+        card.innerHTML=`
+          <h3>${day.header}</h3>
+          <p class="when">${has?'':EMPTY_NOTE}</p>
+          <div class="day-lines"></div>
+        `;
+
+        const lines=card.querySelector('.day-lines');
+        if(has){
+          day.classes.forEach(c=>{
+            const line=document.createElement('div');
+            line.className='classline';
+            line.innerHTML=`
+              <div class="classname">
+                <button type="button" aria-label="View description for ${c.name}">
+                  <strong>${c.name}</strong>
+                </button>
+                <span>${c.time} with ${c.instructor}</span>
+              </div>
+            `;
+
+            line.querySelector('button').addEventListener('click', () => {
+              showClassDescription(c.name);
+            });
+
+            lines.appendChild(line);
+          });
+        }
+        grid.appendChild(card);
       });
     }
-    grid.appendChild(card);
-  });
-}
-
 
     render();
   </script>
