@@ -812,15 +812,16 @@
     });
 
     // PARALLEL LOAD: member lookup and schedule fetch fire at the same time
-    (async () => {
-      const [m] = await Promise.all([
-        loadMember(),
-        loadSchedule()
-      ]);
+ (async () => {
+  await Promise.all([
+    loadMember(),
+    loadSchedule()
+  ]);
 
-      if (!m && memberId) memberBadge.textContent = 'Member link not found';
-      if (!memberId) memberBadge.textContent = 'Missing member link';
-    })();
+  // Badge is set inside loadMember() on success.
+  // Only update it here if memberId was missing entirely.
+  if (!memberId) memberBadge.textContent = 'Missing member link';
+})();
   </script>
 </body>
 </html>
