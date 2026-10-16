@@ -325,6 +325,195 @@
       .mobile-gallery { display: none; }
     }
 
+    /* =====================
+       REVIEWS SECTION
+    ===================== */
+    .reviews-wrap {
+      margin-top: clamp(36px, 5vw, 56px);
+    }
+
+    /* ── Marquee track ── */
+    .reviews-marquee-outer {
+      overflow: hidden;
+      /* bleed past the column to reach full page width */
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      position: relative;
+      /* fade edges */
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+      cursor: grab;
+    }
+    .reviews-marquee-outer:active { cursor: grabbing; }
+
+    .reviews-track {
+      display: flex;
+      gap: 16px;
+      padding: 10px 0 14px;
+      /* animation drives the scroll */
+      animation: marqueeScroll 38s linear infinite;
+      width: max-content;
+      will-change: transform;
+    }
+    .reviews-track.paused,
+    .reviews-marquee-outer:hover .reviews-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .review-card {
+      flex: 0 0 auto;
+      width: clamp(240px, 34vw, 320px);
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 16px;
+      padding: 18px 20px 16px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .review-card-stars {
+      display: flex;
+      gap: 3px;
+      line-height: 1;
+    }
+    .review-card-stars span {
+      color: #c8a84b;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .review-card-text {
+      font-family: "Krub", sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.60;
+      color: var(--dk);
+      /* clamp to ~5 lines so cards stay uniform height */
+      display: -webkit-box;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .review-card-name {
+      font-family: "Inter", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: rgba(68,79,70,.50);
+      margin-top: auto;
+    }
+
+    /* empty / loading state */
+    .reviews-placeholder {
+      display: flex;
+      gap: 16px;
+      padding: 10px 0 14px;
+      overflow: hidden;
+    }
+    .review-card-skeleton {
+      flex: 0 0 auto;
+      width: clamp(240px, 34vw, 320px);
+      height: 156px;
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,.50);
+      animation: shimmer 1.4s ease infinite;
+    }
+    @keyframes shimmer {
+      0%,100% { opacity: .5; }
+      50%      { opacity: .85; }
+    }
+
+    /* ── Submit form ── */
+    .reviews-form-wrap {
+      margin-top: clamp(28px, 4vw, 40px);
+    }
+    .reviews-form-heading {
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      font-size: clamp(15px, 2vw, 17px);
+      color: var(--dk);
+      margin: 0 0 14px 0;
+      letter-spacing: -.01em;
+    }
+    .reviews-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 480px;
+    }
+    .reviews-form input,
+    .reviews-form textarea {
+      font-family: "Krub", sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--dk);
+      background: rgba(255,255,255,.80);
+      border: 1px solid rgba(0,0,0,.14);
+      border-radius: 12px;
+      padding: 11px 14px;
+      resize: none;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .reviews-form input::placeholder,
+    .reviews-form textarea::placeholder {
+      color: rgba(68,79,70,.38);
+    }
+    .reviews-form input:focus,
+    .reviews-form textarea:focus {
+      border-color: rgba(68,79,70,.38);
+      box-shadow: 0 0 0 3px rgba(68,79,70,.07);
+    }
+    .reviews-form textarea { min-height: 100px; }
+
+    .reviews-submit-btn {
+      align-self: flex-start;
+      font-family: "Inter", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--dk);
+      background: transparent;
+      border: 1px solid rgba(68,79,70,.30);
+      border-radius: 100px;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease;
+    }
+    .reviews-submit-btn:hover {
+      background: rgba(68,79,70,.07);
+      border-color: rgba(68,79,70,.55);
+    }
+    .reviews-submit-btn:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    .reviews-status {
+      font-family: "Krub", sans-serif;
+      font-size: 13px;
+      color: var(--dk);
+      opacity: .62;
+      min-height: 18px;
+    }
+    .reviews-status.success { color: #3a6b3e; opacity: 1; }
+    .reviews-status.error   { color: #a04040; opacity: 1; }
+
   </style>
 </head>
 
@@ -423,11 +612,180 @@
         basement. Some might call it unexpectedly elevated. Classes are small, scheduled, and
         intentionally personal — because this is training built for real people, not crowds.
       </p>
+
+      <!-- ── REVIEWS ── -->
+      <div class="reviews-wrap">
+
+        <!-- Scrolling marquee -->
+        <div class="reviews-marquee-outer" id="reviewsMarquee" aria-label="Member reviews">
+          <!-- Skeleton shown while loading -->
+          <div class="reviews-placeholder" id="reviewsPlaceholder" aria-hidden="true">
+            <div class="review-card-skeleton"></div>
+            <div class="review-card-skeleton"></div>
+            <div class="review-card-skeleton"></div>
+          </div>
+          <!-- Track populated by JS -->
+          <div class="reviews-track" id="reviewsTrack" style="display:none;" aria-live="polite"></div>
+        </div>
+
+        <!-- Submit form -->
+        <div class="reviews-form-wrap">
+          <p class="reviews-form-heading">Leave your own review, we love to hear from you!</p>
+          <form class="reviews-form" id="reviewForm" novalidate>
+            <input
+              type="text"
+              id="reviewName"
+              name="name"
+              placeholder="Your name"
+              autocomplete="given-name"
+              maxlength="80"
+              required
+            >
+            <textarea
+              id="reviewText"
+              name="review"
+              placeholder="Tell us about your experience…"
+              maxlength="600"
+              required
+            ></textarea>
+            <button type="submit" class="reviews-submit-btn" id="reviewSubmitBtn">Submit Review</button>
+            <p class="reviews-status" id="reviewStatus" aria-live="polite"></p>
+          </form>
+        </div>
+
+      </div>
+      <!-- /reviews-wrap -->
+
     </div>
+    <!-- /about-text-wrap -->
 
   </section>
 
   <div class="strip" id="contact"></div>
+
+  <!-- =====================
+       REVIEWS LOGIC
+  ===================== -->
+  <script>
+  (() => {
+    const WORKER = 'https://fragrant-glade-e756.heybodiodi.workers.dev';
+    const track      = document.getElementById('reviewsTrack');
+    const placeholder = document.getElementById('reviewsPlaceholder');
+    const form       = document.getElementById('reviewForm');
+    const nameInput  = document.getElementById('reviewName');
+    const textInput  = document.getElementById('reviewText');
+    const submitBtn  = document.getElementById('reviewSubmitBtn');
+    const statusEl   = document.getElementById('reviewStatus');
+    const marqueeOuter = document.getElementById('reviewsMarquee');
+
+    // ── Seed cards: shown if the API has no reviews yet ──
+    const SEED = [
+      { name: 'Maria T.',    review: 'Hands down the best workout I've found in Grand Rapids. Small class means you actually get coached, not just supervised.' },
+      { name: 'James K.',    review: 'The space feels intentional in every way — lighting, flooring, music. It's unlike any gym I've been to.' },
+      { name: 'Priya N.',    review: 'Kinetix completely changed how I move. My back pain is basically gone after two months. Couldn't recommend it more.' },
+      { name: 'Deja W.',     review: 'Anabolix is no joke. I've tried boutique fitness everywhere and this is the most challenging and fun I've ever had.' },
+      { name: 'Carlos R.',   review: 'The personal attention you get here is real. Neeks remembers what you need and pushes you in the right direction every time.' },
+      { name: 'Leah M.',     review: 'I was nervous about small classes but now I wouldn't go back. You actually build a relationship with your trainer.' },
+    ];
+
+    // Build a card element
+    function makeCard(name, review) {
+      const el = document.createElement('div');
+      el.className = 'review-card';
+      el.innerHTML =
+        '<div class="review-card-stars"><span>★★★★★</span></div>' +
+        '<p class="review-card-text">' + escHtml(review) + '</p>' +
+        '<p class="review-card-name">' + escHtml(name) + '</p>';
+      return el;
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+
+    // Populate the marquee track with doubled cards (seamless loop)
+    function populateTrack(reviews) {
+      const list = reviews.length >= 2 ? reviews : [...SEED, ...reviews];
+      track.innerHTML = '';
+      // Double the set so the CSS animation loops seamlessly
+      [...list, ...list].forEach(r => track.appendChild(makeCard(r.name, r.review)));
+      placeholder.style.display = 'none';
+      track.style.display = 'flex';
+    }
+
+    // Touch / drag to pause
+    let isDragging = false, dragStartX = 0, dragScrollX = 0;
+    marqueeOuter.addEventListener('touchstart', () => {
+      track.classList.add('paused');
+    }, { passive: true });
+    marqueeOuter.addEventListener('touchend', () => {
+      track.classList.remove('paused');
+    }, { passive: true });
+    marqueeOuter.addEventListener('mousedown', e => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      track.classList.add('paused');
+    });
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      track.classList.remove('paused');
+    });
+
+    // ── Fetch reviews ──
+    fetch(WORKER + '?action=reviews')
+      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(data => {
+        populateTrack(data.reviews && data.reviews.length ? data.reviews : SEED);
+      })
+      .catch(() => {
+        // Network error: show seeds so marquee is never empty
+        populateTrack(SEED);
+      });
+
+    // ── Submit form ──
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name   = nameInput.value.trim();
+      const review = textInput.value.trim();
+      if (!name || !review) {
+        showStatus('Please fill in both fields.', 'error');
+        return;
+      }
+      submitBtn.disabled = true;
+      showStatus('Submitting…', '');
+
+      fetch(WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'review', name, review })
+      })
+        .then(r => r.ok ? r.json() : Promise.reject(r))
+        .then(() => {
+          showStatus('Thank you! Your review has been added.', 'success');
+          form.reset();
+          submitBtn.disabled = false;
+          // Optimistically prepend the new card
+          const newCard = makeCard(name, review);
+          // Insert at both positions in the doubled track
+          track.prepend(newCard.cloneNode(true));
+          track.appendChild(newCard);
+        })
+        .catch(() => {
+          showStatus('Something went wrong — please try again.', 'error');
+          submitBtn.disabled = false;
+        });
+    });
+
+    function showStatus(msg, cls) {
+      statusEl.textContent = msg;
+      statusEl.className = 'reviews-status' + (cls ? ' ' + cls : '');
+    }
+  })();
+  </script>
 
   <!-- =====================
        GALLERY ANIMATION ENGINE
