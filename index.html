@@ -514,6 +514,95 @@
     .reviews-status.success { color: #3a6b3e; opacity: 1; }
     .reviews-status.error   { color: #a04040; opacity: 1; }
 
+    /* ── Review modal / bottom sheet ── */
+    .review-card { cursor: pointer; }
+    .review-card:hover { box-shadow: 0 14px 32px rgba(0,0,0,.10); }
+
+    .review-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+    }
+    .review-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Desktop: centered modal */
+    .review-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% + 20px));
+      width: min(480px, 90vw);
+      background: var(--page-bg);
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.18);
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .review-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Mobile: bottom sheet */
+    @media (max-width: 600px) {
+      .review-modal {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 20px 20px 0 0;
+        transform: translateY(30px);
+        padding: 24px 22px 36px;
+      }
+      .review-modal.open {
+        transform: translateY(0);
+      }
+    }
+
+    .review-modal-text {
+      font-family: "Krub", sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--dk);
+      margin: 0 0 16px 0;
+    }
+    .review-modal-name {
+      font-family: "Inter", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: rgba(68,79,70,.50);
+    }
+    .review-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      line-height: 1;
+      color: rgba(68,79,70,.40);
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+    .review-modal-close:hover { color: var(--dk); }
+
   </style>
 </head>
 
@@ -661,6 +750,15 @@
 
   </section>
 
+  <!-- Review modal -->
+  <div class="review-overlay" id="reviewOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="review-modal" id="reviewModal">
+      <button class="review-modal-close" id="reviewModalClose" aria-label="Close">✕</button>
+      <p class="review-modal-text" id="reviewModalText"></p>
+      <p class="review-modal-name" id="reviewModalName"></p>
+    </div>
+  </div>
+
   <div class="strip" id="contact"></div>
 
   <!-- =====================
@@ -677,6 +775,29 @@
     const submitBtn  = document.getElementById('reviewSubmitBtn');
     const statusEl   = document.getElementById('reviewStatus');
     const marqueeOuter = document.getElementById('reviewsMarquee');
+    const overlay      = document.getElementById('reviewOverlay');
+    const modal        = document.getElementById('reviewModal');
+    const modalText    = document.getElementById('reviewModalText');
+    const modalName    = document.getElementById('reviewModalName');
+    const modalClose   = document.getElementById('reviewModalClose');
+
+    function openModal(name, review) {
+      modalText.textContent = review;
+      modalName.textContent = name;
+      overlay.classList.add('open');
+      modal.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      track.classList.add('paused');
+    }
+    function closeModal() {
+      overlay.classList.remove('open');
+      modal.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      track.classList.remove('paused');
+    }
+    modalClose.addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     // ── Seed cards: shown if the API has no reviews yet ──
     const SEED = [
@@ -692,9 +813,14 @@
     function makeCard(name, review) {
       const el = document.createElement('div');
       el.className = 'review-card';
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-label', 'Read full review by ' + name);
       el.innerHTML =
         '<p class="review-card-text">' + escHtml(review) + '</p>' +
         '<p class="review-card-name">' + escHtml(name) + '</p>';
+      el.addEventListener('click', () => openModal(name, review));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(name, review); });
       return el;
     }
 
