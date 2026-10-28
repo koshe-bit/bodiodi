@@ -986,10 +986,12 @@ const RSVP_ENDPOINT = "https://fragrant-glade-e756.heybodiodi.workers.dev";
       options.innerHTML = order.map(key => {
         const p = REUP_PRODUCTS[key];
         const note = `Bodiodi ${p.noteWord} BOD-${code}`;
-        const url = `https://venmo.com/${VENMO_USER}?txn=pay&amount=${p.price}&note=${encodeURIComponent(note)}`;
+        const q = `txn=pay&amount=${p.price}&note=${encodeURIComponent(note)}`;
+        const url = `https://venmo.com/${VENMO_USER}?${q}`;
+        const appQ = `txn=pay&recipients=${VENMO_USER}&${q.replace('txn=pay&', '')}`;
         const isCurrent = key === current;
         return `
-          <a class="reup-option${isCurrent ? ' current' : ''}" href="${url}" target="_blank" rel="noopener">
+          <a class="reup-option${isCurrent ? ' current' : ''}" href="${url}" target="_blank" rel="noopener" data-app-q="${appQ}">
             ${isCurrent ? `<span class="reup-flag">Your plan</span>` : ``}
             <span class="reup-name">${esc(p.name)}</span>
             <span class="reup-price">$${p.price}</span>
@@ -997,10 +999,50 @@ const RSVP_ENDPOINT = "https://fragrant-glade-e756.heybodiodi.workers.dev";
           </a>`;
       }).join('');
 
+      options.querySelectorAll('.reup-option').forEach(a => {
+        a.addEventListener('click', (e) => openVenmo(e, a));
+      });
+
       fine.innerHTML =
         `Payments usually apply within 10 minutes, and you'll get a confirmation email. ` +
         `Please don't change the Venmo note: the code in it (<strong>BOD-${esc(code)}</strong>) ` +
         `is how we match your payment to your account.`;
+    }
+
+    /* Opening Venmo with the amount + note pre-filled.
+       - Desktop and iPhone Safari: the venmo.com link works (Safari hands it to the app).
+       - Chrome/Firefox/Edge on iPhone, and in-app browsers (Gmail, Instagram, Facebook…),
+         do NOT hand venmo.com links to the app, so they get the app's own venmo:// link.
+       - Android: intent:// link, which falls back to venmo.com if the app isn't installed.
+       If the app doesn't open within 1.5s, we fall back to the venmo.com link. */
+    function openVenmo(e, a){
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      const ua = navigator.userAgent || '';
+      const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isAndroid = /Android/i.test(ua);
+      if (!isIOS && !isAndroid) return; // desktop: normal link
+
+      const isIOSSafari = isIOS && /Safari\//.test(ua) &&
+        !/CriOS|FxiOS|EdgiOS|OPiOS|GSA|FBAN|FBAV|Instagram|Line\/|GmailApp/i.test(ua);
+      if (isIOSSafari) return; // Safari: normal link works
+
+      e.preventDefault();
+      const webUrl = a.href;
+      const appQ = a.dataset.appQ;
+      const appUrl = isAndroid
+        ? `intent://paycharge?${appQ}#Intent;scheme=venmo;package=com.venmo;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`
+        : `venmo://paycharge?${appQ}`;
+
+      let left = false;
+      const markLeft = () => { left = true; };
+      document.addEventListener('visibilitychange', () => { if (document.hidden) markLeft(); }, { once:true });
+      window.addEventListener('pagehide', markLeft, { once:true });
+      window.addEventListener('blur', markLeft, { once:true });
+
+      window.location.href = appUrl;
+      setTimeout(() => { if (!left && !document.hidden) window.location.href = webUrl; }, 1500);
     }
 
     function esc(v){
