@@ -236,9 +236,15 @@
     const BACKEND_URL = 'https://fragrant-glade-e756.heybodiodi.workers.dev';
     const TZ = 'America/Detroit';
 
+    function normalizeISO(iso) {
+      // Fix short offsets like -5 or +5 -> -05:00 or +05:00
+      return String(iso || '').replace(/([+-])(\d)$/, '$10$2:00').replace(/([+-])(\d{2})$/, '$1$2:00');
+    }
+
     function formatClassTime(iso) {
       if (!iso) return '';
-      const d = new Date(iso);
+      const d = new Date(normalizeISO(iso));
+      if (isNaN(d.getTime())) return iso; // fallback: show raw string
       return new Intl.DateTimeFormat('en-US', {
         timeZone: TZ,
         weekday: 'long',
