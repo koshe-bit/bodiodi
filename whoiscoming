@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Who's Coming</title>
+
+  <link rel="stylesheet" href="https://use.typekit.net/xtw4aqt.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Krub:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/global.css?v=5">
+
+  <style>
+    main { padding-top: 96px; }
+
+    .wrap {
+      width: min(640px, 100%);
+      margin: 0 auto;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      margin: 0 0 6px 0;
+      font-family: "Inter";
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--dk85);
+      opacity: .9;
+      font-size: 12px;
+    }
+
+    .weekline {
+      margin: 6px 0 0 0;
+      font-size: 14px;
+      color: var(--dk85);
+      opacity: .95;
+    }
+
+    .refresh-btn {
+      all: unset;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(58,67,60,.3);
+      font-family: "Inter";
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--dk85);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .refresh-btn:hover { opacity: .75; }
+    .refresh-btn:active { opacity: .5; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card {
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 16px;
+      padding: 16px 18px 14px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      margin: 0 0 2px 0;
+      font-family: "Inter";
+      font-weight: 800;
+      letter-spacing: -.01em;
+      color: var(--dk);
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .card-when {
+      margin: 0;
+      font-size: 13px;
+      color: var(--dk85);
+      opacity: .88;
+    }
+
+    .spot-count {
+      flex-shrink: 0;
+      font-family: "Inter";
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--dk85);
+      opacity: .7;
+      padding-top: 3px;
+    }
+
+    .roster {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid rgba(0,0,0,.08);
+    }
+
+    .roster li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      font-size: 15px;
+      color: var(--dk);
+    }
+    .roster li:last-child { border-bottom: none; }
+
+    .new-badge {
+      display: inline-block;
+      background: #d4ead4;
+      color: #2a5c2a;
+      font-family: "Inter";
+      font-weight: 800;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+
+    .empty-note {
+      margin: 0;
+      font-size: 14px;
+      color: var(--dk85);
+      opacity: .7;
+      font-style: italic;
+      padding-top: 4px;
+    }
+
+    .no-classes {
+      text-align: center;
+      padding: 48px 0;
+      color: var(--dk85);
+      opacity: .7;
+      font-size: 15px;
+    }
+
+    .error-banner {
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: rgba(255,240,235,.85);
+      font-size: 14px;
+      color: var(--dk);
+      margin-bottom: 16px;
+    }
+
+    .last-updated {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--dk85);
+      opacity: .6;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body class="simple-page">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <p class="brand">
+        <img src="bodiodilogo.svg" alt="Bodiodi" class="brand-logo">
+      </p>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav id="drawer" class="drawer" aria-hidden="true">
+    <a href="https://bodiodi.com/schedule.html">Schedule</a>
+    <a href="https://bodiodi.com/signup.html">Join</a>
+    <a href="https://bodiodi.com/classes.html">Classes</a>
+    <a href="https://bodiodi.com/about.html">About</a>
+    <a href="https://bodiodi.com/pricing.html">Pricing</a>
+    <a href="https://bodiodi.com/faqs.html">FAQs</a>
+  </nav>
+
+  <main>
+    <div class="wrap">
+
+      <div class="page-head">
+        <div>
+          <p class="kicker">Owner View</p>
+          <h1 style="margin:0;">Who's Coming</h1>
+          <p class="weekline" id="weekLine"></p>
+        </div>
+        <button class="refresh-btn" id="refreshBtn" type="button">↻ Refresh</button>
+      </div>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <div id="errorBanner" class="error-banner" style="display:none;">
+        Could not load roster. Check your connection and tap Refresh.
+      </div>
+
+      <div class="grid" id="rosterGrid" aria-label="Class rosters"></div>
+
+      <p class="last-updated" id="lastUpdated"></p>
+
+    </div>
+  </main>
+
+  <script src="assets/site.js?v=2"></script>
+
+  <script>
+    const BACKEND_URL = 'https://fragrant-glade-e756.heybodiodi.workers.dev';
+    const TZ = 'America/Detroit';
+
+    function formatClassTime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: TZ,
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      }).format(d);
+    }
+
+    function weekLabel() {
+      const now = new Date();
+      // Find Sunday of current week (same cutover logic as schedule page)
+      const wd = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short' }).format(now).toLowerCase();
+      const wdMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+      const offset = wdMap[wd] ?? 0;
+      const sunday = new Date(now.getTime() - offset * 86400000);
+      return 'Week of ' + new Intl.DateTimeFormat('en-US', {
+        timeZone: TZ, month: 'short', day: 'numeric'
+      }).format(sunday);
+    }
+
+    async function load() {
+      document.getElementById('weekLine').textContent = weekLabel();
+      document.getElementById('errorBanner').style.display = 'none';
+      const grid = document.getElementById('rosterGrid');
+      grid.innerHTML = '<p class="no-classes">Loading…</p>';
+
+      let data;
+      try {
+        const res = await fetch(`${BACKEND_URL}?action=roster`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('API error');
+        data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'API returned ok:false');
+      } catch (e) {
+        console.error(e);
+        document.getElementById('errorBanner').style.display = 'block';
+        grid.innerHTML = '';
+        return;
+      }
+
+      const classes = data.classes || [];
+      grid.innerHTML = '';
+
+      if (classes.length === 0) {
+        grid.innerHTML = '<p class="no-classes">No reservations this week yet.</p>';
+      } else {
+        classes.forEach(cls => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          const memberCount = cls.members.length;
+          const spotsLeft = 6 - memberCount;
+
+          let rosterHtml = '';
+          if (memberCount === 0) {
+            rosterHtml = '<p class="empty-note">No sign-ups yet.</p>';
+          } else {
+            const items = cls.members.map(m => {
+              const badge = m.isNew ? '<span class="new-badge">New</span>' : '';
+              return `<li>${badge}${escHtml(m.displayName)}</li>`;
+            }).join('');
+            rosterHtml = `<ul class="roster">${items}</ul>`;
+          }
+
+          card.innerHTML = `
+            <div class="card-head">
+              <div>
+                <h3>${escHtml(cls.className)}</h3>
+                <p class="card-when">${formatClassTime(cls.classStartISO)}</p>
+              </div>
+              <span class="spot-count">${memberCount}/6</span>
+            </div>
+            ${rosterHtml}
+          `;
+
+          grid.appendChild(card);
+        });
+      }
+
+      const now = new Date();
+      document.getElementById('lastUpdated').textContent =
+        'Updated ' + new Intl.DateTimeFormat('en-US', {
+          timeZone: TZ, hour: 'numeric', minute: '2-digit'
+        }).format(now);
+    }
+
+    function escHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', load);
+
+    load();
+  </script>
+</body>
+</html>
